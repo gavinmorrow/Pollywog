@@ -12,6 +12,14 @@ pub fn start_app() {
 
     App::new()
         .add_plugins(default_plugins)
+        .add_systems(Startup, setup)
         .add_systems(Update, bevy::window::close_on_esc)
         .run();
+}
+
+fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
+    info!("Starting setup");
+
+    commands.spawn(Camera2dBundle::default());
+    commands.spawn(player::PlayerBundle::new(asset_server));
 }
