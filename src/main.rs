@@ -1,3 +1,5 @@
 fn main() {
-    println!("Hello, world!");
+    eprintln!("Starting pollywog...");
+
+    pollywog::start_app();
 }
