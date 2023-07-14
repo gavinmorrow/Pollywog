@@ -7,7 +7,7 @@ const SIZE_VEC2: Vec2 = Vec2::new(SIZE, SIZE);
 const TEXTURE_PATH: &str = "player.png";
 
 #[derive(Component)]
-struct Player;
+pub struct Player;
 
 #[derive(Bundle)]
 pub struct PlayerBundle {
