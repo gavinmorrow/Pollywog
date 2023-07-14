@@ -16,7 +16,14 @@ pub fn start_app() {
             Startup,
             (camera::spawn_camera, player::spawn, level::spawn_blocks),
         )
-        .add_systems(Update, (player::r#move, bevy::window::close_on_esc))
+        .add_systems(
+            Update,
+            (
+                camera::keep_player_in_view.after(player::r#move),
+                player::r#move,
+                bevy::window::close_on_esc,
+            ),
+        )
         .run();
 }
 
