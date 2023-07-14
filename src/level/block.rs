@@ -9,6 +9,7 @@ pub struct BlockBundle {
     sprite_bundle: SpriteBundle,
     rigid_body: RigidBody,
     collider: Collider,
+    friction: Friction,
 }
 
 impl core::fmt::Debug for BlockBundle {
@@ -41,6 +42,7 @@ impl BlockBundle {
             },
             rigid_body: RigidBody::Static,
             collider: Collider::cuboid(SIZE, SIZE),
+            friction: Friction::new(1.0),
         }
     }
 }
