@@ -1,6 +1,5 @@
 use bevy::{prelude::*, window::PrimaryWindow};
-
-use crate::{gravity::Gravity, velocity::Velocity};
+use bevy_xpbd_2d::prelude::*;
 
 const SIZE_F32: f32 = 64.0;
 const SIZE: Vec2 = Vec2::new(SIZE_F32, SIZE_F32);
@@ -10,8 +9,8 @@ const TEXTURE_PATH: &str = "player.png";
 #[derive(Bundle)]
 pub struct PlayerBundle {
     sprite_bundle: SpriteBundle,
-    velocity: Velocity,
-    gravity: Gravity,
+    rigid_body: RigidBody,
+    collider: Collider,
 }
 
 impl PlayerBundle {
@@ -31,8 +30,8 @@ impl PlayerBundle {
                 },
                 ..default()
             },
-            velocity: Velocity::new(00.0, 0.0, 0.0),
-            gravity: Gravity {},
+            rigid_body: RigidBody::Dynamic,
+            collider: Collider::ball(SIZE / 2.0),
         }
     }
 }

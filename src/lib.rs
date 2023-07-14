@@ -1,10 +1,8 @@
 use bevy::{app::PluginGroupBuilder, log::LogPlugin, prelude::*, window::PrimaryWindow};
 use bevy_xpbd_2d::prelude::*;
 
-mod gravity;
 mod level;
 mod player;
-mod velocity;
 
 pub fn start_app() {
     eprintln!("Creating app...");
@@ -15,14 +13,9 @@ pub fn start_app() {
         // It runs on a fixed time step to ensure that the physics is consistent.
         .insert_resource(FixedTime::new_from_secs(1.0 / 240.0))
         .insert_resource(level::Level::new(0))
+        .insert_resource(Gravity(Vec2::new(0.0, -9.81 * 100.0)))
         .add_systems(Startup, (spawn_camera, player::spawn, level::spawn_blocks))
-        .add_systems(
-            FixedUpdate,
-            (
-                gravity::apply_gravity.before(velocity::update_velocity),
-                velocity::update_velocity,
-            ),
-        )
+        // .add_systems(FixedUpdate, ())
         .add_systems(Update, bevy::window::close_on_esc)
         .run();
 }
