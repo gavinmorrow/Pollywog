@@ -31,7 +31,7 @@ impl PlayerBundle {
                 },
                 ..default()
             },
-            velocity: Velocity::new(0.0, 0.0, 0.0),
+            velocity: Velocity::new(00.0, 0.0, 0.0),
             gravity: Gravity {},
         }
     }
