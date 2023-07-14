@@ -15,6 +15,8 @@ pub struct PlayerBundle {
     rigid_body: RigidBody,
     collider: Collider,
     player: Player,
+    angular_damping: AngularDamping,
+    linear_damping: LinearDamping,
 }
 
 impl PlayerBundle {
@@ -37,6 +39,8 @@ impl PlayerBundle {
             rigid_body: RigidBody::Dynamic,
             collider: Collider::ball(SIZE / 2.0),
             player: Player,
+            angular_damping: AngularDamping(3.0),
+            linear_damping: LinearDamping(1.0),
         }
     }
 }
@@ -50,4 +54,16 @@ pub fn spawn(
 
     debug!("Spawning player");
     commands.spawn(PlayerBundle::new(asset_server, window));
+}
+
+pub fn r#move(key_input: Res<Input<KeyCode>>, mut query: Query<&mut LinearVelocity, With<Player>>) {
+    for mut velocity in query.iter_mut() {
+        for key in key_input.get_pressed() {
+            match key {
+                KeyCode::Left | KeyCode::A => velocity.x = -300.0,
+                KeyCode::Right | KeyCode::D => velocity.x = 300.0,
+                _ => {}
+            }
+        }
+    }
 }
