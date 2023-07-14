@@ -10,8 +10,7 @@ pub fn start_app() {
     eprintln!("Creating app...");
 
     App::new()
-        .add_plugins(setup_default_plugins())
-        .add_plugins(PhysicsPlugins)
+        .add_plugins((setup_default_plugins(), PhysicsPlugins::default()))
         // Physics is run seperatly from the main loop.
         // It runs on a fixed time step to ensure that the physics is consistent.
         .insert_resource(FixedTime::new_from_secs(1.0 / 240.0))
