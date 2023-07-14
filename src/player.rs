@@ -63,6 +63,7 @@ pub fn r#move(key_input: Res<Input<KeyCode>>, mut query: Query<&mut LinearVeloci
             match key {
                 KeyCode::Left | KeyCode::A => velocity.x = -300.0,
                 KeyCode::Right | KeyCode::D => velocity.x = 300.0,
+                KeyCode::Up | KeyCode::W | KeyCode::Space => velocity.y = 300.0,
                 _ => {}
             }
         }
