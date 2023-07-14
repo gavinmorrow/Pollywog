@@ -56,6 +56,7 @@ pub fn spawn(
     commands.spawn(PlayerBundle::new(asset_server, window));
 }
 
+// FIXME: make a better movement system, this is just a placeholder
 pub fn r#move(key_input: Res<Input<KeyCode>>, mut query: Query<&mut LinearVelocity, With<Player>>) {
     for mut velocity in query.iter_mut() {
         for key in key_input.get_pressed() {
