@@ -1,4 +1,4 @@
-use bevy::prelude::*;
+use bevy::{prelude::*, window::PrimaryWindow};
 
 use crate::{gravity::Gravity, velocity::Velocity};
 
@@ -35,4 +35,15 @@ impl PlayerBundle {
             gravity: Gravity {},
         }
     }
+}
+
+pub fn spawn(
+    mut commands: Commands,
+    asset_server: Res<AssetServer>,
+    window_query: Query<&Window, With<PrimaryWindow>>,
+) {
+    let window = window_query.single();
+
+    debug!("Spawning player");
+    commands.spawn(PlayerBundle::new(asset_server, window));
 }

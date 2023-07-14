@@ -24,3 +24,12 @@ impl<const N: usize> Level<N> {
         Self { id, blocks }
     }
 }
+
+impl<const N: usize> Resource for Level<N> {}
+
+pub fn spawn_blocks<const N: usize>(mut commands: Commands, level: Res<Level<N>>) {
+    debug!("Spawning blocks");
+    for block in level.blocks.iter() {
+        commands.spawn(block.clone());
+    }
+}

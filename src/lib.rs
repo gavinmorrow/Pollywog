@@ -13,7 +13,10 @@ pub fn start_app() {
         // Physics is run seperatly from the main loop.
         // It runs on a fixed time step to ensure that the physics is consistent.
         .insert_resource(FixedTime::new_from_secs(1.0 / 240.0))
-        .add_systems(Startup, setup)
+        .add_systems(
+            Startup,
+            (spawn_camera, player::spawn, level::spawn_blocks::<100>),
+        )
         .add_systems(
             FixedUpdate,
             (
@@ -32,13 +35,7 @@ fn setup_default_plugins() -> PluginGroupBuilder {
     })
 }
 
-fn setup(
-    mut commands: Commands,
-    asset_server: Res<AssetServer>,
-    window_query: Query<&Window, With<PrimaryWindow>>,
-) {
-    info!("Starting setup");
-
+fn spawn_camera(mut commands: Commands, window_query: Query<&Window, With<PrimaryWindow>>) {
     let window = window_query.single();
 
     debug!("Spawning camera");
@@ -49,15 +46,4 @@ fn setup(
         },
         ..default()
     });
-
-    debug!("Spawning player");
-    commands.spawn(player::PlayerBundle::new(asset_server, window));
-
-    // Spawn the blocks in the level
-    // FIXME: this should be loaded from a file
-    debug!("Spawning blocks");
-    let level = level::Level::<100>::new(0);
-    for block in level.blocks {
-        commands.spawn(block);
-    }
 }
