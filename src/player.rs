@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-use crate::velocity::Velocity;
+use crate::{gravity::Gravity, velocity::Velocity};
 
 const SIZE_F32: f32 = 64.0;
 const SIZE: Vec2 = Vec2::new(SIZE_F32, SIZE_F32);
@@ -11,6 +11,7 @@ const TEXTURE_PATH: &str = "player.png";
 pub struct PlayerBundle {
     sprite_bundle: SpriteBundle,
     velocity: Velocity,
+    gravity: Gravity,
 }
 
 impl PlayerBundle {
@@ -31,6 +32,7 @@ impl PlayerBundle {
                 ..default()
             },
             velocity: Velocity::new(0.0, 0.0, 0.0),
+            gravity: Gravity {},
         }
     }
 }
