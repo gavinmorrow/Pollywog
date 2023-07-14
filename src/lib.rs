@@ -1,5 +1,6 @@
 use bevy::{log::LogPlugin, prelude::*};
 
+mod gravity;
 mod player;
 mod velocity;
 
@@ -17,7 +18,13 @@ pub fn start_app() {
         // Game stuff is seperate from physics (runs on update loop)
         .insert_resource(FixedTime::new_from_secs(1.0 / 240.0))
         .add_systems(Startup, setup)
-        .add_systems(FixedUpdate, velocity::update_velocity)
+        .add_systems(
+            FixedUpdate,
+            (
+                gravity::apply_gravity.before(velocity::update_velocity),
+                velocity::update_velocity,
+            ),
+        )
         .add_systems(Update, bevy::window::close_on_esc)
         .run();
 }
