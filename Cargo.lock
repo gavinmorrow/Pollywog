@@ -1020,8 +1020,9 @@ dependencies = [
 
 [[package]]
 name = "bevy_xpbd_2d"
-version = "0.1.0"
-source = "git+https://github.com/Jondolf/bevy_xpbd.git#7563f66fde5ad40829cef2a06e1dd7986aa16a77"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "111aaf452e60d484487536a44d254f30a1261efa7f3a0dd6f1bc1fb473c05edd"
 dependencies = [
  "bevy",
  "bevy_xpbd_derive",
@@ -1033,7 +1034,8 @@ dependencies = [
 [[package]]
 name = "bevy_xpbd_derive"
 version = "0.1.0"
-source = "git+https://github.com/Jondolf/bevy_xpbd.git#7563f66fde5ad40829cef2a06e1dd7986aa16a77"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3e1ef1d5e328abe1b76df974245f78e17fd17867583883d5e77444c6a8223a64"
 dependencies = [
  "quote",
  "syn 2.0.25",
