@@ -10,6 +10,7 @@ impl Velocity {
 }
 
 pub fn update_velocity(mut query: Query<(&Velocity, &mut Transform)>) {
+    trace!("Applying velocity to {} entities", query.iter().len());
     for (velocity, mut transform) in query.iter_mut() {
         transform.translation += velocity.0;
     }

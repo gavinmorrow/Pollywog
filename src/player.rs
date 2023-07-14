@@ -16,7 +16,7 @@ pub struct PlayerBundle {
 
 impl PlayerBundle {
     pub fn new(asset_server: Res<AssetServer>) -> Self {
-        trace!("Creating player bundle");
+        debug!("Creating player bundle");
 
         Self {
             sprite_bundle: SpriteBundle {
