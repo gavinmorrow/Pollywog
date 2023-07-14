@@ -1,33 +1,34 @@
 use bevy::prelude::*;
 
-use self::block::BlockBundle;
+use block::BlockBundle;
 
 mod block;
 
-pub struct Level<const N: usize> {
+pub struct Level {
     pub id: u32,
-    pub blocks: [BlockBundle; N],
+    pub blocks: Vec<BlockBundle>,
 }
 
-impl<const N: usize> Level<N> {
+impl Level {
     pub fn new(id: u32) -> Self {
-        let blocks = (0..N)
-            // Map each index to a `BlockBundle` with a translation of `i * 64.0` on the x axis.
-            // This will create a line of blocks, each their width apart.
-            .map(|i| BlockBundle::new(Vec3::new(i as f32 * 64.0, 0.0, 0.0)))
-            .collect::<Vec<_>>()
-            .try_into()
-            // Unwrap is safe because we know that the length of the vector is equal to N
-            // because we created it from a range of N elements (the `(0..N)` line).
-            .unwrap();
+        let num_blocks = match id {
+            0 => 100,
+            id => panic!("Unknown level ID: {}", id),
+        };
+
+        let mut blocks = Vec::with_capacity(num_blocks);
+        for i in 0..num_blocks {
+            let translation = Vec3::new(i as f32 * block::SIZE_F32, 0.0, 0.0);
+            blocks.push(BlockBundle::new(translation));
+        }
 
         Self { id, blocks }
     }
 }
 
-impl<const N: usize> Resource for Level<N> {}
+impl Resource for Level {}
 
-pub fn spawn_blocks<const N: usize>(mut commands: Commands, level: Res<Level<N>>) {
+pub fn spawn_blocks(mut commands: Commands, level: Res<Level>) {
     debug!("Spawning blocks");
     for block in level.blocks.iter() {
         commands.spawn(block.clone());

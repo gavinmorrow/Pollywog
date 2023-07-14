@@ -13,11 +13,8 @@ pub fn start_app() {
         // Physics is run seperatly from the main loop.
         // It runs on a fixed time step to ensure that the physics is consistent.
         .insert_resource(FixedTime::new_from_secs(1.0 / 240.0))
-        .insert_resource(level::Level::<100>::new(0))
-        .add_systems(
-            Startup,
-            (spawn_camera, player::spawn, level::spawn_blocks::<100>),
-        )
+        .insert_resource(level::Level::new(0))
+        .add_systems(Startup, (spawn_camera, player::spawn, level::spawn_blocks))
         .add_systems(
             FixedUpdate,
             (
