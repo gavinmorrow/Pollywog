@@ -9,8 +9,8 @@ pub fn start_app() {
 
     App::new()
         .add_plugins(setup_default_plugins())
-        // TODO: Add a physics timer (running at 240fps, on timer loop) (see breakout example)
-        // Game stuff is seperate from physics (runs on update loop)
+        // Physics is run seperatly from the main loop.
+        // It runs on a fixed time step to ensure that the physics is consistent.
         .insert_resource(FixedTime::new_from_secs(1.0 / 240.0))
         .add_systems(Startup, setup)
         .add_systems(
