@@ -15,13 +15,13 @@ pub struct PlayerBundle {
 }
 
 impl PlayerBundle {
-    pub fn new(asset_server: Res<AssetServer>) -> Self {
+    pub fn new(asset_server: Res<AssetServer>, window: &Window) -> Self {
         debug!("Creating player bundle");
 
         Self {
             sprite_bundle: SpriteBundle {
                 transform: Transform {
-                    translation: Vec3::new(0.0, 0.0, 0.0),
+                    translation: Vec3::new(0.0, window.height(), 0.0),
                     ..default()
                 },
                 texture: asset_server.load(TEXTURE_PATH),

@@ -1,4 +1,4 @@
-use bevy::{app::PluginGroupBuilder, log::LogPlugin, prelude::*};
+use bevy::{app::PluginGroupBuilder, log::LogPlugin, prelude::*, window::PrimaryWindow};
 
 mod gravity;
 mod level;
@@ -32,9 +32,32 @@ fn setup_default_plugins() -> PluginGroupBuilder {
     })
 }
 
-fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
+fn setup(
+    mut commands: Commands,
+    asset_server: Res<AssetServer>,
+    window_query: Query<&Window, With<PrimaryWindow>>,
+) {
     info!("Starting setup");
 
-    commands.spawn(Camera2dBundle::default());
-    commands.spawn(player::PlayerBundle::new(asset_server));
+    let window = window_query.single();
+
+    debug!("Spawning camera");
+    commands.spawn(Camera2dBundle {
+        transform: Transform {
+            translation: Vec3::new(window.width() / 2.0 - 100.0, window.height() / 2.0, 1000.0),
+            ..default()
+        },
+        ..default()
+    });
+
+    debug!("Spawning player");
+    commands.spawn(player::PlayerBundle::new(asset_server, window));
+
+    // Spawn the blocks in the level
+    // FIXME: this should be loaded from a file
+    debug!("Spawning blocks");
+    let level = level::Level::<100>::new(0);
+    for block in level.blocks {
+        commands.spawn(block);
+    }
 }
