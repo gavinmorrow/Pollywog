@@ -1,6 +1,7 @@
 use bevy::{log::LogPlugin, prelude::*};
 
 mod player;
+mod velocity;
 
 pub fn start_app() {
     eprintln!("Creating app...");
@@ -12,7 +13,11 @@ pub fn start_app() {
 
     App::new()
         .add_plugins(default_plugins)
+        // TODO: Add a physics timer (running at 240fps, on timer loop) (see breakout example)
+        // Game stuff is seperate from physics (runs on update loop)
+        .insert_resource(FixedTime::new_from_secs(1.0 / 240.0))
         .add_systems(Startup, setup)
+        .add_systems(FixedUpdate, velocity::update_velocity)
         .add_systems(Update, bevy::window::close_on_esc)
         .run();
 }
