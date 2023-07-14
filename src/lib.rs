@@ -1,4 +1,5 @@
 use bevy::{app::PluginGroupBuilder, log::LogPlugin, prelude::*, window::PrimaryWindow};
+use bevy_xpbd_2d::prelude::*;
 
 mod gravity;
 mod level;
@@ -10,6 +11,7 @@ pub fn start_app() {
 
     App::new()
         .add_plugins(setup_default_plugins())
+        .add_plugins(PhysicsPlugins)
         // Physics is run seperatly from the main loop.
         // It runs on a fixed time step to ensure that the physics is consistent.
         .insert_resource(FixedTime::new_from_secs(1.0 / 240.0))
