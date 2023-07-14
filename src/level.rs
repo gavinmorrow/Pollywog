@@ -11,10 +11,14 @@ pub struct Level {
 
 impl Level {
     pub fn new(id: u32) -> Self {
+        debug!("Creating level (id: {})", id);
+
         let num_blocks = match id {
             0 => 100,
             id => panic!("Unknown level ID: {}", id),
         };
+
+        trace!("Creating {} blocks for level", num_blocks);
 
         let mut blocks = Vec::with_capacity(num_blocks);
         for i in 0..num_blocks {
