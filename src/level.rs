@@ -22,11 +22,10 @@ impl Level {
 
         let mut blocks = Vec::with_capacity(num_blocks);
         for i in 0..num_blocks {
-            let translation = Vec3::new(
-                i as f32 * block::SIZE,
-                (i % 5) as f32 * 64.0 + block::SIZE / 2.0,
-                0.0,
-            );
+            let x = i as f32 * block::SIZE;
+            let y = if i % 20 == 0 { block::SIZE } else { 0. } + block::SIZE / 2.0;
+
+            let translation = Vec3::new(x, y, 0.0);
             blocks.push(BlockBundle::new(translation));
         }
 
