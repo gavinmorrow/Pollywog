@@ -1,8 +1,8 @@
 use bevy::{prelude::*, window::PrimaryWindow};
 use bevy_xpbd_2d::prelude::*;
 
-const SIZE_F32: f32 = 64.0;
-const SIZE: Vec2 = Vec2::new(SIZE_F32, SIZE_F32);
+const SIZE: f32 = 64.0;
+const SIZE_VEC2: Vec2 = Vec2::new(SIZE, SIZE);
 
 const TEXTURE_PATH: &str = "player.png";
 
@@ -25,7 +25,7 @@ impl PlayerBundle {
                 },
                 texture: asset_server.load(TEXTURE_PATH),
                 sprite: Sprite {
-                    custom_size: Some(SIZE),
+                    custom_size: Some(SIZE_VEC2),
                     ..default()
                 },
                 ..default()

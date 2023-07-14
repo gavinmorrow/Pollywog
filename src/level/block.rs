@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 
-pub const SIZE_F32: f32 = 64.0;
-pub const SIZE: Vec2 = Vec2::new(SIZE_F32, SIZE_F32);
+pub const SIZE: f32 = 64.0;
+pub const SIZE_VEC2: Vec2 = Vec2::new(SIZE, SIZE);
 
 #[derive(Bundle, Clone)]
 pub struct BlockBundle {
@@ -30,7 +30,7 @@ impl BlockBundle {
                     ..default()
                 },
                 sprite: Sprite {
-                    custom_size: Some(SIZE),
+                    custom_size: Some(SIZE_VEC2),
                     color: Color::rgb(0.22, 0.14, 0.07),
                     ..default()
                 },
