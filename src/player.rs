@@ -6,11 +6,15 @@ const SIZE_VEC2: Vec2 = Vec2::new(SIZE, SIZE);
 
 const TEXTURE_PATH: &str = "player.png";
 
+#[derive(Component)]
+struct Player;
+
 #[derive(Bundle)]
 pub struct PlayerBundle {
     sprite_bundle: SpriteBundle,
     rigid_body: RigidBody,
     collider: Collider,
+    player: Player,
 }
 
 impl PlayerBundle {
@@ -32,6 +36,7 @@ impl PlayerBundle {
             },
             rigid_body: RigidBody::Dynamic,
             collider: Collider::ball(SIZE / 2.0),
+            player: Player,
         }
     }
 }
