@@ -1,4 +1,4 @@
-use bevy::{app::PluginGroupBuilder, log::LogPlugin, prelude::*};
+use bevy::{app::PluginGroupBuilder, log::LogPlugin, prelude::*, window::WindowMode};
 use bevy_xpbd_2d::prelude::*;
 
 mod camera;
@@ -28,8 +28,17 @@ pub fn start_app() {
 }
 
 fn setup_default_plugins() -> PluginGroupBuilder {
-    DefaultPlugins.set(LogPlugin {
-        filter: "info,wgpu_core=warn,wgpu_hal=warn,pollywog=debug".into(),
-        level: bevy::log::Level::TRACE,
-    })
+    DefaultPlugins
+        .set(LogPlugin {
+            filter: "info,wgpu_core=warn,wgpu_hal=warn,pollywog=debug".into(),
+            level: bevy::log::Level::TRACE,
+        })
+        .set(WindowPlugin {
+            primary_window: Some(Window {
+                mode: WindowMode::BorderlessFullscreen,
+                title: "Pollywog".to_string(),
+                ..default()
+            }),
+            ..default()
+        })
 }
