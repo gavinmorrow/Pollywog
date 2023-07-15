@@ -1,5 +1,6 @@
 use bevy::{app::PluginGroupBuilder, log::LogPlugin, prelude::*, window::WindowMode};
 use bevy_xpbd_2d::prelude::*;
+use leafwing_input_manager::prelude::*;
 
 mod camera;
 mod level;
@@ -9,7 +10,11 @@ pub fn start_app() {
     eprintln!("Creating app...");
 
     App::new()
-        .add_plugins((setup_default_plugins(), PhysicsPlugins::default()))
+        .add_plugins((
+            setup_default_plugins(),
+            PhysicsPlugins::default(),
+            InputManagerPlugin::<player::Action>::default(),
+        ))
         .insert_resource(level::Level::new(0))
         .insert_resource(Gravity(Vec2::new(0.0, -9.81 * 100.0)))
         .add_systems(

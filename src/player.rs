@@ -18,11 +18,21 @@ pub struct PlayerBundle {
     player: Player,
     angular_damping: AngularDamping,
     linear_damping: LinearDamping,
+    input_manager: InputManagerBundle<Action>,
 }
 
 impl PlayerBundle {
     pub fn new(asset_server: Res<AssetServer>, window: &Window) -> Self {
         debug!("Creating player bundle");
+
+        let mut input_map = InputMap::default();
+        input_map
+            .insert(KeyCode::Left, Action::Left)
+            .insert(QwertyScanCode::A, Action::Left)
+            .insert(KeyCode::Right, Action::Right)
+            .insert(QwertyScanCode::D, Action::Right)
+            .insert(KeyCode::Space, Action::Jump)
+            .insert(KeyCode::Up, Action::Jump);
 
         Self {
             sprite_bundle: SpriteBundle {
@@ -42,12 +52,16 @@ impl PlayerBundle {
             player: Player,
             angular_damping: AngularDamping(3.0),
             linear_damping: LinearDamping(1.0),
+            input_manager: InputManagerBundle::<Action> {
+                action_state: ActionState::default(),
+                input_map,
+            },
         }
     }
 }
 
 #[derive(Actionlike, PartialEq, Eq, Clone, Copy, Hash, Debug, Reflect)]
-enum Action {
+pub enum Action {
     Left,
     Right,
     Jump,
@@ -66,15 +80,22 @@ pub fn spawn(
 }
 
 // FIXME: make a better movement system, this is just a placeholder
-pub fn r#move(key_input: Res<Input<KeyCode>>, mut query: Query<&mut LinearVelocity, With<Player>>) {
-    for mut velocity in query.iter_mut() {
-        for key in key_input.get_pressed() {
-            match key {
-                KeyCode::Left | KeyCode::A => velocity.x = -300.0,
-                KeyCode::Right | KeyCode::D => velocity.x = 300.0,
-                KeyCode::Up | KeyCode::W | KeyCode::Space => velocity.y = 300.0,
-                _ => {}
-            }
+pub fn r#move(
+    action_state_query: Query<&ActionState<Action>, With<Player>>,
+    mut player_query: Query<&mut LinearVelocity, With<Player>>,
+) {
+    let action_state = action_state_query.single();
+    let Ok(mut player) = player_query.get_single_mut() else { return; };
+
+    debug!("Moving player.");
+
+    for action in action_state.get_pressed() {
+        trace!("Action: {:#?}", action);
+        match action {
+            Action::Left => player.x = -300.0,
+            Action::Right => player.x = 300.0,
+            Action::Jump => player.y = 300.0,
+            Action::Grapple => todo!(),
         }
     }
 }
