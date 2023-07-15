@@ -35,7 +35,7 @@ pub fn start_app() {
 fn setup_default_plugins() -> PluginGroupBuilder {
     DefaultPlugins
         .set(LogPlugin {
-            filter: "info,wgpu_core=warn,wgpu_hal=warn,pollywog=debug".into(),
+            filter: "info,wgpu_core=warn,wgpu_hal=warn,pollywog=trace".into(),
             level: bevy::log::Level::TRACE,
         })
         .set(WindowPlugin {
