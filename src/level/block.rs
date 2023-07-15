@@ -27,6 +27,8 @@ impl core::fmt::Debug for BlockBundle {
 
 impl BlockBundle {
     pub fn new(translation: Vec3) -> Self {
+        trace!("Creating block bundle (translation: {:?})", translation);
+
         Self {
             sprite_bundle: SpriteBundle {
                 transform: Transform {

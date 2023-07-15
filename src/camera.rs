@@ -38,9 +38,16 @@ pub fn keep_player_in_view(
 
     const PADDING: f32 = 256.0;
 
+    trace!("player_x: {}, camera_x: {}", player_x, camera_x);
+
     let distance = camera_x - player_x;
     if distance.abs() > window.width() / 2.0 - PADDING {
+        debug!("Moving camera to catch up with player");
+
+        let new_x = player_x + (window.width() / 2.0 - PADDING) * distance.signum();
+        trace!("new_x: {}", new_x);
+
         // move the camera to catch up with the player
-        camera.translation.x = player_x + (window.width() / 2.0 - PADDING) * distance.signum();
+        camera.translation.x = new_x;
     }
 }

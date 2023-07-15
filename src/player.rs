@@ -86,10 +86,13 @@ pub fn r#move(
 ) {
     let action_state = action_state_query.single();
     let Ok(mut player) = player_query.get_single_mut() else { return; };
+    let actions = action_state.get_pressed();
 
-    debug!("Moving player.");
+    if actions.len() > 0 {
+        debug!("Moving player.");
+    }
 
-    for action in action_state.get_pressed() {
+    for action in actions {
         trace!("Action: {:#?}", action);
         match action {
             Action::Left => player.x = -300.0,
