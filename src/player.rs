@@ -1,5 +1,6 @@
 use bevy::{prelude::*, window::PrimaryWindow};
 use bevy_xpbd_2d::prelude::*;
+use leafwing_input_manager::prelude::*;
 
 const SIZE: f32 = 64.0;
 const SIZE_VEC2: Vec2 = Vec2::new(SIZE, SIZE);
@@ -43,6 +44,14 @@ impl PlayerBundle {
             linear_damping: LinearDamping(1.0),
         }
     }
+}
+
+#[derive(Actionlike, PartialEq, Eq, Clone, Copy, Hash, Debug, Reflect)]
+enum Action {
+    Left,
+    Right,
+    Jump,
+    Grapple,
 }
 
 pub fn spawn(
