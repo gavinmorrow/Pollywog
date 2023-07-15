@@ -31,8 +31,9 @@ impl PlayerBundle {
             .insert(QwertyScanCode::A, Action::Left)
             .insert(KeyCode::Right, Action::Right)
             .insert(QwertyScanCode::D, Action::Right)
-            .insert(KeyCode::Space, Action::Jump)
-            .insert(KeyCode::Up, Action::Jump);
+            .insert(KeyCode::W, Action::Jump)
+            .insert(QwertyScanCode::Up, Action::Jump)
+            .insert(KeyCode::Space, Action::Jump);
 
         Self {
             sprite_bundle: SpriteBundle {
