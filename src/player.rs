@@ -33,7 +33,10 @@ impl PlayerBundle {
             .insert(QwertyScanCode::D, Action::Right)
             .insert(KeyCode::W, Action::Jump)
             .insert(QwertyScanCode::Up, Action::Jump)
-            .insert(KeyCode::Space, Action::Jump);
+            .insert(KeyCode::Space, Action::Jump)
+            .insert(QwertyScanCode::E, Action::Grapple)
+            .insert(QwertyScanCode::Slash, Action::Grapple)
+            .insert(DualAxis::mouse_motion(), Action::AimGrapple);
 
         Self {
             sprite_bundle: SpriteBundle {
@@ -67,6 +70,20 @@ pub enum Action {
     Right,
     Jump,
     Grapple,
+    AimGrapple,
+}
+
+#[derive(States, Debug, Clone, Eq, PartialEq, Hash)]
+pub enum GrappleState {
+    Idle,
+    Aiming,
+    Grappling,
+}
+
+impl Default for GrappleState {
+    fn default() -> Self {
+        Self::Idle
+    }
 }
 
 pub fn spawn(
@@ -100,6 +117,7 @@ pub fn r#move(
             Action::Right => player.x = 300.0,
             Action::Jump => player.y = 300.0,
             Action::Grapple => todo!(),
+            Action::AimGrapple => todo!(),
         }
     }
 }
