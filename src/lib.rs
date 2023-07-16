@@ -14,6 +14,7 @@ pub fn start_app() {
             setup_default_plugins(),
             PhysicsPlugins::default(),
             InputManagerPlugin::<player::Action>::default(),
+            player::grapple::GrapplePlugin::default(),
         ))
         .insert_resource(level::Level::new(0))
         .insert_resource(Gravity(Vec2::new(0.0, -9.81 * 100.0)))

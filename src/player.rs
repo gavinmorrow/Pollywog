@@ -2,6 +2,8 @@ use bevy::{prelude::*, window::PrimaryWindow};
 use bevy_xpbd_2d::prelude::*;
 use leafwing_input_manager::prelude::*;
 
+pub mod grapple;
+
 const SIZE: f32 = 64.0;
 const SIZE_VEC2: Vec2 = Vec2::new(SIZE, SIZE);
 
@@ -35,8 +37,7 @@ impl PlayerBundle {
             .insert(QwertyScanCode::Up, Action::Jump)
             .insert(KeyCode::Space, Action::Jump)
             .insert(QwertyScanCode::E, Action::Grapple)
-            .insert(QwertyScanCode::Slash, Action::Grapple)
-            .insert(DualAxis::mouse_motion(), Action::AimGrapple);
+            .insert(QwertyScanCode::Slash, Action::Grapple);
 
         Self {
             sprite_bundle: SpriteBundle {
@@ -70,20 +71,6 @@ pub enum Action {
     Right,
     Jump,
     Grapple,
-    AimGrapple,
-}
-
-#[derive(States, Debug, Clone, Eq, PartialEq, Hash)]
-pub enum GrappleState {
-    Idle,
-    Aiming,
-    Grappling,
-}
-
-impl Default for GrappleState {
-    fn default() -> Self {
-        Self::Idle
-    }
 }
 
 pub fn spawn(
@@ -116,8 +103,7 @@ pub fn r#move(
             Action::Left => player.x = -300.0,
             Action::Right => player.x = 300.0,
             Action::Jump => player.y = 300.0,
-            Action::Grapple => todo!(),
-            Action::AimGrapple => todo!(),
+            Action::Grapple => { /* Do nothing, this is handled elsewhere. */ }
         }
     }
 }
