@@ -170,7 +170,6 @@ fn should_grapple_end(
         if (collision.0.entity1 == player && collision.0.entity2 == target)
             || (collision.0.entity2 == player && collision.0.entity1 == target)
         {
-            // FIXME: it should touch the exact point, not just the entity
             debug!("Player is touching target, stopping grapple");
 
             commands.remove_resource::<TargetPos>();
@@ -181,7 +180,7 @@ fn should_grapple_end(
         }
     }
 
-    trace!("Player is not touching target");
+    trace!("Player is not touching target ({:?})", target_pos.0);
 }
 
 fn start_grapple(
@@ -245,19 +244,20 @@ fn start_grapple(
 
     debug!("Grapple shapecast hit: {:?}", point);
 
+    // add a point at the hit location (both for the target detection and debugging)
+	commands
+        .spawn(SpriteBundle {
+            sprite: Sprite {
+                color: Color::RED,
+                custom_size: Some(Vec2::new(10.0, 10.0)),
+                ..default()
+            },
+            transform: Transform::from_translation(point.extend(1.0)),
+            ..Default::default()
+        });
+
     // Add point to target pos resource
     commands.insert_resource(TargetPos(point, first_hit.entity));
-
-    // for debugging, add a point at the hit locations
-    commands.spawn(SpriteBundle {
-        sprite: Sprite {
-            color: Color::RED,
-            custom_size: Some(Vec2::new(10.0, 10.0)),
-            ..default()
-        },
-        transform: Transform::from_translation(point.extend(1.0)),
-        ..Default::default()
-    });
 
     // Add force to player
     let force = direction * FORCE_MULT;
