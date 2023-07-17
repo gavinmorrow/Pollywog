@@ -4,6 +4,8 @@ use leafwing_input_manager::prelude::*;
 
 use super::{Action, Player};
 
+const FORCE_MULT: f32 = 5_000_000.0;
+
 #[derive(Default)]
 pub struct GrapplePlugin {}
 
@@ -13,11 +15,16 @@ impl Plugin for GrapplePlugin {
 
         app.add_state::<GrappleState>()
             .add_systems(OnEnter(GrappleState::Grappling), start_grapple)
+            .add_systems(OnExit(GrappleState::Grappling), end_grapple)
             .add_systems(
                 Update,
                 (
+                    idle.run_if(state_exists_and_equals(GrappleState::Idle)),
                     aim.run_if(state_exists_and_equals(GrappleState::Aiming)),
-                    watch_input,
+                    aim_guideline.run_if(state_exists_and_equals(GrappleState::Aiming)),
+                    grapple.run_if(state_exists_and_equals(GrappleState::Grappling)),
+                    manage_grapple.run_if(state_exists_and_equals(GrappleState::Grappling)),
+                    should_grapple_end.run_if(state_exists_and_equals(GrappleState::Grappling)),
                 ),
             );
     }
@@ -46,56 +53,135 @@ impl Default for GrappleState {
     }
 }
 
+fn idle(
+    action_state_query: Query<&ActionState<Action>, With<Player>>,
+    mut next_grapple_state: ResMut<NextState<GrappleState>>,
+) {
+    let action_state = action_state_query.single();
+
+    let just_pressed = action_state.get_just_pressed();
+    let just_released = action_state.get_just_released();
+
+    // Only start aiming if grapple was just pressed and not released
+    if just_pressed.contains(&Action::Grapple) && !just_released.contains(&Action::Grapple) {
+        debug!("Starting grapple aiming (idle -> aiming)");
+        next_grapple_state.set(GrappleState::Idle.next());
+    }
+}
+
 fn aim(
+    action_state_query: Query<&ActionState<Action>, With<Player>>,
+    mut next_grapple_state: ResMut<NextState<GrappleState>>,
+) {
+    let action_state = action_state_query.single();
+    let just_released = action_state.get_just_released();
+
+    // If the key was just released, stop aiming and start grappling
+    if just_released.contains(&Action::Grapple) {
+        debug!("Starting grapple (aiming -> grappling)");
+        next_grapple_state.set(GrappleState::Aiming.next());
+    }
+}
+
+fn aim_guideline(
     mut player_query: Query<&mut LinearVelocity, With<Player>>,
     window_query: Query<&Window, With<PrimaryWindow>>,
 ) {
     let Ok(mut _player) = player_query.get_single_mut() else { return; };
+
+    // Get the mouse position
     let window = window_query.single();
     let Some(mouse_pos) = window.cursor_position() else {
 		warn!("Tried to aim grapple when mouse was not in window");
 		return;
 	};
 
-    debug!("Aiming grapple");
-    trace!("Aiming grapple (mouse pos: {:?})", mouse_pos);
+    debug!("Aiming grapple (mouse pos: {:?})", mouse_pos);
+
+    // TODO: draw guidelines
 }
 
-pub fn watch_input(
+#[derive(Resource)]
+struct TargetPos(Vec2, Entity);
+
+fn grapple(
     action_state_query: Query<&ActionState<Action>, With<Player>>,
-    grapple_state: Res<State<GrappleState>>,
     mut next_grapple_state: ResMut<NextState<GrappleState>>,
 ) {
     let action_state = action_state_query.single();
-    let grapple_state = grapple_state.get();
+    let just_pressed = action_state.get_just_pressed();
 
-    match grapple_state {
-        GrappleState::Idle => {
-            let just_pressed = action_state.get_just_pressed();
-            let just_released = action_state.get_just_released();
+    // If the grapple key was just pressed, stop grappling and start aiming
+    if just_pressed.contains(&Action::Grapple) {
+        debug!("Stopping grapple (grappling -> aiming)");
+        next_grapple_state.set(GrappleState::Aiming);
+    }
+}
 
-            // Only start aiming if grapple was just pressed and not released
-            if just_pressed.contains(&Action::Grapple) && !just_released.contains(&Action::Grapple)
-            {
-                debug!("Starting grapple aiming (idle -> aiming)");
-                next_grapple_state.set(grapple_state.next());
-            }
-        }
-        GrappleState::Aiming => {
-            let just_released = action_state.get_just_released();
+fn manage_grapple(
+    player_query: Query<&GlobalTransform, With<Player>>,
+    target_pos: Option<ResMut<TargetPos>>,
+    mut commands: Commands,
+    mut player_external_force_query: Query<&mut ExternalForce, With<Player>>,
+    mut next_grapple_state: ResMut<NextState<GrappleState>>,
+) {
+    // Resolve queries
+    let Ok(player_transform) = player_query.get_single() else {
+		error!("Could not get player transform");
+		return;
+	};
+    let Some(target_pos) = target_pos else {
+		error!("Could not get target position");
+		return;
+	};
 
-            if just_released.contains(&Action::Grapple) {
-                debug!("Starting grapple (aiming -> grappling)");
-                next_grapple_state.set(grapple_state.next());
-            }
-        }
-        GrappleState::Grappling => {
-            // TODO: act as breaking out of grapple
-            // Maybe start new grapple? ask mateo
-            debug!("Reeling in grapple");
-            next_grapple_state.set(GrappleState::Idle);
+    let player = player_transform.translation().truncate();
+    let target = target_pos.0;
+
+    // Recalculate the direction to the target
+    let direction = target - player;
+    let direction = direction.normalize();
+
+    debug!("Recalculated grapple direction to {:?}", direction);
+
+    // Set the force on the player
+    player_external_force_query
+        .single_mut()
+        .set_force(direction * FORCE_MULT);
+
+    trace!(
+        "Player external force set to {:?}",
+        player_external_force_query.single()
+    );
+}
+
+fn should_grapple_end(
+    mut collisions: EventReader<Collision>,
+    player: Query<Entity, With<Player>>,
+    target_pos: Res<TargetPos>,
+    mut commands: Commands,
+    mut next_grapple_state: ResMut<NextState<GrappleState>>,
+) {
+    let player = player.single();
+    let target = target_pos.1;
+
+    // Check if the player is touching the target
+    for collision in collisions.iter() {
+        if (collision.0.entity1 == player && collision.0.entity2 == target)
+            || (collision.0.entity2 == player && collision.0.entity1 == target)
+        {
+            // FIXME: it should touch the exact point, not just the entity
+            debug!("Player is touching target, stopping grapple");
+
+            commands.remove_resource::<TargetPos>();
+            next_grapple_state.set(GrappleState::Grappling.next());
+
+            // No more cleanup is needed because it will be done in the OnExit
+            return;
         }
     }
+
+    trace!("Player is not touching target");
 }
 
 fn start_grapple(
@@ -159,6 +245,9 @@ fn start_grapple(
 
     debug!("Grapple shapecast hit: {:?}", point);
 
+    // Add point to target pos resource
+    commands.insert_resource(TargetPos(point, first_hit.entity));
+
     // for debugging, add a point at the hit locations
     commands.spawn(SpriteBundle {
         sprite: Sprite {
@@ -171,12 +260,27 @@ fn start_grapple(
     });
 
     // Add force to player
-    let force = direction * 5_000.0;
+    let force = direction * FORCE_MULT;
     trace!("Setting external force on player to: {:?}", force);
     player_external_force_query.single_mut().set_force(force);
 
     // Remove player gravity
     player_gravity_query.single_mut().0 = 0.0;
+}
+
+fn end_grapple(
+    mut player_external_force_query: Query<&mut ExternalForce, With<Player>>,
+    mut player_gravity_query: Query<&mut GravityScale, With<Player>>,
+) {
+    debug!("Ending grapple");
+
+    // Remove player external force
+    player_external_force_query
+        .single_mut()
+        .set_force(Vec2::ZERO);
+
+    // Add player gravity
+    player_gravity_query.single_mut().0 = 1.0;
 }
 
 fn get_distance_to_window_edge(player: &Transform, window: &Window, direction: Vec2) -> f32 {
@@ -229,6 +333,7 @@ fn resolve_mouse_pos(
 
     // Make mouse_pos relative to player (not world)
     let direction = mouse_pos - player_translation;
+    let direction = direction.normalize();
 
     Ok(direction)
 }
