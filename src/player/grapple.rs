@@ -104,6 +104,8 @@ fn start_grapple(
     player_query: Query<(Entity, &Collider, &Transform), With<Player>>,
     camera_query: Query<(&Camera, &GlobalTransform)>,
     entities_query: Query<&Transform>,
+    mut player_external_force_query: Query<&mut ExternalForce, With<Player>>,
+    mut player_gravity_query: Query<&mut GravityScale, With<Player>>,
     mut commands: Commands,
 ) {
     // Resolve queries
@@ -167,6 +169,14 @@ fn start_grapple(
         transform: Transform::from_translation(point.extend(1.0)),
         ..Default::default()
     });
+
+    // Add force to player
+    let force = direction * 5_000.0;
+    trace!("Setting external force on player to: {:?}", force);
+    player_external_force_query.single_mut().set_force(force);
+
+    // Remove player gravity
+    player_gravity_query.single_mut().0 = 0.0;
 }
 
 fn get_distance_to_window_edge(player: &Transform, window: &Window, direction: Vec2) -> f32 {

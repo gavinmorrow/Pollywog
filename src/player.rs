@@ -9,10 +9,10 @@ const SIZE_VEC2: Vec2 = Vec2::new(SIZE, SIZE);
 
 const TEXTURE_PATH: &str = "player.png";
 
-#[derive(Component)]
+#[derive(Component, Default)]
 pub struct Player;
 
-#[derive(Bundle)]
+#[derive(Bundle, Default)]
 pub struct PlayerBundle {
     sprite_bundle: SpriteBundle,
     rigid_body: RigidBody,
@@ -21,6 +21,8 @@ pub struct PlayerBundle {
     angular_damping: AngularDamping,
     linear_damping: LinearDamping,
     input_manager: InputManagerBundle<Action>,
+    external_force: ExternalForce,
+    gravity_scale: GravityScale,
 }
 
 impl PlayerBundle {
@@ -61,6 +63,8 @@ impl PlayerBundle {
                 action_state: ActionState::default(),
                 input_map,
             },
+            external_force: ExternalForce::default(),
+            gravity_scale: GravityScale(1.0),
         }
     }
 }
