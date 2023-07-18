@@ -55,7 +55,14 @@ impl Default for GrappleState {
 }
 
 #[derive(Resource)]
-struct TargetPos(Vec2, Entity);
+struct TargetPos(
+    /// The position of the target.
+    Vec2,
+    /// The entity that the target is attached to.
+    Entity,
+    /// The entity of the target.
+    Entity,
+);
 
 fn idle(
     action_state_query: Query<&ActionState<Action>, With<Player>>,
@@ -92,18 +99,32 @@ fn aim_guideline(
     window_query: Query<&Window, With<PrimaryWindow>>,
     player_query: Query<(Entity, &Transform), With<Player>>,
     camera_query: Query<(&Camera, &GlobalTransform)>,
+    target_pos: Option<Res<TargetPos>>,
     mut commands: Commands,
 ) {
+    // Clear old marker
+    if let Some(target_pos) = target_pos {
+        // Despawn
+        commands.entity(target_pos.2).despawn_recursive();
+
+        // Remove resource
+        // If this is not done and the raycast doesn't hit anything (so the resource
+        // doesn't get overwritten), it will attempt to despawn the marker again, which
+        // will cause a panic.
+        commands.remove_resource::<TargetPos>();
+    }
+
     let Ok((point, target)) = cast_grapple_ray(spatial_query, window_query, player_query, camera_query) else {
         warn!("Could not cast grapple ray");
         return;
     };
 
     // Add grapple marker
-    add_grapple_marker(&mut commands, &point);
+    let marker = add_grapple_marker(&mut commands, &point);
 
     // Add point to target pos resource
-    commands.insert_resource(TargetPos(point, target));
+    let target_pos = TargetPos(point, target, marker);
+    commands.insert_resource(target_pos);
 }
 
 enum RaycastError {
