@@ -14,13 +14,16 @@ impl Plugin for GrapplePlugin {
         debug!("Building GrapplePlugin");
 
         app.add_state::<GrappleState>()
+            .insert_resource(Guideline::default())
             .add_systems(OnExit(GrappleState::Grappling), end_grapple)
+            .add_systems(OnExit(GrappleState::Aiming), remove_guideline)
             .add_systems(
                 Update,
                 (
                     idle.run_if(state_exists_and_equals(GrappleState::Idle)),
                     aim.run_if(state_exists_and_equals(GrappleState::Aiming)),
                     aim_marker.run_if(state_exists_and_equals(GrappleState::Aiming)),
+                    aim_guideline.run_if(state_exists_and_equals(GrappleState::Aiming)),
                     grapple.run_if(state_exists_and_equals(GrappleState::Grappling)),
                     manage_grapple.run_if(state_exists_and_equals(GrappleState::Grappling)),
                     should_grapple_end.run_if(state_exists_and_equals(GrappleState::Grappling)),
@@ -63,6 +66,9 @@ struct TargetPos(
     /// The entity of the target.
     Entity,
 );
+
+#[derive(Resource, Default)]
+struct Guideline(Vec<Entity>);
 
 fn idle(
     action_state_query: Query<&ActionState<Action>, With<Player>>,
@@ -118,6 +124,53 @@ fn aim_marker(
     // Add point to target pos resource
     let target_pos = TargetPos(point, target, marker);
     commands.insert_resource(target_pos);
+}
+
+fn aim_guideline(
+    target_pos: Option<Res<TargetPos>>,
+    player_query: Query<&GlobalTransform, With<Player>>,
+    mut guideline: ResMut<Guideline>,
+    mut commands: Commands,
+) {
+    // Clear old guidelines
+    for guideline in guideline.0.iter() {
+        commands.entity(*guideline).despawn();
+    }
+    guideline.0.clear();
+
+    let Some(target_pos) = target_pos else {
+        warn!("No target pos for grapple guidelines");
+        return;
+    };
+    let player = player_query.single();
+
+    // Get direction from player to target
+    let player_pos = player.translation().truncate();
+    let target_pos = target_pos.0;
+    let direction = target_pos - player_pos;
+    let distance = direction.normalize() * 50.0;
+
+    // Add guidelines
+    let mut current_pos = player_pos;
+    while current_pos.distance(target_pos) >= 50.0 {
+        let sprite = SpriteBundle {
+            sprite: Sprite {
+                color: Color::BLUE,
+                custom_size: Some(Vec2::new(10.0, 10.0)),
+                ..default()
+            },
+            transform: Transform {
+                translation: current_pos.extend(2.0),
+                ..default()
+            },
+            ..default()
+        };
+
+        let entity = commands.spawn(sprite).id();
+
+        guideline.0.push(entity);
+        current_pos += distance;
+    }
 }
 
 /// Cleanly removes the `TargetPos` resource.
@@ -321,6 +374,17 @@ fn end_grapple(
 
     // Remove player external force
     super::remove_grapple_force(mut_player_query);
+}
+
+fn remove_guideline(mut guideline: ResMut<Guideline>, mut commands: Commands) {
+    debug!("Removing guideline");
+
+    // Clear old guidelines
+    for guideline in guideline.0.iter() {
+        commands.entity(*guideline).despawn();
+    }
+
+    guideline.0.clear();
 }
 
 fn get_distance_to_window_edge(player: &Transform, window: &Window, direction: Vec2) -> f32 {
