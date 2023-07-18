@@ -25,6 +25,8 @@ impl Plugin for GrapplePlugin {
                     grapple.run_if(state_exists_and_equals(GrappleState::Grappling)),
                     manage_grapple.run_if(state_exists_and_equals(GrappleState::Grappling)),
                     should_grapple_end.run_if(state_exists_and_equals(GrappleState::Grappling)),
+                    end_grapple_on_other_input
+                        .run_if(state_exists_and_equals(GrappleState::Grappling)),
                 ),
             );
     }
@@ -158,11 +160,15 @@ fn manage_grapple(
 fn should_grapple_end(
     mut collisions: EventReader<Collision>,
     player: Query<Entity, With<Player>>,
-    target_pos: Res<TargetPos>,
-    mut commands: Commands,
+    target_pos: Option<Res<TargetPos>>,
     mut next_grapple_state: ResMut<NextState<GrappleState>>,
 ) {
     let player = player.single();
+
+    let Some(target_pos) = target_pos else {
+		warn!("No target pos resource");
+		return;
+	};
     let target = target_pos.1;
 
     // Check if the player is touching the target
@@ -171,8 +177,6 @@ fn should_grapple_end(
             || (collision.0.entity2 == player && collision.0.entity1 == target)
         {
             debug!("Player is touching target, stopping grapple");
-
-            commands.remove_resource::<TargetPos>();
             next_grapple_state.set(GrappleState::Grappling.next());
 
             // No more cleanup is needed because it will be done in the OnExit
@@ -181,6 +185,19 @@ fn should_grapple_end(
     }
 
     trace!("Player is not touching target ({:?})", target_pos.0);
+}
+
+fn end_grapple_on_other_input(
+    action_state_query: Query<&ActionState<Action>, With<Player>>,
+    mut next_grapple_state: ResMut<NextState<GrappleState>>,
+) {
+    let action_state = action_state_query.single();
+    for action in action_state.get_pressed() {
+        if action != Action::Grapple {
+            // End grapple
+            next_grapple_state.set(GrappleState::Grappling.next());
+        }
+    }
 }
 
 fn start_grapple(
@@ -233,16 +250,24 @@ fn start_grapple(
     // 	return;
     // };
 
+    trace!(
+        "Origin: {}, direction: {}, distance_to_window_edge: {}",
+        origin,
+        direction,
+        distance_to_window_edge
+    );
+
     let Some(first_hit) = spatial_query.cast_ray(
         origin,
         direction,
         distance_to_window_edge,
-        false,
+        true,
         query_filter,
-    );
-
-	println!("normal: {:?}", first_hit.normal);
-	return;
+    ) else {
+		warn!("Raycast hit nothing");
+		return;
+	};
+    let point = origin + direction * first_hit.time_of_impact;
 
     // Find transform for entity
     let Ok(entity_transform) = entities_query.get(first_hit.entity) else {
@@ -251,7 +276,7 @@ fn start_grapple(
 	};
 
     // Resolve point to global space
-    let point = resolve_local_point(&entity_transform.translation.truncate(), &first_hit.point2);
+    // let point = resolve_local_point(&entity_transform.translation.truncate(), &point);
 
     debug!("Grapple shapecast hit: {:?}", point);
 
@@ -281,8 +306,12 @@ fn start_grapple(
 fn end_grapple(
     mut player_external_force_query: Query<&mut ExternalForce, With<Player>>,
     mut player_gravity_query: Query<&mut GravityScale, With<Player>>,
+    mut commands: Commands,
 ) {
     debug!("Ending grapple");
+
+    // Remove target pos resource
+    commands.remove_resource::<TargetPos>();
 
     // Remove player external force
     player_external_force_query
