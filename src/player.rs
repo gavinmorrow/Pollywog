@@ -111,3 +111,36 @@ pub fn r#move(
         }
     }
 }
+
+/// Add a force to the player in the given direction (to be used for grappling).
+fn add_grapple_force(
+    mut player_query: Query<(&mut ExternalForce, &mut GravityScale), With<Player>>,
+    direction: Vec2,
+) {
+    let (mut external_force, mut gravity) = player_query.single_mut();
+
+    // Add force to player
+    let force = direction * grapple::FORCE_MULT;
+    trace!("Setting external force on player to: {:?}", force);
+    external_force.set_force(force);
+
+    // Remove player gravity
+    gravity.0 = 0.0;
+
+    debug!("Added grapple force to player.");
+}
+
+/// Remove the force from the player (to be used for stopping grappling).
+fn remove_grapple_force(
+    mut player_query: Query<(&mut ExternalForce, &mut GravityScale), With<Player>>,
+) {
+    let (mut external_force, mut gravity) = player_query.single_mut();
+
+    // Remove player external force
+    external_force.set_force(Vec2::ZERO);
+
+    // Add player gravity
+    gravity.0 = 1.0;
+
+    debug!("Removed grapple force from player.");
+}

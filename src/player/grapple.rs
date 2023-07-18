@@ -4,7 +4,7 @@ use leafwing_input_manager::prelude::*;
 
 use super::{Action, Player};
 
-const FORCE_MULT: f32 = 5_000_000.0;
+pub const FORCE_MULT: f32 = 5_000_000.0;
 
 #[derive(Default)]
 pub struct GrapplePlugin {}
@@ -103,6 +103,83 @@ fn aim_guideline(
     // TODO: draw guidelines
 }
 
+enum RaycastError {
+    NoPlayer,
+    NoCamera,
+    CouldNotResolveMousePos,
+    RayHitNothing,
+}
+
+/// Casts a ray from the player to the mouse position.
+///
+/// # Returns
+///
+/// A tuple, containing:
+///
+/// 0. the point of impact
+/// 1. the entity that was impacted
+///
+/// An error is returned if there was an error casting the ray, or if the ray
+/// hit nothing.
+fn cast_grapple_ray(
+    spatial_query: SpatialQuery,
+    window_query: Query<&Window, With<PrimaryWindow>>,
+    player_query: Query<(Entity, &Transform), With<Player>>,
+    camera_query: Query<(&Camera, &GlobalTransform)>,
+) -> Result<(Vec2, Entity), RaycastError> {
+    // Resolve queries
+    let window = window_query.single();
+    let Ok((player, player_transform)) = player_query.get_single() else {
+		error!("Could not get player entity or transform");
+		return Err(RaycastError::NoPlayer);
+	};
+    let Ok((camera, camera_transform)) = camera_query.get_single() else {
+		error!("Could not get camera for grapple raycast");
+		return Err(RaycastError::NoCamera);
+	};
+
+    debug!("Starting grapple raycast");
+
+    // Get ray input
+    let Ok(direction) = resolve_mouse_pos(
+        window,
+        camera,
+        camera_transform,
+        player_transform.translation.truncate(),
+    ) else {
+		error!("Could not resolve mouse position for starting grapple");
+		return Err(RaycastError::CouldNotResolveMousePos);
+	};
+    let origin = player_transform.translation.truncate();
+    let distance_to_window_edge = get_distance_to_window_edge(player_transform, window, direction);
+    let query_filter = SpatialQueryFilter::default().without_entities([player]);
+
+    trace!(
+        "Origin: {}, direction: {}, distance_to_window_edge: {}",
+        origin,
+        direction,
+        distance_to_window_edge
+    );
+
+    // Cast ray
+    let Some(first_hit) = spatial_query.cast_ray(
+        origin,
+        direction,
+        distance_to_window_edge,
+        true,
+        query_filter,
+    ) else {
+		warn!("Raycast hit nothing");
+		return Err(RaycastError::RayHitNothing);
+	};
+    let point = origin + direction * first_hit.time_of_impact;
+    let entity = first_hit.entity;
+
+    debug!("Raycast hit entity {:?} at {:?}", entity, point);
+
+    Ok((point, entity))
+}
+
 #[derive(Resource)]
 struct TargetPos(Vec2, Entity);
 
@@ -123,7 +200,7 @@ fn grapple(
 fn manage_grapple(
     player_query: Query<&GlobalTransform, With<Player>>,
     target_pos: Option<ResMut<TargetPos>>,
-    mut player_external_force_query: Query<&mut ExternalForce, With<Player>>,
+    mut_player_query: Query<(&mut ExternalForce, &mut GravityScale), With<Player>>,
 ) {
     // Resolve queries
     let Ok(player_transform) = player_query.get_single() else {
@@ -145,14 +222,7 @@ fn manage_grapple(
     debug!("Recalculated grapple direction to {:?}", direction);
 
     // Set the force on the player
-    player_external_force_query
-        .single_mut()
-        .set_force(direction * FORCE_MULT);
-
-    trace!(
-        "Player external force set to {:?}",
-        player_external_force_query.single()
-    );
+    super::add_grapple_force(mut_player_query, direction);
 }
 
 fn should_grapple_end(
@@ -203,84 +273,40 @@ fn start_grapple(
     window_query: Query<&Window, With<PrimaryWindow>>,
     player_query: Query<(Entity, &Transform), With<Player>>,
     camera_query: Query<(&Camera, &GlobalTransform)>,
-    mut player_external_force_query: Query<&mut ExternalForce, With<Player>>,
-    mut player_gravity_query: Query<&mut GravityScale, With<Player>>,
     mut commands: Commands,
 ) {
-    // Resolve queries
-    let window = window_query.single();
-    let Ok((player, player_transform)) = player_query.get_single() else {
-		error!("Could not get player collider or transform");
-		return;
-	};
-    let Ok((camera, camera_transform)) = camera_query.get_single() else {
-		error!("Could not get camera for starting grapple");
-		return;
-	};
+    let Ok((point, target)) = cast_grapple_ray(spatial_query, window_query, player_query, camera_query) else {
+        warn!("Could not cast grapple ray");
+        return;
+    };
 
-    debug!("Starting grapple raycast");
-
-    // Cast ray
-    let Ok(direction) = resolve_mouse_pos(
-        window,
-        camera,
-        camera_transform,
-        player_transform.translation.truncate(),
-    ) else {
-		error!("Could not resolve mouse position for starting grapple");
-		return;
-	};
-    let origin = player_transform.translation.truncate();
-    let distance_to_window_edge = get_distance_to_window_edge(player_transform, window, direction);
-    let query_filter = SpatialQueryFilter::default().without_entities([player]);
-
-    trace!(
-        "Origin: {}, direction: {}, distance_to_window_edge: {}",
-        origin,
-        direction,
-        distance_to_window_edge
-    );
-
-    let Some(first_hit) = spatial_query.cast_ray(
-        origin,
-        direction,
-        distance_to_window_edge,
-        true,
-        query_filter,
-    ) else {
-		warn!("Raycast hit nothing");
-		return;
-	};
-    let point = origin + direction * first_hit.time_of_impact;
-
-    debug!("Grapple raycast hit: {:?}", point);
-
-    // add a point at the hit location (both for the target detection and debugging)
-    commands.spawn(SpriteBundle {
-        sprite: Sprite {
-            color: Color::RED,
-            custom_size: Some(Vec2::new(10.0, 10.0)),
-            ..default()
-        },
-        transform: Transform::from_translation(point.extend(1.0)),
-        ..Default::default()
-    });
+    // Add grapple marker
+    add_grapple_marker(&mut commands, &point);
 
     // Add point to target pos resource
-    commands.insert_resource(TargetPos(point, first_hit.entity));
+    commands.insert_resource(TargetPos(point, target));
 
-    // Add force to player
-    let force = direction * FORCE_MULT;
-    trace!("Setting external force on player to: {:?}", force);
-    player_external_force_query.single_mut().set_force(force);
+    // All player force stuff is taken care of in `manage_grapple`
+}
 
-    // Remove player gravity
-    player_gravity_query.single_mut().0 = 0.0;
+fn add_grapple_marker(commands: &mut Commands, point: &Vec2) -> Entity {
+    // add a point at the hit location
+    debug!("Adding grapple marker at {:?}", point);
+    commands
+        .spawn(SpriteBundle {
+            sprite: Sprite {
+                color: Color::RED,
+                custom_size: Some(Vec2::new(10.0, 10.0)),
+                ..default()
+            },
+            transform: Transform::from_translation(point.extend(1.0)),
+            ..Default::default()
+        })
+        .id()
 }
 
 fn end_grapple(
-    mut player_external_force_query: Query<&mut ExternalForce, With<Player>>,
-    mut player_gravity_query: Query<&mut GravityScale, With<Player>>,
+    mut_player_query: Query<(&mut ExternalForce, &mut GravityScale), With<Player>>,
     mut commands: Commands,
 ) {
     debug!("Ending grapple");
@@ -289,12 +315,7 @@ fn end_grapple(
     commands.remove_resource::<TargetPos>();
 
     // Remove player external force
-    player_external_force_query
-        .single_mut()
-        .set_force(Vec2::ZERO);
-
-    // Add player gravity
-    player_gravity_query.single_mut().0 = 1.0;
+    super::remove_grapple_force(mut_player_query);
 }
 
 fn get_distance_to_window_edge(player: &Transform, window: &Window, direction: Vec2) -> f32 {
