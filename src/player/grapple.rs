@@ -123,9 +123,7 @@ fn grapple(
 fn manage_grapple(
     player_query: Query<&GlobalTransform, With<Player>>,
     target_pos: Option<ResMut<TargetPos>>,
-    mut commands: Commands,
     mut player_external_force_query: Query<&mut ExternalForce, With<Player>>,
-    mut next_grapple_state: ResMut<NextState<GrappleState>>,
 ) {
     // Resolve queries
     let Ok(player_transform) = player_query.get_single() else {
@@ -203,16 +201,15 @@ fn end_grapple_on_other_input(
 fn start_grapple(
     spatial_query: SpatialQuery,
     window_query: Query<&Window, With<PrimaryWindow>>,
-    player_query: Query<(Entity, &Collider, &Transform), With<Player>>,
+    player_query: Query<(Entity, &Transform), With<Player>>,
     camera_query: Query<(&Camera, &GlobalTransform)>,
-    entities_query: Query<&Transform>,
     mut player_external_force_query: Query<&mut ExternalForce, With<Player>>,
     mut player_gravity_query: Query<&mut GravityScale, With<Player>>,
     mut commands: Commands,
 ) {
     // Resolve queries
     let window = window_query.single();
-    let Ok((player, player_collider, player_transform)) = player_query.get_single() else {
+    let Ok((player, player_transform)) = player_query.get_single() else {
 		error!("Could not get player collider or transform");
 		return;
 	};
@@ -237,19 +234,6 @@ fn start_grapple(
     let distance_to_window_edge = get_distance_to_window_edge(player_transform, window, direction);
     let query_filter = SpatialQueryFilter::default().without_entities([player]);
 
-    // let Some(first_hit) = spatial_query.cast_shape(
-    // 	player_collider,
-    // 	origin,
-    // 	default(),
-    // 	direction,
-    // 	distance_to_window_edge,
-    // 	true,
-    // 	query_filter,
-    // ) else {
-    // 	warn!("Grapple shapecast hit nothing");
-    // 	return;
-    // };
-
     trace!(
         "Origin: {}, direction: {}, distance_to_window_edge: {}",
         origin,
@@ -268,15 +252,6 @@ fn start_grapple(
 		return;
 	};
     let point = origin + direction * first_hit.time_of_impact;
-
-    // Find transform for entity
-    let Ok(entity_transform) = entities_query.get(first_hit.entity) else {
-		error!("Grapple shapecast hit entity with no transform");
-		return;
-	};
-
-    // Resolve point to global space
-    // let point = resolve_local_point(&entity_transform.translation.truncate(), &point);
 
     debug!("Grapple shapecast hit: {:?}", point);
 
@@ -332,19 +307,6 @@ fn get_distance_to_window_edge(player: &Transform, window: &Window, direction: V
     let distance_to_edge = distance_to_edge / 2.0;
 
     distance_to_edge
-}
-
-fn resolve_local_point(translate: &Vec2, local_point: &Vec2) -> Vec2 {
-    let result = *translate - *local_point;
-
-    trace!(
-        "Resolving local point (translate: {:?}, local_point: {:?}) to {:?}",
-        translate,
-        local_point,
-        result
-    );
-
-    result
 }
 
 enum ResolveMousePosError {
