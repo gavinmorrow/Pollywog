@@ -54,6 +54,9 @@ impl Default for GrappleState {
     }
 }
 
+#[derive(Resource)]
+struct TargetPos(Vec2, Entity);
+
 fn idle(
     action_state_query: Query<&ActionState<Action>, With<Player>>,
     mut next_grapple_state: ResMut<NextState<GrappleState>>,
@@ -179,9 +182,6 @@ fn cast_grapple_ray(
 
     Ok((point, entity))
 }
-
-#[derive(Resource)]
-struct TargetPos(Vec2, Entity);
 
 fn grapple(
     action_state_query: Query<&ActionState<Action>, With<Player>>,
