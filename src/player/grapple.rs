@@ -20,7 +20,7 @@ impl Plugin for GrapplePlugin {
                 (
                     idle.run_if(state_exists_and_equals(GrappleState::Idle)),
                     aim.run_if(state_exists_and_equals(GrappleState::Aiming)),
-                    aim_guideline.run_if(state_exists_and_equals(GrappleState::Aiming)),
+                    aim_marker.run_if(state_exists_and_equals(GrappleState::Aiming)),
                     grapple.run_if(state_exists_and_equals(GrappleState::Grappling)),
                     manage_grapple.run_if(state_exists_and_equals(GrappleState::Grappling)),
                     should_grapple_end.run_if(state_exists_and_equals(GrappleState::Grappling)),
@@ -94,7 +94,7 @@ fn aim(
     }
 }
 
-fn aim_guideline(
+fn aim_marker(
     spatial_query: SpatialQuery,
     window_query: Query<&Window, With<PrimaryWindow>>,
     player_query: Query<(Entity, &Transform), With<Player>>,
@@ -104,14 +104,7 @@ fn aim_guideline(
 ) {
     // Clear old marker
     if let Some(target_pos) = target_pos {
-        // Despawn
-        commands.entity(target_pos.2).despawn_recursive();
-
-        // Remove resource
-        // If this is not done and the raycast doesn't hit anything (so the resource
-        // doesn't get overwritten), it will attempt to despawn the marker again, which
-        // will cause a panic.
-        commands.remove_resource::<TargetPos>();
+        remove_target_pos(&mut commands, target_pos.2);
     }
 
     let Ok((point, target)) = cast_grapple_ray(spatial_query, window_query, player_query, camera_query) else {
@@ -125,6 +118,15 @@ fn aim_guideline(
     // Add point to target pos resource
     let target_pos = TargetPos(point, target, marker);
     commands.insert_resource(target_pos);
+}
+
+/// Cleanly removes the `TargetPos` resource.
+///
+/// This despawns the marker entity and removes the resource.
+fn remove_target_pos(commands: &mut Commands, marker: Entity) {
+    debug!("Removing target pos for marker {:?}", marker);
+    commands.entity(marker).despawn_recursive();
+    commands.remove_resource::<TargetPos>();
 }
 
 enum RaycastError {
@@ -307,12 +309,15 @@ fn add_grapple_marker(commands: &mut Commands, point: &Vec2) -> Entity {
 
 fn end_grapple(
     mut_player_query: Query<(&mut ExternalForce, &mut GravityScale), With<Player>>,
+    target_pos: Option<Res<TargetPos>>,
     mut commands: Commands,
 ) {
     debug!("Ending grapple");
 
-    // Remove target pos resource
-    commands.remove_resource::<TargetPos>();
+    // Remove target pos resource if it exists
+    if let Some(target_pos) = target_pos {
+        remove_target_pos(&mut commands, target_pos.2);
+    }
 
     // Remove player external force
     super::remove_grapple_force(mut_player_query);
