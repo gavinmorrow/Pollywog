@@ -5,6 +5,8 @@ use leafwing_input_manager::prelude::*;
 use super::{Action, Player};
 
 pub const FORCE_MULT: f32 = 5_000_000.0;
+const GUIDELINE_DISTANCE: f32 = 50.0;
+const GUIDELINE_SIZE: f32 = 10.0;
 
 #[derive(Default)]
 pub struct GrapplePlugin {}
@@ -16,7 +18,7 @@ impl Plugin for GrapplePlugin {
         app.add_state::<GrappleState>()
             .insert_resource(Guideline::default())
             .add_systems(OnExit(GrappleState::Grappling), end_grapple)
-            .add_systems(OnExit(GrappleState::Aiming), remove_guideline)
+            .add_systems(OnExit(GrappleState::Aiming), remove_guideline_system)
             .add_systems(
                 Update,
                 (
@@ -133,10 +135,7 @@ fn aim_guideline(
     mut commands: Commands,
 ) {
     // Clear old guidelines
-    for guideline in guideline.0.iter() {
-        commands.entity(*guideline).despawn();
-    }
-    guideline.0.clear();
+    remove_guideline(&mut guideline, &mut commands);
 
     let Some(target_pos) = target_pos else {
         warn!("No target pos for grapple guidelines");
@@ -148,15 +147,15 @@ fn aim_guideline(
     let player_pos = player.translation().truncate();
     let target_pos = target_pos.0;
     let direction = target_pos - player_pos;
-    let distance = direction.normalize() * 50.0;
+    let distance = direction.normalize() * GUIDELINE_DISTANCE;
 
     // Add guidelines
     let mut current_pos = player_pos;
-    while current_pos.distance(target_pos) >= 50.0 {
+    while current_pos.distance(target_pos) >= GUIDELINE_DISTANCE {
         let sprite = SpriteBundle {
             sprite: Sprite {
                 color: Color::BLUE,
-                custom_size: Some(Vec2::new(10.0, 10.0)),
+                custom_size: Some(Vec2::new(GUIDELINE_SIZE, GUIDELINE_SIZE)),
                 ..default()
             },
             transform: Transform {
@@ -376,7 +375,7 @@ fn end_grapple(
     super::remove_grapple_force(mut_player_query);
 }
 
-fn remove_guideline(mut guideline: ResMut<Guideline>, mut commands: Commands) {
+fn remove_guideline(guideline: &mut ResMut<Guideline>, commands: &mut Commands) {
     debug!("Removing guideline");
 
     // Clear old guidelines
@@ -385,6 +384,10 @@ fn remove_guideline(mut guideline: ResMut<Guideline>, mut commands: Commands) {
     }
 
     guideline.0.clear();
+}
+
+fn remove_guideline_system(mut guideline: ResMut<Guideline>, mut commands: Commands) {
+    remove_guideline(&mut guideline, &mut commands);
 }
 
 fn get_distance_to_window_edge(player: &Transform, window: &Window, direction: Vec2) -> f32 {
