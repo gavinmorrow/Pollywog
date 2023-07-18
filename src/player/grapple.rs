@@ -14,7 +14,6 @@ impl Plugin for GrapplePlugin {
         debug!("Building GrapplePlugin");
 
         app.add_state::<GrappleState>()
-            .add_systems(OnEnter(GrappleState::Grappling), start_grapple)
             .add_systems(OnExit(GrappleState::Grappling), end_grapple)
             .add_systems(
                 Update,
@@ -86,21 +85,22 @@ fn aim(
 }
 
 fn aim_guideline(
-    mut player_query: Query<&mut LinearVelocity, With<Player>>,
+    spatial_query: SpatialQuery,
     window_query: Query<&Window, With<PrimaryWindow>>,
+    player_query: Query<(Entity, &Transform), With<Player>>,
+    camera_query: Query<(&Camera, &GlobalTransform)>,
+    mut commands: Commands,
 ) {
-    let Ok(mut _player) = player_query.get_single_mut() else { return; };
+    let Ok((point, target)) = cast_grapple_ray(spatial_query, window_query, player_query, camera_query) else {
+        warn!("Could not cast grapple ray");
+        return;
+    };
 
-    // Get the mouse position
-    let window = window_query.single();
-    let Some(mouse_pos) = window.cursor_position() else {
-		warn!("Tried to aim grapple when mouse was not in window");
-		return;
-	};
+    // Add grapple marker
+    add_grapple_marker(&mut commands, &point);
 
-    debug!("Aiming grapple (mouse pos: {:?})", mouse_pos);
-
-    // TODO: draw guidelines
+    // Add point to target pos resource
+    commands.insert_resource(TargetPos(point, target));
 }
 
 enum RaycastError {
@@ -266,27 +266,6 @@ fn end_grapple_on_other_input(
             next_grapple_state.set(GrappleState::Grappling.next());
         }
     }
-}
-
-fn start_grapple(
-    spatial_query: SpatialQuery,
-    window_query: Query<&Window, With<PrimaryWindow>>,
-    player_query: Query<(Entity, &Transform), With<Player>>,
-    camera_query: Query<(&Camera, &GlobalTransform)>,
-    mut commands: Commands,
-) {
-    let Ok((point, target)) = cast_grapple_ray(spatial_query, window_query, player_query, camera_query) else {
-        warn!("Could not cast grapple ray");
-        return;
-    };
-
-    // Add grapple marker
-    add_grapple_marker(&mut commands, &point);
-
-    // Add point to target pos resource
-    commands.insert_resource(TargetPos(point, target));
-
-    // All player force stuff is taken care of in `manage_grapple`
 }
 
 fn add_grapple_marker(commands: &mut Commands, point: &Vec2) -> Entity {
