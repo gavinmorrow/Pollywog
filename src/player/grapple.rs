@@ -220,18 +220,29 @@ fn start_grapple(
     let distance_to_window_edge = get_distance_to_window_edge(player_transform, window, direction);
     let query_filter = SpatialQueryFilter::default().without_entities([player]);
 
-    let Some(first_hit) = spatial_query.cast_shape(
-		player_collider,
-		origin,
-		default(),
-		direction,
-		distance_to_window_edge,
-		true,
-		query_filter,
-	) else {
-		warn!("Grapple shapecast hit nothing");
-		return;
-	};
+    // let Some(first_hit) = spatial_query.cast_shape(
+    // 	player_collider,
+    // 	origin,
+    // 	default(),
+    // 	direction,
+    // 	distance_to_window_edge,
+    // 	true,
+    // 	query_filter,
+    // ) else {
+    // 	warn!("Grapple shapecast hit nothing");
+    // 	return;
+    // };
+
+    let Some(first_hit) = spatial_query.cast_ray(
+        origin,
+        direction,
+        distance_to_window_edge,
+        false,
+        query_filter,
+    );
+
+	println!("normal: {:?}", first_hit.normal);
+	return;
 
     // Find transform for entity
     let Ok(entity_transform) = entities_query.get(first_hit.entity) else {
@@ -245,16 +256,15 @@ fn start_grapple(
     debug!("Grapple shapecast hit: {:?}", point);
 
     // add a point at the hit location (both for the target detection and debugging)
-	commands
-        .spawn(SpriteBundle {
-            sprite: Sprite {
-                color: Color::RED,
-                custom_size: Some(Vec2::new(10.0, 10.0)),
-                ..default()
-            },
-            transform: Transform::from_translation(point.extend(1.0)),
-            ..Default::default()
-        });
+    commands.spawn(SpriteBundle {
+        sprite: Sprite {
+            color: Color::RED,
+            custom_size: Some(Vec2::new(10.0, 10.0)),
+            ..default()
+        },
+        transform: Transform::from_translation(point.extend(1.0)),
+        ..Default::default()
+    });
 
     // Add point to target pos resource
     commands.insert_resource(TargetPos(point, first_hit.entity));
