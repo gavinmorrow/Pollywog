@@ -218,9 +218,9 @@ fn start_grapple(
 		return;
 	};
 
-    debug!("Starting grapple shapecast");
+    debug!("Starting grapple raycast");
 
-    // Cast shape
+    // Cast ray
     let Ok(direction) = resolve_mouse_pos(
         window,
         camera,
@@ -253,7 +253,7 @@ fn start_grapple(
 	};
     let point = origin + direction * first_hit.time_of_impact;
 
-    debug!("Grapple shapecast hit: {:?}", point);
+    debug!("Grapple raycast hit: {:?}", point);
 
     // add a point at the hit location (both for the target detection and debugging)
     commands.spawn(SpriteBundle {
