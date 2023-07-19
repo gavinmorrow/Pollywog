@@ -2,15 +2,17 @@ use bevy::{prelude::*, window::PrimaryWindow};
 use bevy_xpbd_2d::prelude::*;
 use leafwing_input_manager::prelude::*;
 
+pub mod grapple;
+
 const SIZE: f32 = 64.0;
 const SIZE_VEC2: Vec2 = Vec2::new(SIZE, SIZE);
 
 const TEXTURE_PATH: &str = "player.png";
 
-#[derive(Component)]
+#[derive(Component, Default)]
 pub struct Player;
 
-#[derive(Bundle)]
+#[derive(Bundle, Default)]
 pub struct PlayerBundle {
     sprite_bundle: SpriteBundle,
     rigid_body: RigidBody,
@@ -19,6 +21,8 @@ pub struct PlayerBundle {
     angular_damping: AngularDamping,
     linear_damping: LinearDamping,
     input_manager: InputManagerBundle<Action>,
+    external_force: ExternalForce,
+    gravity_scale: GravityScale,
 }
 
 impl PlayerBundle {
@@ -31,8 +35,11 @@ impl PlayerBundle {
             .insert(QwertyScanCode::A, Action::Left)
             .insert(KeyCode::Right, Action::Right)
             .insert(QwertyScanCode::D, Action::Right)
+            .insert(KeyCode::W, Action::Jump)
+            .insert(QwertyScanCode::Up, Action::Jump)
             .insert(KeyCode::Space, Action::Jump)
-            .insert(KeyCode::Up, Action::Jump);
+            .insert(QwertyScanCode::E, Action::Grapple)
+            .insert(QwertyScanCode::Slash, Action::Grapple);
 
         Self {
             sprite_bundle: SpriteBundle {
@@ -56,6 +63,8 @@ impl PlayerBundle {
                 action_state: ActionState::default(),
                 input_map,
             },
+            external_force: ExternalForce::default(),
+            gravity_scale: GravityScale(1.0),
         }
     }
 }
@@ -98,7 +107,40 @@ pub fn r#move(
             Action::Left => player.x = -300.0,
             Action::Right => player.x = 300.0,
             Action::Jump => player.y = 300.0,
-            Action::Grapple => todo!(),
+            Action::Grapple => { /* Do nothing, this is handled elsewhere. */ }
         }
     }
+}
+
+/// Add a force to the player in the given direction (to be used for grappling).
+fn add_grapple_force(
+    mut player_query: Query<(&mut ExternalForce, &mut GravityScale), With<Player>>,
+    direction: Vec2,
+) {
+    let (mut external_force, mut gravity) = player_query.single_mut();
+
+    // Add force to player
+    let force = direction * grapple::FORCE_MULT;
+    trace!("Setting external force on player to: {:?}", force);
+    external_force.set_force(force);
+
+    // Remove player gravity
+    gravity.0 = 0.0;
+
+    debug!("Added grapple force to player.");
+}
+
+/// Remove the force from the player (to be used for stopping grappling).
+fn remove_grapple_force(
+    mut player_query: Query<(&mut ExternalForce, &mut GravityScale), With<Player>>,
+) {
+    let (mut external_force, mut gravity) = player_query.single_mut();
+
+    // Remove player external force
+    external_force.set_force(Vec2::ZERO);
+
+    // Add player gravity
+    gravity.0 = 1.0;
+
+    debug!("Removed grapple force from player.");
 }
