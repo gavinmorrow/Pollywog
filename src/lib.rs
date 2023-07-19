@@ -18,6 +18,7 @@ pub fn start_app() {
         ))
         .insert_resource(level::Level::new(0))
         .insert_resource(Gravity(Vec2::new(0.0, -9.81 * 100.0)))
+        .insert_resource(player::CanJump(true))
         .add_systems(
             Startup,
             (camera::spawn_camera, player::spawn, level::spawn_blocks),
@@ -27,6 +28,7 @@ pub fn start_app() {
             (
                 camera::keep_player_in_view.after(player::r#move),
                 player::r#move,
+                player::can_jump.before(player::r#move),
                 bevy::window::close_on_esc,
             ),
         )
@@ -41,7 +43,7 @@ fn setup_default_plugins() -> PluginGroupBuilder {
         })
         .set(WindowPlugin {
             primary_window: Some(Window {
-                mode: WindowMode::BorderlessFullscreen,
+                mode: WindowMode::Windowed,
                 title: "Pollywog".to_string(),
                 ..default()
             }),

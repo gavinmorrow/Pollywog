@@ -4,12 +4,16 @@ use bevy_xpbd_2d::prelude::*;
 pub const SIZE: f32 = 64.0;
 pub const SIZE_VEC2: Vec2 = Vec2::new(SIZE, SIZE);
 
+#[derive(Component, Clone, Default)]
+pub struct Block;
+
 #[derive(Bundle, Clone)]
 pub struct BlockBundle {
     sprite_bundle: SpriteBundle,
     rigid_body: RigidBody,
     collider: Collider,
     friction: Friction,
+    block: Block,
 }
 
 impl core::fmt::Debug for BlockBundle {
@@ -45,6 +49,7 @@ impl BlockBundle {
             rigid_body: RigidBody::Static,
             collider: Collider::cuboid(SIZE, SIZE),
             friction: Friction::new(1.0),
+            block: Block,
         }
     }
 }

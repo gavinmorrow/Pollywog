@@ -2,7 +2,7 @@ use bevy::prelude::*;
 
 use block::BlockBundle;
 
-mod block;
+pub mod block;
 
 pub struct Level {
     pub id: u32,

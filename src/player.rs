@@ -77,6 +77,9 @@ pub enum Action {
     Grapple,
 }
 
+#[derive(Resource, Default)]
+pub struct CanJump(pub bool);
+
 pub fn spawn(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
@@ -91,6 +94,7 @@ pub fn spawn(
 // FIXME: make a better movement system, this is just a placeholder
 pub fn r#move(
     action_state_query: Query<&ActionState<Action>, With<Player>>,
+    can_jump: Res<CanJump>,
     mut player_query: Query<&mut LinearVelocity, With<Player>>,
 ) {
     let action_state = action_state_query.single();
@@ -106,9 +110,24 @@ pub fn r#move(
         match action {
             Action::Left => player.x = -300.0,
             Action::Right => player.x = 300.0,
-            Action::Jump => player.y = 300.0,
+            Action::Jump => {
+                if can_jump.0 {
+                    player.y = 300.0
+                }
+            }
             Action::Grapple => { /* Do nothing, this is handled elsewhere. */ }
         }
+    }
+}
+
+pub fn can_jump(
+    mut collisions: EventReader<Collision>,
+    mut can_jump: ResMut<CanJump>,
+    player_query: Query<Entity, With<Player>>,
+    blocks_query: Query<Entity, With<crate::level::block::Block>>,
+) {
+    for collision in collisions.iter() {
+        
     }
 }
 
