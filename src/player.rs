@@ -123,12 +123,39 @@ pub fn r#move(
 pub fn can_jump(
     mut collisions: EventReader<Collision>,
     mut can_jump: ResMut<CanJump>,
-    player_query: Query<Entity, With<Player>>,
-    blocks_query: Query<Entity, With<crate::level::block::Block>>,
+    query: Query<(
+        Entity,
+        Option<&crate::level::block::JumpCollisionBox>,
+        Option<&Player>,
+    )>,
+    // player_query: Query<Entity, With<Player>>,
+    // blocks_query: Query<Entity, With<crate::level::block::JumpCollisionBox>>,
 ) {
+    let player = query
+        .iter()
+        .filter(|(_, _, player)| player.is_some())
+        .next()
+        .unwrap()
+        .0;
     for collision in collisions.iter() {
-        
+        let collision = collision.0;
+
+        if player == collision.entity1 || player == collision.entity2 {
+            let other = if player == collision.entity1 {
+                collision.entity2
+            } else {
+                collision.entity1
+            };
+
+            if query.get(other).is_ok() {
+                can_jump.0 = true;
+                trace!("Player can jump.");
+                return;
+            }
+        }
     }
+    can_jump.0 = false;
+    trace!("Player can't jump.");
 }
 
 /// Add a force to the player in the given direction (to be used for grappling).

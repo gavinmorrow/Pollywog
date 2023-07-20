@@ -16,6 +16,16 @@ pub struct BlockBundle {
     block: Block,
 }
 
+#[derive(Component, Clone, Default)]
+pub struct JumpCollisionBox;
+
+#[derive(Bundle, Clone)]
+pub struct JumpCollisionBoxBundle {
+    sprite_bundle: SpriteBundle,
+    collider: Collider,
+    jump_collision_box: JumpCollisionBox,
+}
+
 impl core::fmt::Debug for BlockBundle {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> core::fmt::Result {
         f.debug_struct(
@@ -50,6 +60,32 @@ impl BlockBundle {
             collider: Collider::cuboid(SIZE, SIZE),
             friction: Friction::new(1.0),
             block: Block,
+        }
+    }
+}
+
+impl JumpCollisionBoxBundle {
+    pub fn new(translation: Vec3) -> Self {
+        // Add padding on left so wall clinging doesn't work
+        let translation = translation + Vec3::new(1.0, 0.0, 0.0);
+
+        trace!(
+            "Creating jump collision box bundle (translation: {:?})",
+            translation
+        );
+
+        Self {
+            sprite_bundle: SpriteBundle {
+                transform: Transform {
+                    translation,
+                    ..default()
+                },
+                visibility: Visibility::Hidden,
+                ..default()
+            },
+            // Add padding so wall clinging doesn't work
+            collider: Collider::cuboid(SIZE - 2.0, SIZE - 2.0),
+            jump_collision_box: JumpCollisionBox,
         }
     }
 }
