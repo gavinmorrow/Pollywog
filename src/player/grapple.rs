@@ -397,7 +397,7 @@ fn get_distance_to_window_edge(player: &Transform, window: &Window, direction: V
     let distance_to_edge = window_size - player_pos;
     let distance_to_edge = distance_to_edge / direction;
     let distance_to_edge = (distance_to_edge.x.powf(2.0) + distance_to_edge.y.powf(2.0)).sqrt();
-    
+
     distance_to_edge / 2.0
 }
 

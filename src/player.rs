@@ -140,7 +140,11 @@ fn can_jump(
         Option<&Player>,
     )>,
 ) {
-    let player = query.iter().find(|(_, _, player)| player.is_some()).unwrap().0;
+    let player = query
+        .iter()
+        .find(|(_, _, player)| player.is_some())
+        .unwrap()
+        .0;
     for collision in collisions.iter() {
         let collision = collision.0;
 
