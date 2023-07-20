@@ -16,10 +16,9 @@ pub fn start_app() {
             InputManagerPlugin::<player::Action>::default(),
             camera::CameraPlugin::default(),
             player::PlayerPlugin::default(),
+            level::LevelPlugin::default(),
         ))
-        .insert_resource(level::Level::new(0))
         .insert_resource(Gravity(Vec2::new(0.0, -9.81 * 100.0)))
-        .add_systems(Startup, (level::spawn_blocks))
         .add_systems(Update, (bevy::window::close_on_esc,))
         .run();
 }

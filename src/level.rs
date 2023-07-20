@@ -1,10 +1,17 @@
 use bevy::prelude::*;
 
-use block::BlockBundle;
-
-use crate::level::block::JumpCollisionBoxBundle;
+use block::{BlockBundle, JumpCollisionBoxBundle};
 
 pub mod block;
+
+#[derive(Default)]
+pub struct LevelPlugin;
+impl Plugin for LevelPlugin {
+    fn build(&self, app: &mut App) {
+        app.insert_resource(Level::new(0))
+            .add_systems(Startup, spawn_blocks);
+    }
+}
 
 pub struct Level {
     pub id: u32,
