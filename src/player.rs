@@ -2,7 +2,7 @@ use bevy::{prelude::*, window::PrimaryWindow};
 use bevy_xpbd_2d::prelude::*;
 use leafwing_input_manager::prelude::*;
 
-pub mod grapple;
+mod grapple;
 
 const SIZE: f32 = 64.0;
 const SIZE_VEC2: Vec2 = Vec2::new(SIZE, SIZE);
@@ -24,7 +24,7 @@ impl Plugin for PlayerPlugin {
 pub struct Player;
 
 #[derive(Bundle, Default)]
-pub struct PlayerBundle {
+struct PlayerBundle {
     sprite_bundle: SpriteBundle,
     rigid_body: RigidBody,
     collider: Collider,
@@ -37,7 +37,7 @@ pub struct PlayerBundle {
 }
 
 impl PlayerBundle {
-    pub fn new(asset_server: Res<AssetServer>, window: &Window) -> Self {
+    fn new(asset_server: Res<AssetServer>, window: &Window) -> Self {
         debug!("Creating player bundle");
 
         let mut input_map = InputMap::default();
@@ -91,7 +91,7 @@ pub enum Action {
 #[derive(Resource, Default)]
 pub struct CanJump(pub bool);
 
-pub fn spawn(
+fn spawn(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
     window_query: Query<&Window, With<PrimaryWindow>>,
@@ -131,7 +131,7 @@ pub fn r#move(
     }
 }
 
-pub fn can_jump(
+fn can_jump(
     mut collisions: EventReader<Collision>,
     mut can_jump: ResMut<CanJump>,
     query: Query<(

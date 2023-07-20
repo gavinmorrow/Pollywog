@@ -37,14 +37,14 @@ impl Plugin for GrapplePlugin {
 }
 
 #[derive(States, Debug, Clone, Eq, PartialEq, Hash)]
-pub enum GrappleState {
+enum GrappleState {
     Idle,
     Aiming,
     Grappling,
 }
 
 impl GrappleState {
-    pub fn next(&self) -> Self {
+    fn next(&self) -> Self {
         match self {
             Self::Idle => Self::Aiming,
             Self::Aiming => Self::Grappling,

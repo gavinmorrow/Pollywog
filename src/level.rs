@@ -13,14 +13,14 @@ impl Plugin for LevelPlugin {
     }
 }
 
-pub struct Level {
-    pub id: u32,
-    pub blocks: Vec<BlockBundle>,
-    pub jump_collision_block_boxes: Vec<JumpCollisionBoxBundle>,
+struct Level {
+    id: u32,
+    blocks: Vec<BlockBundle>,
+    jump_collision_block_boxes: Vec<JumpCollisionBoxBundle>,
 }
 
 impl Level {
-    pub fn new(id: u32) -> Self {
+    fn new(id: u32) -> Self {
         debug!("Creating level (id: {})", id);
 
         let num_blocks = match id {
@@ -55,7 +55,7 @@ impl Level {
 
 impl Resource for Level {}
 
-pub fn spawn_blocks(mut commands: Commands, level: Res<Level>) {
+fn spawn_blocks(mut commands: Commands, level: Res<Level>) {
     debug!("Spawning blocks");
     for block in level.blocks.iter() {
         commands.spawn(block.clone());
