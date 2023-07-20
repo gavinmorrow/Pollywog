@@ -1,6 +1,6 @@
 use bevy::{prelude::*, window::PrimaryWindow};
 
-use crate::player::{Player, self};
+use crate::player::{self, Player};
 
 /// The starting X position of the camera (from the left edge of the window).
 const START_X: f32 = 100.0;
