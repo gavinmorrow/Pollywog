@@ -1,9 +1,18 @@
 use bevy::{prelude::*, window::PrimaryWindow};
 
-use crate::player::Player;
+use crate::player::{Player, self};
 
 /// The starting X position of the camera (from the left edge of the window).
 const START_X: f32 = 100.0;
+
+#[derive(Default)]
+pub struct CameraPlugin;
+impl Plugin for CameraPlugin {
+    fn build(&self, app: &mut App) {
+        app.add_systems(Startup, spawn_camera)
+            .add_systems(Update, keep_player_in_view.after(player::r#move));
+    }
+}
 
 pub fn spawn_camera(mut commands: Commands, window_query: Query<&Window, With<PrimaryWindow>>) {
     let window = window_query.single();

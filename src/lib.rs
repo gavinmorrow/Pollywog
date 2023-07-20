@@ -14,6 +14,7 @@ pub fn start_app() {
             setup_default_plugins(),
             PhysicsPlugins::default(),
             InputManagerPlugin::<player::Action>::default(),
+            camera::CameraPlugin::default(),
             player::grapple::GrapplePlugin::default(),
         ))
         .insert_resource(level::Level::new(0))
@@ -21,7 +22,7 @@ pub fn start_app() {
         .insert_resource(player::CanJump(true))
         .add_systems(
             Startup,
-            (camera::spawn_camera, player::spawn, level::spawn_blocks),
+            (player::spawn, level::spawn_blocks),
         )
         .add_systems(
             Update,
