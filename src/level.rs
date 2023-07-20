@@ -14,7 +14,8 @@ impl Plugin for LevelPlugin {
 }
 
 struct Level {
-    id: u32,
+    // this will be used soon
+    _id: u32,
     blocks: Vec<BlockBundle>,
     jump_collision_block_boxes: Vec<JumpCollisionBoxBundle>,
 }
@@ -46,7 +47,7 @@ impl Level {
         }
 
         Self {
-            id,
+            _id: id,
             blocks,
             jump_collision_block_boxes,
         }

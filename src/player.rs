@@ -112,7 +112,7 @@ pub fn r#move(
     let Ok(mut player) = player_query.get_single_mut() else { return; };
     let actions = action_state.get_pressed();
 
-    if actions.len() > 0 {
+    if !actions.is_empty() {
         debug!("Moving player.");
     }
 
@@ -139,15 +139,8 @@ fn can_jump(
         Option<&crate::level::block::JumpCollisionBox>,
         Option<&Player>,
     )>,
-    // player_query: Query<Entity, With<Player>>,
-    // blocks_query: Query<Entity, With<crate::level::block::JumpCollisionBox>>,
 ) {
-    let player = query
-        .iter()
-        .filter(|(_, _, player)| player.is_some())
-        .next()
-        .unwrap()
-        .0;
+    let player = query.iter().find(|(_, _, player)| player.is_some()).unwrap().0;
     for collision in collisions.iter() {
         let collision = collision.0;
 
