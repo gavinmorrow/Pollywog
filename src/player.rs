@@ -9,6 +9,17 @@ const SIZE_VEC2: Vec2 = Vec2::new(SIZE, SIZE);
 
 const TEXTURE_PATH: &str = "player.png";
 
+#[derive(Default)]
+pub struct PlayerPlugin;
+impl Plugin for PlayerPlugin {
+    fn build(&self, app: &mut App) {
+        app.add_plugins(grapple::GrapplePlugin::default())
+            .insert_resource(CanJump(true))
+            .add_systems(Startup, spawn)
+            .add_systems(Update, (r#move, can_jump.before(r#move)));
+    }
+}
+
 #[derive(Component, Default)]
 pub struct Player;
 

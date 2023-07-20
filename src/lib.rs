@@ -15,24 +15,12 @@ pub fn start_app() {
             PhysicsPlugins::default(),
             InputManagerPlugin::<player::Action>::default(),
             camera::CameraPlugin::default(),
-            player::grapple::GrapplePlugin::default(),
+            player::PlayerPlugin::default(),
         ))
         .insert_resource(level::Level::new(0))
         .insert_resource(Gravity(Vec2::new(0.0, -9.81 * 100.0)))
-        .insert_resource(player::CanJump(true))
-        .add_systems(
-            Startup,
-            (player::spawn, level::spawn_blocks),
-        )
-        .add_systems(
-            Update,
-            (
-                camera::keep_player_in_view.after(player::r#move),
-                player::r#move,
-                player::can_jump.before(player::r#move),
-                bevy::window::close_on_esc,
-            ),
-        )
+        .add_systems(Startup, (level::spawn_blocks))
+        .add_systems(Update, (bevy::window::close_on_esc,))
         .run();
 }
 
