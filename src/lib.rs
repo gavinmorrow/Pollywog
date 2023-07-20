@@ -19,7 +19,7 @@ pub fn start_app() {
             level::LevelPlugin::default(),
         ))
         .insert_resource(Gravity(Vec2::new(0.0, -9.81 * 100.0)))
-        .add_systems(Update, (bevy::window::close_on_esc,))
+        .add_systems(Update, bevy::window::close_on_esc)
         .run();
 }
 
