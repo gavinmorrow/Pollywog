@@ -8,19 +8,19 @@ pub mod block;
 pub struct LevelPlugin;
 impl Plugin for LevelPlugin {
     fn build(&self, app: &mut App) {
-        app.insert_resource(Level::new(0))
+        app.insert_resource(LevelSprites::new(0))
             .add_systems(Startup, spawn_blocks);
     }
 }
 
-struct Level {
+struct LevelSprites {
     // this will be used soon
     _id: u32,
     blocks: Vec<BlockBundle>,
     jump_collision_block_boxes: Vec<JumpCollisionBoxBundle>,
 }
 
-impl Level {
+impl LevelSprites {
     fn new(id: u32) -> Self {
         debug!("Creating level (id: {})", id);
 
@@ -54,9 +54,9 @@ impl Level {
     }
 }
 
-impl Resource for Level {}
+impl Resource for LevelSprites {}
 
-fn spawn_blocks(mut commands: Commands, level: Res<Level>) {
+fn spawn_blocks(mut commands: Commands, level: Res<LevelSprites>) {
     debug!("Spawning blocks");
     for block in level.blocks.iter() {
         commands.spawn(block.clone());
