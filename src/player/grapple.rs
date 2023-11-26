@@ -115,7 +115,9 @@ fn aim_marker(
         remove_target_pos(&mut commands, target_pos.2);
     }
 
-    let Ok((point, target)) = cast_grapple_ray(spatial_query, window_query, player_query, camera_query) else {
+    let Ok((point, target)) =
+        cast_grapple_ray(spatial_query, window_query, player_query, camera_query)
+    else {
         warn!("Could not cast grapple ray");
         return;
     };
@@ -208,13 +210,13 @@ fn cast_grapple_ray(
     // Resolve queries
     let window = window_query.single();
     let Ok((player, player_transform)) = player_query.get_single() else {
-		error!("Could not get player entity or transform");
-		return Err(RaycastError::NoPlayer);
-	};
+        error!("Could not get player entity or transform");
+        return Err(RaycastError::NoPlayer);
+    };
     let Ok((camera, camera_transform)) = camera_query.get_single() else {
-		error!("Could not get camera for grapple raycast");
-		return Err(RaycastError::NoCamera);
-	};
+        error!("Could not get camera for grapple raycast");
+        return Err(RaycastError::NoCamera);
+    };
 
     debug!("Starting grapple raycast");
 
@@ -225,9 +227,9 @@ fn cast_grapple_ray(
         camera_transform,
         player_transform.translation.truncate(),
     ) else {
-		error!("Could not resolve mouse position for starting grapple");
-		return Err(RaycastError::CouldNotResolveMousePos);
-	};
+        error!("Could not resolve mouse position for starting grapple");
+        return Err(RaycastError::CouldNotResolveMousePos);
+    };
     let origin = player_transform.translation.truncate();
     let distance_to_window_edge = get_distance_to_window_edge(player_transform, window, direction);
     let query_filter = SpatialQueryFilter::default().without_entities([player]);
@@ -247,9 +249,9 @@ fn cast_grapple_ray(
         true,
         query_filter,
     ) else {
-		warn!("Raycast hit nothing");
-		return Err(RaycastError::RayHitNothing);
-	};
+        warn!("Raycast hit nothing");
+        return Err(RaycastError::RayHitNothing);
+    };
     let point = origin + direction * first_hit.time_of_impact;
     let entity = first_hit.entity;
 
@@ -279,13 +281,13 @@ fn manage_grapple(
 ) {
     // Resolve queries
     let Ok(player_transform) = player_query.get_single() else {
-		error!("Could not get player transform");
-		return;
-	};
+        error!("Could not get player transform");
+        return;
+    };
     let Some(target_pos) = target_pos else {
-		error!("Could not get target position");
-		return;
-	};
+        error!("Could not get target position");
+        return;
+    };
 
     let player = player_transform.translation().truncate();
     let target = target_pos.0;
@@ -309,9 +311,9 @@ fn should_grapple_end(
     let player = player.single();
 
     let Some(target_pos) = target_pos else {
-		warn!("No target pos resource");
-		return;
-	};
+        warn!("No target pos resource");
+        return;
+    };
     let target = target_pos.1;
 
     // Check if the player is touching the target
@@ -414,15 +416,15 @@ fn resolve_mouse_pos(
 ) -> Result<Vec2, ResolveMousePosError> {
     // Get mouse_pos relative to top left of screen
     let Some(mouse_pos) = window.cursor_position() else {
-		warn!("Tried to start grapple when mouse was not in window");
-		return Err(ResolveMousePosError::NoMousePos);
-	};
+        warn!("Tried to start grapple when mouse was not in window");
+        return Err(ResolveMousePosError::NoMousePos);
+    };
 
     // Make mouse_pos relative to world (not top left of screen)
     let Some(mouse_pos) = camera.viewport_to_world_2d(camera_transform, mouse_pos) else {
-		error!("Could not get mouse position in world space");
-		return Err(ResolveMousePosError::NoMouseCoords);
-	};
+        error!("Could not get mouse position in world space");
+        return Err(ResolveMousePosError::NoMouseCoords);
+    };
 
     // Make mouse_pos relative to player (not world)
     let direction = mouse_pos - player_translation;

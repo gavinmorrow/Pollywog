@@ -40,7 +40,9 @@ pub fn keep_player_in_view(
 ) {
     let window = window_query.single();
     let mut camera = camera_query.single_mut();
-    let Ok(player) = player_query.get_single() else { return; };
+    let Ok(player) = player_query.get_single() else {
+        return;
+    };
 
     let player_x = player.translation.x;
     let camera_x = camera.translation.x;

@@ -109,7 +109,9 @@ pub fn r#move(
     mut player_query: Query<&mut LinearVelocity, With<Player>>,
 ) {
     let action_state = action_state_query.single();
-    let Ok(mut player) = player_query.get_single_mut() else { return; };
+    let Ok(mut player) = player_query.get_single_mut() else {
+        return;
+    };
     let actions = action_state.get_pressed();
 
     if !actions.is_empty() {
