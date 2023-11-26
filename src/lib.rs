@@ -14,9 +14,9 @@ pub fn start_app() {
             setup_default_plugins(),
             PhysicsPlugins::default(),
             InputManagerPlugin::<player::Action>::default(),
-            camera::CameraPlugin::default(),
-            player::PlayerPlugin::default(),
-            level::LevelPlugin::default(),
+            camera::CameraPlugin,
+            player::PlayerPlugin,
+            level::LevelPlugin,
         ))
         .insert_resource(Gravity(Vec2::new(0.0, -9.81 * 100.0)))
         .add_systems(Update, bevy::window::close_on_esc)
