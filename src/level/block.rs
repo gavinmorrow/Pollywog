@@ -1,5 +1,5 @@
 use bevy::prelude::*;
-use bevy_xpbd_2d::prelude::*;
+use bevy_rapier2d::prelude::*;
 
 pub const SIZE: f32 = 64.0;
 pub const SIZE_VEC2: Vec2 = Vec2::new(SIZE, SIZE);

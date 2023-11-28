@@ -1,10 +1,12 @@
 use bevy::{app::PluginGroupBuilder, log::LogPlugin, prelude::*, window::WindowMode};
-use bevy_xpbd_2d::prelude::*;
+use bevy_rapier2d::prelude::*;
 use leafwing_input_manager::prelude::*;
 
 mod camera;
 mod level;
 mod player;
+
+const PIXELS_PER_METER: f32 = 100.0;
 
 pub fn start_app() {
     eprintln!("Creating app...");
@@ -12,13 +14,12 @@ pub fn start_app() {
     App::new()
         .add_plugins((
             setup_default_plugins(),
-            PhysicsPlugins::default(),
+            RapierPhysicsPlugin::<NoUserData>::pixels_per_meter(PIXELS_PER_METER),
             InputManagerPlugin::<player::Action>::default(),
             camera::CameraPlugin,
             player::PlayerPlugin,
             level::LevelPlugin,
         ))
-        .insert_resource(Gravity(Vec2::new(0.0, -9.81 * 100.0)))
         .add_systems(Update, bevy::window::close_on_esc)
         .run();
 }
