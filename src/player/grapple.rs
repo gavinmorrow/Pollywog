@@ -103,7 +103,7 @@ fn aim(
 }
 
 fn aim_marker(
-    spatial_query: SpatialQuery,
+    rapier_context: Res<RapierContext>,
     window_query: Query<&Window, With<PrimaryWindow>>,
     player_query: Query<(Entity, &Transform), With<Player>>,
     camera_query: Query<(&Camera, &GlobalTransform)>,
@@ -116,7 +116,7 @@ fn aim_marker(
     }
 
     let Ok((point, target)) =
-        cast_grapple_ray(spatial_query, window_query, player_query, camera_query)
+        cast_grapple_ray(rapier_context, window_query, player_query, camera_query)
     else {
         warn!("Could not cast grapple ray");
         return;
