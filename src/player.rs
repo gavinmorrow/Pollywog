@@ -2,7 +2,7 @@ use bevy::{prelude::*, window::PrimaryWindow};
 use bevy_rapier2d::prelude::*;
 use leafwing_input_manager::prelude::*;
 
-use crate::{GRAVITY, PIXELS_PER_METER};
+use crate::GRAVITY;
 
 mod grapple;
 
