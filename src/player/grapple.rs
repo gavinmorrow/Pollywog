@@ -202,7 +202,7 @@ enum RaycastError {
 /// An error is returned if there was an error casting the ray, or if the ray
 /// hit nothing.
 fn cast_grapple_ray(
-    spatial_query: SpatialQuery,
+    rapier_context: Res<RapierContext>,
     window_query: Query<&Window, With<PrimaryWindow>>,
     player_query: Query<(Entity, &Transform), With<Player>>,
     camera_query: Query<(&Camera, &GlobalTransform)>,
@@ -232,7 +232,14 @@ fn cast_grapple_ray(
     };
     let origin = player_transform.translation.truncate();
     let distance_to_window_edge = get_distance_to_window_edge(player_transform, window, direction);
-    let query_filter = SpatialQueryFilter::default().without_entities([player]);
+    // FIXME: exclude player from raycast
+    let query_filter = QueryFilter::default();
+
+    let ray_pos = Vec2::new(1.0, 2.0);
+    let ray_dir = Vec2::new(0.0, 1.0);
+    let max_toi = 4.0;
+    let solid = true;
+    let filter = QueryFilter::default();
 
     trace!(
         "Origin: {}, direction: {}, distance_to_window_edge: {}",
@@ -242,7 +249,7 @@ fn cast_grapple_ray(
     );
 
     // Cast ray
-    let Some(first_hit) = spatial_query.cast_ray(
+    let Some((entity, toi)) = rapier_context.cast_ray(
         origin,
         direction,
         distance_to_window_edge,
@@ -252,8 +259,8 @@ fn cast_grapple_ray(
         warn!("Raycast hit nothing");
         return Err(RaycastError::RayHitNothing);
     };
-    let point = origin + direction * first_hit.time_of_impact;
-    let entity = first_hit.entity;
+    let point = origin + direction * toi;
+    let entity = entity;
 
     debug!("Raycast hit entity {:?} at {:?}", entity, point);
 
@@ -319,9 +326,7 @@ fn should_grapple_end(
     // Check if the player is touching the target
     for collision in collisions.read() {
         if let CollisionEvent::Started(a, b, flags) = collision {
-            if (a == player && b == target)
-                || (b == player && a == target)
-            {
+            if (a == player && b == target) || (b == player && a == target) {
                 debug!("Player is touching target, stopping grapple");
                 next_grapple_state.set(GrappleState::Grappling.next());
 
