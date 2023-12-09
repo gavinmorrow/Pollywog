@@ -4,7 +4,7 @@ use leafwing_input_manager::prelude::*;
 
 use super::{Action, Player};
 
-pub const FORCE_MULT: f32 = 5_000_000.0;
+// pub const FORCE_MULT: f32 = 5_000_000.0;
 const GUIDELINE_DISTANCE: f32 = 50.0;
 const GUIDELINE_SIZE: f32 = 10.0;
 
@@ -319,7 +319,7 @@ fn should_grapple_end(
 
     // Check if the player is touching the target
     for collision in collisions.read() {
-        if let CollisionEvent::Started(a, b, flags) = collision {
+        if let CollisionEvent::Started(a, b, _) = collision {
             if (a == player && b == target) || (b == player && a == target) {
                 debug!("Player is touching target, stopping grapple");
                 next_grapple_state.set(GrappleState::Grappling.next());

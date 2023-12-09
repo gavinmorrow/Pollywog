@@ -6,7 +6,8 @@ mod camera;
 mod level;
 mod player;
 
-const PIXELS_PER_METER: f32 = 100.0;
+const PIXELS_PER_METER: f32 = 64.0;
+const GRAVITY: Vec2 = Vec2::new(0.0, -9.81);
 
 pub fn start_app() {
     eprintln!("Creating app...");

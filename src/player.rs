@@ -2,6 +2,8 @@ use bevy::{prelude::*, window::PrimaryWindow};
 use bevy_rapier2d::prelude::*;
 use leafwing_input_manager::prelude::*;
 
+use crate::{GRAVITY, PIXELS_PER_METER};
+
 mod grapple;
 
 const SIZE: f32 = 64.0;
@@ -28,6 +30,7 @@ struct PlayerBundle {
     sprite_bundle: SpriteBundle,
     // FIXME: might need a rigid body
     character_controller: KinematicCharacterController,
+    rigid_body: RigidBody,
     collider: Collider,
     player: Player,
     damping: Damping,
@@ -66,12 +69,16 @@ impl PlayerBundle {
                 ..default()
             },
             // FIXME: maybe not default? just trying to get this to work for now
-            character_controller: KinematicCharacterController::default(),
+            character_controller: KinematicCharacterController {
+                translation: Some(GRAVITY),
+                ..default()
+            },
+            rigid_body: RigidBody::Dynamic,
             collider: Collider::ball(SIZE / 2.0),
             player: Player,
             damping: Damping {
                 angular_damping: 3.0,
-                linear_damping: 1.0,
+                linear_damping: 0.0,
             },
             input_manager: InputManagerBundle::<Action> {
                 action_state: ActionState::default(),
@@ -106,6 +113,8 @@ fn spawn(
 }
 
 // FIXME: make a better movement system, this is just a placeholder
+// FIXME: jumping is broken, it's not working at all
+// FIXME: can move while in air
 pub fn r#move(
     action_state_query: Query<&ActionState<Action>, With<Player>>,
     can_jump: Res<CanJump>,
@@ -121,23 +130,24 @@ pub fn r#move(
         debug!("Moving player.");
     }
 
-    let Some(translation) = &mut player.translation else {
-        return;
-    };
+    player.translation = Some(player.translation.unwrap_or(GRAVITY));
+    let translation = &mut player.translation.expect("Just set to a Some value above.");
 
     for action in actions {
         trace!("Action: {:#?}", action);
         match action {
-            Action::Left => translation.x = -300.0,
-            Action::Right => translation.x = 300.0,
+            Action::Left => translation.x = -3.0,
+            Action::Right => translation.x = 3.0,
             Action::Jump => {
                 if can_jump.0 {
-                    translation.y = 300.0
+                    translation.y = 3.0
                 }
             }
             Action::Grapple => { /* Do nothing, this is handled elsewhere. */ }
         }
     }
+
+    player.translation = Some(*translation);
 }
 
 fn can_jump(
@@ -156,7 +166,7 @@ fn can_jump(
         .0;
     for collision in collisions.read() {
         match collision {
-            CollisionEvent::Started(a, b, flags) => {
+            CollisionEvent::Started(a, b, _) => {
                 let a = *a;
                 let b = *b;
 
@@ -187,7 +197,7 @@ fn add_grapple_force(
 ) {
     let character_controller = &mut player_query.single_mut();
     let Some(translation) = &mut character_controller.translation else {
-        debug!("No translation found for player, can't add grapple force.");
+        warn!("No translation found for player, can't add grapple force.");
         return;
     };
 
@@ -204,7 +214,7 @@ fn add_grapple_force(
 fn remove_grapple_force(mut player_query: Query<&mut KinematicCharacterController, With<Player>>) {
     let character_controller = &mut player_query.single_mut();
     let Some(translation) = &mut character_controller.translation else {
-        debug!("No translation found for player, can't add grapple force.");
+        warn!("No translation found for player, can't remove grapple force.");
         return;
     };
 
