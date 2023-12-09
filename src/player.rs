@@ -29,8 +29,7 @@ struct PlayerBundle {
     rigid_body: RigidBody,
     collider: Collider,
     player: Player,
-    angular_damping: AngularDamping,
-    linear_damping: LinearDamping,
+    damping: Damping,
     input_manager: InputManagerBundle<Action>,
     external_force: ExternalForce,
     gravity_scale: GravityScale,
@@ -68,8 +67,10 @@ impl PlayerBundle {
             rigid_body: RigidBody::Dynamic,
             collider: Collider::ball(SIZE / 2.0),
             player: Player,
-            angular_damping: AngularDamping(3.0),
-            linear_damping: LinearDamping(1.0),
+            damping: Damping {
+                angular_damping: 3.0,
+                linear_damping: 1.0,
+            },
             input_manager: InputManagerBundle::<Action> {
                 action_state: ActionState::default(),
                 input_map,
