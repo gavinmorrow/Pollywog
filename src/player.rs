@@ -141,7 +141,7 @@ pub fn r#move(
 }
 
 fn can_jump(
-    mut collisions: EventReader<Collision>,
+    mut collisions: EventReader<CollisionEvent>,
     mut can_jump: ResMut<CanJump>,
     query: Query<(
         Entity,
@@ -154,21 +154,26 @@ fn can_jump(
         .find(|(_, _, player)| player.is_some())
         .unwrap()
         .0;
-    for collision in collisions.iter() {
-        let collision = collision.0;
+    for collision in collisions.read() {
+        match collision {
+            CollisionEvent::Started(a, b, flags) => {
+                let a = *a;
+                let b = *b;
 
-        if player == collision.entity1 || player == collision.entity2 {
-            let other = if player == collision.entity1 {
-                collision.entity2
-            } else {
-                collision.entity1
-            };
+                if player == a || player == b {
+                    let other = if player == a { b } else { a };
 
-            if query.get(other).is_ok() {
-                can_jump.0 = true;
-                trace!("Player can jump.");
-                return;
+                    if query.get(other).is_ok() {
+                        can_jump.0 = true;
+                        trace!("Player can jump.");
+                        return;
+                    }
+                }
             }
+            // Do nothing, we don't care about stopped collisions
+            // FIXME: maybe we should care about stopped collisions?
+            // Possibly could move `can_jump.0 = false` up here?
+            CollisionEvent::Stopped(_, _, _) => (),
         }
     }
     can_jump.0 = false;
