@@ -233,7 +233,10 @@ fn cast_grapple_ray(
     let origin = player_transform.translation.truncate();
     let distance_to_window_edge = get_distance_to_window_edge(player_transform, window, direction);
     // FIXME: exclude player from raycast
-    let query_filter = QueryFilter::default();
+    let query_filter = QueryFilter {
+        exclude_collider: Some(player),
+        ..default()
+    };
 
     trace!(
         "Origin: {}, direction: {}, distance_to_window_edge: {}",

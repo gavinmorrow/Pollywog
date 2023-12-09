@@ -28,9 +28,7 @@ pub struct Player;
 #[derive(Bundle, Default)]
 struct PlayerBundle {
     sprite_bundle: SpriteBundle,
-    // FIXME: might need a rigid body
     character_controller: KinematicCharacterController,
-    rigid_body: RigidBody,
     collider: Collider,
     player: Player,
     damping: Damping,
@@ -73,7 +71,6 @@ impl PlayerBundle {
                 translation: Some(GRAVITY),
                 ..default()
             },
-            rigid_body: RigidBody::Dynamic,
             collider: Collider::ball(SIZE / 2.0),
             player: Player,
             damping: Damping {
@@ -196,15 +193,10 @@ fn add_grapple_force(
     direction: Vec2,
 ) {
     let character_controller = &mut player_query.single_mut();
-    let Some(translation) = &mut character_controller.translation else {
-        warn!("No translation found for player, can't add grapple force.");
-        return;
-    };
 
-    // Add force to player
-    // FIXME: gravity might still be applied here, idk
-    let force = direction;
-    *translation = force;
+    // Completely replace player translation with grapple force
+    let force = direction * 10.0;
+    character_controller.translation = Some(force);
     trace!("Setting external force on player to: {:?}", force);
 
     debug!("Added grapple force to player.");
