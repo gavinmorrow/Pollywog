@@ -26,7 +26,7 @@ pub struct Player;
 #[derive(Bundle, Default)]
 struct PlayerBundle {
     sprite_bundle: SpriteBundle,
-    rigid_body: RigidBody,
+    character_controller: KinematicCharacterController,
     collider: Collider,
     player: Player,
     damping: Damping,
@@ -64,7 +64,8 @@ impl PlayerBundle {
                 },
                 ..default()
             },
-            rigid_body: RigidBody::Dynamic,
+            // FIXME: maybe not default? just trying to get this to work for now
+            character_controller: KinematicCharacterController::default(),
             collider: Collider::ball(SIZE / 2.0),
             player: Player,
             damping: Damping {
