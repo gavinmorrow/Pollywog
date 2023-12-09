@@ -182,33 +182,37 @@ fn can_jump(
 
 /// Add a force to the player in the given direction (to be used for grappling).
 fn add_grapple_force(
-    mut player_query: Query<(&mut ExternalForce, &mut GravityScale), With<Player>>,
+    mut player_query: Query<&mut KinematicCharacterController, With<Player>>,
     direction: Vec2,
 ) {
-    let (mut external_force, mut gravity) = player_query.single_mut();
+    let character_controller = &mut player_query.single_mut();
+    let Some(translation) = &mut character_controller.translation else {
+        debug!("No translation found for player, can't add grapple force.");
+        return;
+    };
 
     // Add force to player
-    let force = direction * grapple::FORCE_MULT;
+    // FIXME: gravity might still be applied here, idk
+    let force = direction;
+    *translation = force;
     trace!("Setting external force on player to: {:?}", force);
-    external_force.set_force(force);
-
-    // Remove player gravity
-    gravity.0 = 0.0;
 
     debug!("Added grapple force to player.");
 }
 
 /// Remove the force from the player (to be used for stopping grappling).
-fn remove_grapple_force(
-    mut player_query: Query<(&mut ExternalForce, &mut GravityScale), With<Player>>,
-) {
-    let (mut external_force, mut gravity) = player_query.single_mut();
+fn remove_grapple_force(mut player_query: Query<&mut KinematicCharacterController, With<Player>>) {
+    let character_controller = &mut player_query.single_mut();
+    let Some(translation) = &mut character_controller.translation else {
+        debug!("No translation found for player, can't add grapple force.");
+        return;
+    };
 
     // Remove player external force
-    external_force.set_force(Vec2::ZERO);
-
-    // Add player gravity
-    gravity.0 = 1.0;
+    // FIXME: gravity needs to be applied here
+    let force = Vec2::ZERO;
+    *translation = force;
+    trace!("Setting external force on player to: {:?}", force);
 
     debug!("Removed grapple force from player.");
 }
