@@ -303,29 +303,31 @@ fn manage_grapple(
 }
 
 fn should_grapple_end(
-    mut collisions: EventReader<Collision>,
+    mut collisions: EventReader<CollisionEvent>,
     player: Query<Entity, With<Player>>,
     target_pos: Option<Res<TargetPos>>,
     mut next_grapple_state: ResMut<NextState<GrappleState>>,
 ) {
-    let player = player.single();
+    let player = &player.single();
 
     let Some(target_pos) = target_pos else {
         warn!("No target pos resource");
         return;
     };
-    let target = target_pos.1;
+    let target = &target_pos.1;
 
     // Check if the player is touching the target
-    for collision in collisions.iter() {
-        if (collision.0.entity1 == player && collision.0.entity2 == target)
-            || (collision.0.entity2 == player && collision.0.entity1 == target)
-        {
-            debug!("Player is touching target, stopping grapple");
-            next_grapple_state.set(GrappleState::Grappling.next());
+    for collision in collisions.read() {
+        if let CollisionEvent::Started(a, b, flags) = collision {
+            if (a == player && b == target)
+                || (b == player && a == target)
+            {
+                debug!("Player is touching target, stopping grapple");
+                next_grapple_state.set(GrappleState::Grappling.next());
 
-            // No more cleanup is needed because it will be done in the OnExit
-            return;
+                // No more cleanup is needed because it will be done in the OnExit
+                return;
+            }
         }
     }
 
