@@ -26,6 +26,7 @@ pub struct Player;
 #[derive(Bundle, Default)]
 struct PlayerBundle {
     sprite_bundle: SpriteBundle,
+    // FIXME: might need a rigid body
     character_controller: KinematicCharacterController,
     collider: Collider,
     player: Player,
@@ -108,7 +109,7 @@ fn spawn(
 pub fn r#move(
     action_state_query: Query<&ActionState<Action>, With<Player>>,
     can_jump: Res<CanJump>,
-    mut player_query: Query<&mut LinearVelocity, With<Player>>,
+    mut player_query: Query<&mut KinematicCharacterController, With<Player>>,
 ) {
     let action_state = action_state_query.single();
     let Ok(mut player) = player_query.get_single_mut() else {
@@ -120,14 +121,18 @@ pub fn r#move(
         debug!("Moving player.");
     }
 
+    let Some(translation) = &mut player.translation else {
+        return;
+    };
+
     for action in actions {
         trace!("Action: {:#?}", action);
         match action {
-            Action::Left => player.x = -300.0,
-            Action::Right => player.x = 300.0,
+            Action::Left => translation.x = -300.0,
+            Action::Right => translation.x = 300.0,
             Action::Jump => {
                 if can_jump.0 {
-                    player.y = 300.0
+                    translation.y = 300.0
                 }
             }
             Action::Grapple => { /* Do nothing, this is handled elsewhere. */ }
