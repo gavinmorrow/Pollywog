@@ -284,7 +284,7 @@ fn grapple(
 fn manage_grapple(
     player_query: Query<&GlobalTransform, With<Player>>,
     target_pos: Option<ResMut<TargetPos>>,
-    mut_player_query: Query<(&mut ExternalForce, &mut GravityScale), With<Player>>,
+    mut_player_query: Query<&mut KinematicCharacterController, With<Player>>,
 ) {
     // Resolve queries
     let Ok(player_transform) = player_query.get_single() else {
@@ -369,7 +369,7 @@ fn add_grapple_marker(commands: &mut Commands, point: &Vec2) -> Entity {
 }
 
 fn end_grapple(
-    mut_player_query: Query<(&mut ExternalForce, &mut GravityScale), With<Player>>,
+    mut_player_query: Query<&mut KinematicCharacterController, With<Player>>,
     target_pos: Option<Res<TargetPos>>,
     mut commands: Commands,
 ) {
