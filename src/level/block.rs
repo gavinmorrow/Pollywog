@@ -56,7 +56,11 @@ impl BlockBundle {
                 },
                 ..default()
             },
-            rigid_body: RigidBody::Static,
+            // FIXME: Maybe use a kinematic rigid body instead?
+            //
+            // Doing this for now because I'm just trying to get the game
+            // working and we don't have any moving blocks yet
+            rigid_body: RigidBody::Fixed,
             collider: Collider::cuboid(SIZE, SIZE),
             friction: Friction::new(1.0),
             block: Block,
