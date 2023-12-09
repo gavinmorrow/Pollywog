@@ -235,12 +235,6 @@ fn cast_grapple_ray(
     // FIXME: exclude player from raycast
     let query_filter = QueryFilter::default();
 
-    let ray_pos = Vec2::new(1.0, 2.0);
-    let ray_dir = Vec2::new(0.0, 1.0);
-    let max_toi = 4.0;
-    let solid = true;
-    let filter = QueryFilter::default();
-
     trace!(
         "Origin: {}, direction: {}, distance_to_window_edge: {}",
         origin,
