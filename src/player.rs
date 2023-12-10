@@ -94,7 +94,7 @@ impl PlayerBundle {
             },
             external_force: ExternalForce::default(),
             gravity_scale: GravityScale(1.0),
-            jump_component: JumpComponent::new(Vec2::new(0.0, 11.0), false),
+            jump_component: JumpComponent::new(Vec2::new(0.0, 10.0), false),
         }
     }
 }
