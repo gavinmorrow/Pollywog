@@ -9,6 +9,9 @@ mod grapple;
 const SIZE: f32 = 64.0;
 const SIZE_VEC2: Vec2 = Vec2::new(SIZE, SIZE);
 
+const JUMP_MAGNITUDE: Vec2 = Vec2::new(0.0, 10.0);
+const MOVEMENT_SPEED: f32 = 3.0;
+
 const TEXTURE_PATH: &str = "player.png";
 
 #[derive(Default)]
@@ -94,7 +97,7 @@ impl PlayerBundle {
             },
             external_force: ExternalForce::default(),
             gravity_scale: GravityScale(1.0),
-            jump_component: JumpComponent::new(Vec2::new(0.0, 10.0), false),
+            jump_component: JumpComponent::new(JUMP_MAGNITUDE, false),
         }
     }
 }
@@ -107,9 +110,6 @@ pub enum Action {
     Grapple,
 }
 
-// #[derive(Resource, Default)]
-// pub struct CanJump(pub bool);
-
 fn spawn(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
@@ -121,9 +121,6 @@ fn spawn(
     commands.spawn(PlayerBundle::new(asset_server, window));
 }
 
-// FIXME: make a better movement system, this is just a placeholder
-// FIXME: jumping is broken, it's not working at all
-// FIXME: can move while in air
 pub fn r#move(
     action_state_query: Query<&ActionState<Action>, With<Player>>,
     mut player_query: Query<
@@ -152,8 +149,8 @@ pub fn r#move(
     for action in actions {
         trace!("Action: {:#?}", action);
         match action {
-            Action::Left => translation.x = -3.0,
-            Action::Right => translation.x = 3.0,
+            Action::Left => translation.x = -MOVEMENT_SPEED,
+            Action::Right => translation.x = MOVEMENT_SPEED,
             Action::Jump => {
                 if kinematic_character_controller_output.grounded {
                     debug!("Player is grounded, starting jump.");
@@ -185,46 +182,6 @@ pub fn stop_jump(
         jump_component.stop_jump();
     }
 }
-
-// fn can_jump(
-//     mut collisions: EventReader<CollisionEvent>,
-//     mut can_jump: ResMut<CanJump>,
-//     query: Query<(
-//         Entity,
-//         Option<&crate::level::block::JumpCollisionBox>,
-//         Option<&Player>,
-//     )>,
-// ) {
-//     let player = query
-//         .iter()
-//         .find(|(_, _, player)| player.is_some())
-//         .unwrap()
-//         .0;
-//     for collision in collisions.read() {
-//         match collision {
-//             CollisionEvent::Started(a, b, _) => {
-//                 let a = *a;
-//                 let b = *b;
-
-//                 if player == a || player == b {
-//                     let other = if player == a { b } else { a };
-
-//                     if query.get(other).is_ok() {
-//                         can_jump.0 = true;
-//                         trace!("Player can jump.");
-//                         return;
-//                     }
-//                 }
-//             }
-//             // Do nothing, we don't care about stopped collisions
-//             // FIXME: maybe we should care about stopped collisions?
-//             // Possibly could move `can_jump.0 = false` up here?
-//             CollisionEvent::Stopped(_, _, _) => (),
-//         }
-//     }
-//     can_jump.0 = false;
-//     trace!("Player can't jump.");
-// }
 
 /// Add a force to the player in the given direction (to be used for grappling).
 fn add_grapple_force(
