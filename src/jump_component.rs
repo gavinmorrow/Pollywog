@@ -57,7 +57,11 @@ pub fn jump(
         trace!("Jumping with velocity {:?}", jump_component.velocity);
 
         // Apply force to character controller
-        kinematic_character_controller.translation = Some(jump_component.velocity);
+        let translation = kinematic_character_controller
+            .translation
+            .unwrap_or_default();
+        let translation = Vec2::new(translation.x, 0.0);
+        kinematic_character_controller.translation = Some(translation + jump_component.velocity);
 
         // Apply gravity to jump component
         jump_component.apply_gravity();
