@@ -3,6 +3,7 @@ use bevy_rapier2d::prelude::*;
 use leafwing_input_manager::prelude::*;
 
 mod camera;
+mod jump_component;
 mod level;
 mod player;
 

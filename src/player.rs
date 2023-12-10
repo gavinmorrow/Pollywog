@@ -2,7 +2,7 @@ use bevy::{prelude::*, window::PrimaryWindow};
 use bevy_rapier2d::prelude::*;
 use leafwing_input_manager::prelude::*;
 
-use crate::GRAVITY;
+use crate::{jump_component::JumpComponent, GRAVITY};
 
 mod grapple;
 
@@ -16,9 +16,19 @@ pub struct PlayerPlugin;
 impl Plugin for PlayerPlugin {
     fn build(&self, app: &mut App) {
         app.add_plugins(grapple::GrapplePlugin::default())
-            .insert_resource(CanJump(true))
             .add_systems(Startup, spawn)
-            .add_systems(Update, (r#move, can_jump.before(r#move)));
+            // FIXME: maybe move the jump system somewhere else
+            .add_systems(
+                Update,
+                (
+                    r#move,
+                    // Must go after so that the player gets moved immediately after
+                    // the jump starts
+                    crate::jump_component::jump.after(r#move),
+                    // Must go before so that the player is off the ground when we check
+                    stop_jump.before(r#move),
+                ),
+            );
     }
 }
 
@@ -35,6 +45,7 @@ struct PlayerBundle {
     input_manager: InputManagerBundle<Action>,
     external_force: ExternalForce,
     gravity_scale: GravityScale,
+    jump_component: JumpComponent,
 }
 
 impl PlayerBundle {
@@ -83,6 +94,7 @@ impl PlayerBundle {
             },
             external_force: ExternalForce::default(),
             gravity_scale: GravityScale(1.0),
+            jump_component: JumpComponent::new(Vec2::new(0.0, 11.0), false),
         }
     }
 }
@@ -95,8 +107,8 @@ pub enum Action {
     Grapple,
 }
 
-#[derive(Resource, Default)]
-pub struct CanJump(pub bool);
+// #[derive(Resource, Default)]
+// pub struct CanJump(pub bool);
 
 fn spawn(
     mut commands: Commands,
@@ -114,11 +126,18 @@ fn spawn(
 // FIXME: can move while in air
 pub fn r#move(
     action_state_query: Query<&ActionState<Action>, With<Player>>,
-    can_jump: Res<CanJump>,
-    mut player_query: Query<&mut KinematicCharacterController, With<Player>>,
+    mut player_query: Query<
+        (
+            &mut KinematicCharacterController,
+            &KinematicCharacterControllerOutput,
+        ),
+        With<Player>,
+    >,
+    mut jump_component_query: Query<&mut JumpComponent, With<Player>>,
 ) {
     let action_state = action_state_query.single();
-    let Ok(mut player) = player_query.get_single_mut() else {
+    let Ok((mut player, kinematic_character_controller_output)) = player_query.get_single_mut()
+    else {
         return;
     };
     let actions = action_state.get_pressed();
@@ -136,8 +155,12 @@ pub fn r#move(
             Action::Left => translation.x = -3.0,
             Action::Right => translation.x = 3.0,
             Action::Jump => {
-                if can_jump.0 {
-                    translation.y = 3.0
+                if kinematic_character_controller_output.grounded {
+                    debug!("Player is grounded, starting jump.");
+                    let mut jump_component = jump_component_query.single_mut();
+                    jump_component.start_jump();
+                } else {
+                    debug!("Player is not grounded, can't jump.");
                 }
             }
             Action::Grapple => { /* Do nothing, this is handled elsewhere. */ }
@@ -147,45 +170,61 @@ pub fn r#move(
     player.translation = Some(*translation);
 }
 
-fn can_jump(
-    mut collisions: EventReader<CollisionEvent>,
-    mut can_jump: ResMut<CanJump>,
-    query: Query<(
-        Entity,
-        Option<&crate::level::block::JumpCollisionBox>,
-        Option<&Player>,
-    )>,
+pub fn stop_jump(
+    mut player_query: Query<
+        (&mut JumpComponent, &KinematicCharacterControllerOutput),
+        With<Player>,
+    >,
 ) {
-    let player = query
-        .iter()
-        .find(|(_, _, player)| player.is_some())
-        .unwrap()
-        .0;
-    for collision in collisions.read() {
-        match collision {
-            CollisionEvent::Started(a, b, _) => {
-                let a = *a;
-                let b = *b;
+    let Ok((mut jump_component, output)) = player_query.get_single_mut() else {
+        return;
+    };
 
-                if player == a || player == b {
-                    let other = if player == a { b } else { a };
-
-                    if query.get(other).is_ok() {
-                        can_jump.0 = true;
-                        trace!("Player can jump.");
-                        return;
-                    }
-                }
-            }
-            // Do nothing, we don't care about stopped collisions
-            // FIXME: maybe we should care about stopped collisions?
-            // Possibly could move `can_jump.0 = false` up here?
-            CollisionEvent::Stopped(_, _, _) => (),
-        }
+    if output.grounded && jump_component.is_jumping() {
+        debug!("Player is grounded, stopping jump.");
+        jump_component.stop_jump();
     }
-    can_jump.0 = false;
-    trace!("Player can't jump.");
 }
+
+// fn can_jump(
+//     mut collisions: EventReader<CollisionEvent>,
+//     mut can_jump: ResMut<CanJump>,
+//     query: Query<(
+//         Entity,
+//         Option<&crate::level::block::JumpCollisionBox>,
+//         Option<&Player>,
+//     )>,
+// ) {
+//     let player = query
+//         .iter()
+//         .find(|(_, _, player)| player.is_some())
+//         .unwrap()
+//         .0;
+//     for collision in collisions.read() {
+//         match collision {
+//             CollisionEvent::Started(a, b, _) => {
+//                 let a = *a;
+//                 let b = *b;
+
+//                 if player == a || player == b {
+//                     let other = if player == a { b } else { a };
+
+//                     if query.get(other).is_ok() {
+//                         can_jump.0 = true;
+//                         trace!("Player can jump.");
+//                         return;
+//                     }
+//                 }
+//             }
+//             // Do nothing, we don't care about stopped collisions
+//             // FIXME: maybe we should care about stopped collisions?
+//             // Possibly could move `can_jump.0 = false` up here?
+//             CollisionEvent::Stopped(_, _, _) => (),
+//         }
+//     }
+//     can_jump.0 = false;
+//     trace!("Player can't jump.");
+// }
 
 /// Add a force to the player in the given direction (to be used for grappling).
 fn add_grapple_force(
@@ -211,8 +250,7 @@ fn remove_grapple_force(mut player_query: Query<&mut KinematicCharacterControlle
     };
 
     // Remove player external force
-    // FIXME: gravity needs to be applied here
-    let force = Vec2::ZERO;
+    let force = GRAVITY;
     *translation = force;
     trace!("Setting external force on player to: {:?}", force);
 
