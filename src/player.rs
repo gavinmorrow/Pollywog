@@ -140,7 +140,7 @@ pub fn r#move(
     let actions = action_state.get_pressed();
 
     if !actions.is_empty() {
-        debug!("Moving player.");
+        trace!("Moving player.");
     }
 
     player.translation = Some(player.translation.unwrap_or(GRAVITY));
@@ -153,11 +153,11 @@ pub fn r#move(
             Action::Right => translation.x = MOVEMENT_SPEED,
             Action::Jump => {
                 if kinematic_character_controller_output.grounded {
-                    debug!("Player is grounded, starting jump.");
+                    trace!("Player is grounded, starting jump.");
                     let mut jump_component = jump_component_query.single_mut();
                     jump_component.start_jump();
                 } else {
-                    debug!("Player is not grounded, can't jump.");
+                    trace!("Player is not grounded, can't jump.");
                 }
             }
             Action::Grapple => { /* Do nothing, this is handled elsewhere. */ }
@@ -193,9 +193,7 @@ fn add_grapple_force(
     // Completely replace player translation with grapple force
     let force = direction * 10.0;
     character_controller.translation = Some(force);
-    trace!("Setting external force on player to: {:?}", force);
-
-    debug!("Added grapple force to player.");
+    trace!("Setting grapple force on player to: {:?}", force);
 }
 
 /// Remove the force from the player (to be used for stopping grappling).

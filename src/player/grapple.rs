@@ -83,7 +83,7 @@ fn idle(
 
     // Only start aiming if grapple was just pressed and not released
     if just_pressed.contains(&Action::Grapple) && !just_released.contains(&Action::Grapple) {
-        debug!("Starting grapple aiming (idle -> aiming)");
+        info!("Starting grapple aiming (idle -> aiming)");
         next_grapple_state.set(GrappleState::Idle.next());
     }
 }
@@ -97,7 +97,7 @@ fn aim(
 
     // If the key was just released, stop aiming and start grappling
     if just_released.contains(&Action::Grapple) {
-        debug!("Starting grapple (aiming -> grappling)");
+        info!("Starting grapple (aiming -> grappling)");
         next_grapple_state.set(GrappleState::Aiming.next());
     }
 }
@@ -178,7 +178,7 @@ fn aim_guideline(
 ///
 /// This despawns the marker entity and removes the resource.
 fn remove_target_pos(commands: &mut Commands, marker: Entity) {
-    debug!("Removing target pos for marker {:?}", marker);
+    trace!("Removing target pos for marker {:?}", marker);
     commands.entity(marker).despawn_recursive();
     commands.remove_resource::<TargetPos>();
 }
@@ -218,8 +218,6 @@ fn cast_grapple_ray(
         return Err(RaycastError::NoCamera);
     };
 
-    debug!("Starting grapple raycast");
-
     // Get ray input
     let Ok(direction) = resolve_mouse_pos(
         window,
@@ -253,13 +251,13 @@ fn cast_grapple_ray(
         true,
         query_filter,
     ) else {
-        warn!("Raycast hit nothing");
+        trace!("Raycast hit nothing");
         return Err(RaycastError::RayHitNothing);
     };
     let point = origin + direction * toi;
     let entity = entity;
 
-    debug!("Raycast hit entity {:?} at {:?}", entity, point);
+    trace!("Raycast hit entity {:?} at {:?}", entity, point);
 
     Ok((point, entity))
 }
@@ -273,7 +271,7 @@ fn grapple(
 
     // If the grapple key was just pressed, stop grappling and start aiming
     if just_pressed.contains(&Action::Grapple) {
-        debug!("Stopping grapple (grappling -> aiming)");
+        info!("Stopping grapple (grappling -> aiming)");
         next_grapple_state.set(GrappleState::Aiming);
     }
 }
@@ -300,7 +298,7 @@ fn manage_grapple(
     let direction = target - player;
     let direction = direction.normalize();
 
-    debug!("Recalculated grapple direction to {:?}", direction);
+    trace!("Recalculated grapple direction to {:?}", direction);
 
     // Set the force on the player
     super::add_grapple_force(mut_player_query, direction);
@@ -316,6 +314,11 @@ fn should_grapple_end(
 
     let Some(target_pos) = target_pos else {
         warn!("No target pos resource");
+
+        // End grapple
+        info!("Ending grapple because of missing target pos (grappling -> idle)");
+        next_grapple_state.set(GrappleState::Grappling.next());
+
         return;
     };
     let target = &target_pos.1;
@@ -344,6 +347,7 @@ fn end_grapple_on_other_input(
     for action in action_state.get_pressed() {
         if action != Action::Grapple {
             // End grapple
+            info!("Ending grapple because of input (grappling -> idle)");
             next_grapple_state.set(GrappleState::Grappling.next());
         }
     }
@@ -351,7 +355,7 @@ fn end_grapple_on_other_input(
 
 fn add_grapple_marker(commands: &mut Commands, point: &Vec2) -> Entity {
     // add a point at the hit location
-    debug!("Adding grapple marker at {:?}", point);
+    trace!("Adding grapple marker at {:?}", point);
     commands
         .spawn(SpriteBundle {
             sprite: Sprite {
@@ -382,7 +386,7 @@ fn end_grapple(
 }
 
 fn remove_guideline(guideline: &mut ResMut<Guideline>, commands: &mut Commands) {
-    debug!("Removing guideline");
+    trace!("Removing guideline");
 
     // Clear old guidelines
     for guideline in guideline.0.iter() {
