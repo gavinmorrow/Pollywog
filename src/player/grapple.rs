@@ -255,7 +255,6 @@ fn cast_grapple_ray(
         return Err(RaycastError::RayHitNothing);
     };
     let point = origin + direction * toi;
-    let entity = entity;
 
     trace!("Raycast hit entity {:?} at {:?}", entity, point);
 
