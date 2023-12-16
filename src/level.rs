@@ -74,17 +74,13 @@ fn spawn_blocks(
     next_state.set(LevelState::Loaded);
 }
 
-#[derive(Copy, Clone, Debug, Eq, PartialEq, Hash, States)]
+#[derive(Copy, Clone, Debug, Default, Eq, PartialEq, Hash, States)]
 enum LevelState {
+    #[default]
     LoadingAssets,
     ConstructingLevel,
     SpawningBlocks,
     Loaded,
-}
-impl Default for LevelState {
-    fn default() -> Self {
-        LevelState::LoadingAssets
-    }
 }
 
 #[derive(Debug, Resource)]
@@ -103,7 +99,6 @@ impl From<LevelAsset> for Level {
             .into_iter()
             .map(|block| Block {
                 position: block.position * SIZE,
-                ..block
             })
             .collect();
 
