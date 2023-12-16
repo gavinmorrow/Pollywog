@@ -36,8 +36,9 @@ impl Plugin for GrapplePlugin {
     }
 }
 
-#[derive(States, Debug, Clone, Eq, PartialEq, Hash)]
+#[derive(States, Debug, Default, Clone, Eq, PartialEq, Hash)]
 enum GrappleState {
+    #[default]
     Idle,
     Aiming,
     Grappling,
@@ -50,12 +51,6 @@ impl GrappleState {
             Self::Aiming => Self::Grappling,
             Self::Grappling => Self::Idle,
         }
-    }
-}
-
-impl Default for GrappleState {
-    fn default() -> Self {
-        Self::Idle
     }
 }
 
