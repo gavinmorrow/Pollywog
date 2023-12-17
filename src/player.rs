@@ -127,13 +127,15 @@ pub fn r#move(
         (
             &mut KinematicCharacterController,
             &KinematicCharacterControllerOutput,
+            &mut Sprite,
         ),
         With<Player>,
     >,
     mut jump_component_query: Query<&mut JumpComponent, With<Player>>,
 ) {
     let action_state = action_state_query.single();
-    let Ok((mut player, kinematic_character_controller_output)) = player_query.get_single_mut()
+    let Ok((mut player, kinematic_character_controller_output, mut sprite)) =
+        player_query.get_single_mut()
     else {
         return;
     };
@@ -149,8 +151,14 @@ pub fn r#move(
     for action in actions {
         trace!("Action: {:#?}", action);
         match action {
-            Action::Left => translation.x = -MOVEMENT_SPEED,
-            Action::Right => translation.x = MOVEMENT_SPEED,
+            Action::Left => {
+                translation.x = -MOVEMENT_SPEED;
+                sprite.flip_x = true;
+            }
+            Action::Right => {
+                translation.x = MOVEMENT_SPEED;
+                sprite.flip_x = false;
+            }
             Action::Jump => {
                 if kinematic_character_controller_output.grounded {
                     trace!("Player is grounded, starting jump.");

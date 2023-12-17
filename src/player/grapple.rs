@@ -274,6 +274,7 @@ fn manage_grapple(
     player_query: Query<&GlobalTransform, With<Player>>,
     target_pos: Option<ResMut<TargetPos>>,
     mut_player_query: Query<&mut KinematicCharacterController, With<Player>>,
+    mut sprite_query: Query<&mut Sprite, With<Player>>,
 ) {
     // Resolve queries
     let Ok(player_transform) = player_query.get_single() else {
@@ -293,6 +294,8 @@ fn manage_grapple(
     let direction = direction.normalize();
 
     trace!("Recalculated grapple direction to {:?}", direction);
+
+    sprite_query.single_mut().flip_x = direction.x < 0.0;
 
     // Set the force on the player
     super::add_grapple_force(mut_player_query, direction);
