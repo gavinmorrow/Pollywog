@@ -1,6 +1,8 @@
 use bevy::prelude::*;
 use bevy_common_assets::json::JsonAssetPlugin;
 
+use crate::enemy::EnemyBundle;
+
 use self::block::BlockBundle;
 
 mod block;
@@ -65,11 +67,20 @@ fn spawn_blocks(
     mut commands: Commands,
     mut next_state: ResMut<NextState<LevelState>>,
     level: Res<Level>,
+    asset_server: Res<AssetServer>,
 ) {
     info!("Spawning blocks for level: {}", level.name);
     for block in &level.blocks {
-        let block = BlockBundle::new(block.position);
-        commands.spawn(block);
+        match block.kind {
+            Entity::Dirt => {
+                let block = BlockBundle::new(block.position);
+                commands.spawn(block);
+            }
+            Entity::Enemy {} => {
+                let enemy = EnemyBundle::new(block.position, &asset_server);
+                commands.spawn(enemy);
+            }
+        }
     }
     next_state.set(LevelState::Loaded);
 }
@@ -99,6 +110,7 @@ impl From<LevelAsset> for Level {
             .into_iter()
             .map(|block| Block {
                 position: block.position * SIZE,
+                ..block
             })
             .collect();
 
@@ -117,5 +129,13 @@ struct LevelAsset {
 
 #[derive(Clone, Debug, serde::Deserialize)]
 struct Block {
+    kind: Entity,
     position: Vec2,
+}
+
+#[derive(Clone, Debug, serde::Deserialize)]
+#[serde(tag = "type")]
+enum Entity {
+    Dirt,
+    Enemy {},
 }

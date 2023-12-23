@@ -4,6 +4,7 @@ use leafwing_input_manager::prelude::*;
 
 mod camera;
 mod components;
+mod enemy;
 mod level;
 mod player;
 
