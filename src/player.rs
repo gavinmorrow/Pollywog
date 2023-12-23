@@ -2,7 +2,10 @@ use bevy::{prelude::*, window::PrimaryWindow};
 use bevy_rapier2d::prelude::*;
 use leafwing_input_manager::prelude::*;
 
-use crate::{jump_component::JumpComponent, GRAVITY};
+use crate::{
+    components::jump::{jump, JumpComponent},
+    GRAVITY,
+};
 
 mod grapple;
 
@@ -27,7 +30,7 @@ impl Plugin for PlayerPlugin {
                     r#move,
                     // Must go after so that the player gets moved immediately after
                     // the jump starts
-                    crate::jump_component::jump.after(r#move),
+                    jump.after(r#move),
                     // Must go before so that the player is off the ground when we check
                     stop_jump.before(r#move),
                 ),
