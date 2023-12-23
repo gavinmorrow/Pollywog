@@ -20,11 +20,7 @@ pub fn spawn_camera(mut commands: Commands, window_query: Query<&Window, With<Pr
     debug!("Spawning camera");
     commands.spawn(Camera2dBundle {
         transform: Transform {
-            translation: Vec3::new(
-                window.width() / 4.0,
-                window.height() / 3.0,
-                1000.0,
-            ),
+            translation: Vec3::new(window.width() / 4.0, window.height() / 3.0, 1000.0),
             ..default()
         },
         ..default()
