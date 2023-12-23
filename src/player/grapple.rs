@@ -113,7 +113,7 @@ fn aim_marker(
     let Ok((point, target)) =
         cast_grapple_ray(rapier_context, window_query, player_query, camera_query)
     else {
-        warn!("Could not cast grapple ray");
+        trace!("No result for grapple raycast");
         return;
     };
 
@@ -135,7 +135,7 @@ fn aim_guideline(
     remove_guideline(&mut guideline, &mut commands);
 
     let Some(target_pos) = target_pos else {
-        warn!("No target pos for grapple guidelines");
+        trace!("No target pos for grapple guidelines");
         return;
     };
     let player = player_query.single();
@@ -220,7 +220,7 @@ fn cast_grapple_ray(
         camera_transform,
         player_transform.translation.truncate(),
     ) else {
-        error!("Could not resolve mouse position for starting grapple");
+        trace!("Could not resolve mouse position for starting grapple");
         return Err(RaycastError::CouldNotResolveMousePos);
     };
     let origin = player_transform.translation.truncate();
@@ -282,7 +282,7 @@ fn manage_grapple(
         return;
     };
     let Some(target_pos) = target_pos else {
-        error!("Could not get target position");
+        trace!("Could not get target pos resource");
         return;
     };
 
@@ -310,7 +310,7 @@ fn should_grapple_end(
     let player = &player.single();
 
     let Some(target_pos) = target_pos else {
-        warn!("No target pos resource");
+        trace!("No target pos resource");
 
         // End grapple
         info!("Ending grapple because of missing target pos (grappling -> idle)");
@@ -421,7 +421,7 @@ fn resolve_mouse_pos(
 ) -> Result<Vec2, ResolveMousePosError> {
     // Get mouse_pos relative to top left of screen
     let Some(mouse_pos) = window.cursor_position() else {
-        warn!("Tried to start grapple when mouse was not in window");
+        trace!("Tried to start grapple when mouse was not in window");
         return Err(ResolveMousePosError::NoMousePos);
     };
 
