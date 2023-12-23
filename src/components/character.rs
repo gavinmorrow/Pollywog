@@ -42,22 +42,17 @@ pub fn r#move(
         trace!("Moving character.");
     }
 
-    char_controller.translation = Some(char_controller.translation.unwrap_or(GRAVITY));
-    let translation = &mut char_controller
-        .translation
-        .expect("Just set to a Some value above.");
-
-    let movement_speed = char.movement_speed;
+    let translation = &mut char_controller.translation.unwrap_or(GRAVITY);
 
     for action in actions {
         trace!("Action: {:#?}", action);
         match action {
             Action::Left => {
-                translation.x = -movement_speed;
+                translation.x = -char.movement_speed;
                 sprite.flip_x = true;
             }
             Action::Right => {
-                translation.x = movement_speed;
+                translation.x = char.movement_speed;
                 sprite.flip_x = false;
             }
             Action::Jump => {
