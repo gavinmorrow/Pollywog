@@ -2,7 +2,7 @@ use bevy::{prelude::*, window::PrimaryWindow};
 use bevy_rapier2d::prelude::*;
 use leafwing_input_manager::prelude::*;
 
-use super::{Action, Player};
+use crate::components::character::{add_grapple_force, Action, Character};
 
 // pub const FORCE_MULT: f32 = 5_000_000.0;
 const GUIDELINE_DISTANCE: f32 = 50.0;
@@ -68,7 +68,7 @@ struct TargetPos(
 struct Guideline(Vec<Entity>);
 
 fn idle(
-    action_state_query: Query<&ActionState<Action>, With<Player>>,
+    action_state_query: Query<&ActionState<Action>, With<Character>>,
     mut next_grapple_state: ResMut<NextState<GrappleState>>,
 ) {
     let action_state = action_state_query.single();
@@ -84,7 +84,7 @@ fn idle(
 }
 
 fn aim(
-    action_state_query: Query<&ActionState<Action>, With<Player>>,
+    action_state_query: Query<&ActionState<Action>, With<Character>>,
     mut next_grapple_state: ResMut<NextState<GrappleState>>,
 ) {
     let action_state = action_state_query.single();
@@ -100,7 +100,7 @@ fn aim(
 fn aim_marker(
     rapier_context: Res<RapierContext>,
     window_query: Query<&Window, With<PrimaryWindow>>,
-    player_query: Query<(Entity, &Transform), With<Player>>,
+    char_query: Query<(Entity, &Transform), With<Character>>,
     camera_query: Query<(&Camera, &GlobalTransform)>,
     target_pos: Option<Res<TargetPos>>,
     mut commands: Commands,
@@ -111,7 +111,7 @@ fn aim_marker(
     }
 
     let Ok((point, target)) =
-        cast_grapple_ray(rapier_context, window_query, player_query, camera_query)
+        cast_grapple_ray(rapier_context, window_query, char_query, camera_query)
     else {
         trace!("No result for grapple raycast");
         return;
@@ -127,7 +127,7 @@ fn aim_marker(
 
 fn aim_guideline(
     target_pos: Option<Res<TargetPos>>,
-    player_query: Query<&GlobalTransform, With<Player>>,
+    char_query: Query<&GlobalTransform, With<Character>>,
     mut guideline: ResMut<Guideline>,
     mut commands: Commands,
 ) {
@@ -138,16 +138,16 @@ fn aim_guideline(
         trace!("No target pos for grapple guidelines");
         return;
     };
-    let player = player_query.single();
+    let char = char_query.single();
 
-    // Get direction from player to target
-    let player_pos = player.translation().truncate();
+    // Get direction from character to target
+    let char_pos = char.translation().truncate();
     let target_pos = target_pos.0;
-    let direction = target_pos - player_pos;
+    let direction = target_pos - char_pos;
     let distance = direction.normalize() * GUIDELINE_DISTANCE;
 
     // Add guidelines
-    let mut current_pos = player_pos;
+    let mut current_pos = char_pos;
     while current_pos.distance(target_pos) >= GUIDELINE_DISTANCE {
         let sprite = SpriteBundle {
             sprite: Sprite {
@@ -179,13 +179,13 @@ fn remove_target_pos(commands: &mut Commands, marker: Entity) {
 }
 
 enum RaycastError {
-    NoPlayer,
+    NoCharacter,
     NoCamera,
     CouldNotResolveMousePos,
     RayHitNothing,
 }
 
-/// Casts a ray from the player to the mouse position.
+/// Casts a ray from the character to the mouse position.
 ///
 /// # Returns
 ///
@@ -199,14 +199,14 @@ enum RaycastError {
 fn cast_grapple_ray(
     rapier_context: Res<RapierContext>,
     window_query: Query<&Window, With<PrimaryWindow>>,
-    player_query: Query<(Entity, &Transform), With<Player>>,
+    char_query: Query<(Entity, &Transform), With<Character>>,
     camera_query: Query<(&Camera, &GlobalTransform)>,
 ) -> Result<(Vec2, Entity), RaycastError> {
     // Resolve queries
     let window = window_query.single();
-    let Ok((player, player_transform)) = player_query.get_single() else {
-        error!("Could not get player entity or transform");
-        return Err(RaycastError::NoPlayer);
+    let Ok((char, char_transform)) = char_query.get_single() else {
+        error!("Could not get character entity or transform");
+        return Err(RaycastError::NoCharacter);
     };
     let Ok((camera, camera_transform)) = camera_query.get_single() else {
         error!("Could not get camera for grapple raycast");
@@ -218,16 +218,16 @@ fn cast_grapple_ray(
         window,
         camera,
         camera_transform,
-        player_transform.translation.truncate(),
+        char_transform.translation.truncate(),
     ) else {
         trace!("Could not resolve mouse position for starting grapple");
         return Err(RaycastError::CouldNotResolveMousePos);
     };
-    let origin = player_transform.translation.truncate();
-    let distance_to_window_edge = get_distance_to_window_edge(player_transform, window, direction);
-    // FIXME: exclude player from raycast
+    let origin = char_transform.translation.truncate();
+    let distance_to_window_edge = get_distance_to_window_edge(char_transform, window, direction);
+    // FIXME: exclude character from raycast
     let query_filter = QueryFilter {
-        exclude_collider: Some(player),
+        exclude_collider: Some(char),
         ..default()
     };
 
@@ -257,7 +257,7 @@ fn cast_grapple_ray(
 }
 
 fn grapple(
-    action_state_query: Query<&ActionState<Action>, With<Player>>,
+    action_state_query: Query<&ActionState<Action>, With<Character>>,
     mut next_grapple_state: ResMut<NextState<GrappleState>>,
 ) {
     let action_state = action_state_query.single();
@@ -271,14 +271,14 @@ fn grapple(
 }
 
 fn manage_grapple(
-    player_query: Query<&GlobalTransform, With<Player>>,
+    char_query: Query<&GlobalTransform, With<Character>>,
     target_pos: Option<ResMut<TargetPos>>,
-    mut_player_query: Query<&mut KinematicCharacterController, With<Player>>,
-    mut sprite_query: Query<&mut Sprite, With<Player>>,
+    char_controller_query: Query<&mut KinematicCharacterController, With<Character>>,
+    mut sprite_query: Query<&mut Sprite, With<Character>>,
 ) {
     // Resolve queries
-    let Ok(player_transform) = player_query.get_single() else {
-        error!("Could not get player transform");
+    let Ok(char_transform) = char_query.get_single() else {
+        error!("Could not get character transform");
         return;
     };
     let Some(target_pos) = target_pos else {
@@ -286,28 +286,28 @@ fn manage_grapple(
         return;
     };
 
-    let player = player_transform.translation().truncate();
+    let char = char_transform.translation().truncate();
     let target = target_pos.0;
 
     // Recalculate the direction to the target
-    let direction = target - player;
+    let direction = target - char;
     let direction = direction.normalize();
 
     trace!("Recalculated grapple direction to {:?}", direction);
 
     sprite_query.single_mut().flip_x = direction.x < 0.0;
 
-    // Set the force on the player
-    super::add_grapple_force(mut_player_query, direction);
+    // Set the force on the character
+    add_grapple_force(char_controller_query, direction);
 }
 
 fn should_grapple_end(
     mut collisions: EventReader<CollisionEvent>,
-    player: Query<Entity, With<Player>>,
+    char: Query<Entity, With<Character>>,
     target_pos: Option<Res<TargetPos>>,
     mut next_grapple_state: ResMut<NextState<GrappleState>>,
 ) {
-    let player = &player.single();
+    let char = &char.single();
 
     let Some(target_pos) = target_pos else {
         trace!("No target pos resource");
@@ -320,11 +320,12 @@ fn should_grapple_end(
     };
     let target = &target_pos.1;
 
-    // Check if the player is touching the target
+    // Check if the character is touching the target
+    // FIXME: doesn't work
     for collision in collisions.read() {
         if let CollisionEvent::Started(a, b, _) = collision {
-            if (a == player && b == target) || (b == player && a == target) {
-                debug!("Player is touching target, stopping grapple");
+            if (a == char && b == target) || (b == char && a == target) {
+                debug!("Character is touching target, stopping grapple");
                 next_grapple_state.set(GrappleState::Grappling.next());
 
                 // No more cleanup is needed because it will be done in the OnExit
@@ -333,11 +334,11 @@ fn should_grapple_end(
         }
     }
 
-    trace!("Player is not touching target ({:?})", target_pos.0);
+    trace!("Character is not touching target ({:?})", target_pos.0);
 }
 
 fn end_grapple_on_other_input(
-    action_state_query: Query<&ActionState<Action>, With<Player>>,
+    action_state_query: Query<&ActionState<Action>, With<Character>>,
     mut next_grapple_state: ResMut<NextState<GrappleState>>,
 ) {
     let action_state = action_state_query.single();
@@ -390,11 +391,11 @@ fn remove_guideline_system(mut guideline: ResMut<Guideline>, mut commands: Comma
     remove_guideline(&mut guideline, &mut commands);
 }
 
-fn get_distance_to_window_edge(player: &Transform, window: &Window, direction: Vec2) -> f32 {
+fn get_distance_to_window_edge(char: &Transform, window: &Window, direction: Vec2) -> f32 {
     let window_size = Vec2::new(window.width(), window.height());
-    let player_pos = player.translation.truncate();
+    let char_pos = char.translation.truncate();
 
-    let distance_to_edge = window_size - player_pos;
+    let distance_to_edge = window_size - char_pos;
     let distance_to_edge = distance_to_edge / direction;
     let distance_to_edge = (distance_to_edge.x.powf(2.0) + distance_to_edge.y.powf(2.0)).sqrt();
 
@@ -410,7 +411,7 @@ fn resolve_mouse_pos(
     window: &Window,
     camera: &Camera,
     camera_transform: &GlobalTransform,
-    player_translation: Vec2,
+    char_translation: Vec2,
 ) -> Result<Vec2, ResolveMousePosError> {
     // Get mouse_pos relative to top left of screen
     let Some(mouse_pos) = window.cursor_position() else {
@@ -424,8 +425,8 @@ fn resolve_mouse_pos(
         return Err(ResolveMousePosError::NoMouseCoords);
     };
 
-    // Make mouse_pos relative to player (not world)
-    let direction = mouse_pos - player_translation;
+    // Make mouse_pos relative to character (not world)
+    let direction = mouse_pos - char_translation;
     let direction = direction.normalize();
 
     Ok(direction)

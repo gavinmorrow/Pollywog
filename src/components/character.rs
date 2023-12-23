@@ -70,3 +70,16 @@ pub fn r#move(
 
     char_controller.translation = Some(*translation);
 }
+
+/// Add a force to the player in the given direction (to be used for grappling).
+pub fn add_grapple_force(
+    mut player_query: Query<&mut KinematicCharacterController, With<Character>>,
+    direction: Vec2,
+) {
+    let char_controller = &mut player_query.single_mut();
+
+    // Completely replace player translation with grapple force
+    let force = direction * 10.0;
+    char_controller.translation = Some(force);
+    trace!("Setting grapple force on player to: {:?}", force);
+}

@@ -136,16 +136,3 @@ pub fn stop_jump(
         jump_component.stop_jump();
     }
 }
-
-/// Add a force to the player in the given direction (to be used for grappling).
-fn add_grapple_force(
-    mut player_query: Query<&mut KinematicCharacterController, With<Player>>,
-    direction: Vec2,
-) {
-    let character_controller = &mut player_query.single_mut();
-
-    // Completely replace player translation with grapple force
-    let force = direction * 10.0;
-    character_controller.translation = Some(force);
-    trace!("Setting grapple force on player to: {:?}", force);
-}
