@@ -42,18 +42,6 @@ impl PlayerBundle {
     fn new(asset_server: Res<AssetServer>, window: &Window) -> Self {
         debug!("Creating player bundle");
 
-        let mut input_map = InputMap::default();
-        input_map
-            .insert(KeyCode::Left, Action::Left)
-            .insert(QwertyScanCode::A, Action::Left)
-            .insert(KeyCode::Right, Action::Right)
-            .insert(QwertyScanCode::D, Action::Right)
-            .insert(KeyCode::W, Action::Jump)
-            .insert(QwertyScanCode::Up, Action::Jump)
-            .insert(KeyCode::Space, Action::Jump)
-            .insert(QwertyScanCode::E, Action::Grapple)
-            .insert(QwertyScanCode::Slash, Action::Grapple);
-
         Self {
             sprite_bundle: SpriteBundle {
                 transform: Transform {
@@ -80,7 +68,7 @@ impl PlayerBundle {
             },
             input_manager: InputManagerBundle::<Action> {
                 action_state: ActionState::default(),
-                input_map,
+                input_map: get_input_map(),
             },
             external_force: ExternalForce::default(),
             gravity_scale: GravityScale(1.0),
@@ -90,6 +78,24 @@ impl PlayerBundle {
             },
         }
     }
+}
+
+fn get_input_map() -> InputMap<Action> {
+    let mut input_map = InputMap::default();
+
+    #[rustfmt::skip]
+        input_map
+            .insert(KeyCode::Left,         Action::Left)
+            .insert(QwertyScanCode::A,     Action::Left)
+            .insert(KeyCode::Right,        Action::Right)
+            .insert(QwertyScanCode::D,     Action::Right)
+            .insert(KeyCode::Up,           Action::Jump)
+            .insert(QwertyScanCode::W,     Action::Jump)
+            .insert(KeyCode::Space,        Action::Jump)
+            .insert(QwertyScanCode::E,     Action::Grapple)
+            .insert(QwertyScanCode::Slash, Action::Grapple);
+
+    input_map
 }
 
 fn spawn(
