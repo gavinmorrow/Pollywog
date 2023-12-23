@@ -4,7 +4,29 @@ use leafwing_input_manager::prelude::*;
 
 use crate::GRAVITY;
 
-use super::jump::JumpComponent;
+use super::jump::{jump, JumpComponent};
+
+pub mod grapple;
+
+#[derive(Default)]
+pub struct CharacterPlugin;
+impl Plugin for CharacterPlugin {
+    fn build(&self, app: &mut App) {
+        app.add_plugins(crate::components::character::grapple::GrapplePlugin::default())
+            // FIXME: maybe move the jump system somewhere else
+            .add_systems(
+                Update,
+                (
+                    r#move,
+                    // Must go after so that the player gets moved immediately after
+                    // the jump starts
+                    jump.after(r#move),
+                    // Must go before so that the player is off the ground when we check
+                    stop_jump.before(r#move),
+                ),
+            );
+    }
+}
 
 #[derive(Component, Default)]
 pub struct Character {
@@ -82,4 +104,20 @@ pub fn add_grapple_force(
     let force = direction * 10.0;
     char_controller.translation = Some(force);
     trace!("Setting grapple force on player to: {:?}", force);
+}
+
+pub fn stop_jump(
+    mut char_query: Query<
+        (&mut JumpComponent, &KinematicCharacterControllerOutput),
+        With<Character>,
+    >,
+) {
+    let Ok((mut jump_component, char_controller_output)) = char_query.get_single_mut() else {
+        return;
+    };
+
+    if char_controller_output.grounded && jump_component.is_jumping() {
+        debug!("Player is grounded, stopping jump.");
+        jump_component.stop_jump();
+    }
 }

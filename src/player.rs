@@ -1,14 +1,9 @@
-use crate::components::character::{r#move, Action, Character};
+use crate::components::character::{Action, Character};
 use bevy::{prelude::*, window::PrimaryWindow};
 use bevy_rapier2d::prelude::*;
 use leafwing_input_manager::prelude::*;
 
-use crate::{
-    components::jump::{jump, JumpComponent},
-    GRAVITY,
-};
-
-mod grapple;
+use crate::{components::jump::JumpComponent, GRAVITY};
 
 const SIZE: f32 = 64.0;
 const SIZE_VEC2: Vec2 = Vec2::new(SIZE, SIZE);
@@ -22,20 +17,7 @@ const TEXTURE_PATH: &str = "player.png";
 pub struct PlayerPlugin;
 impl Plugin for PlayerPlugin {
     fn build(&self, app: &mut App) {
-        app.add_plugins(grapple::GrapplePlugin::default())
-            .add_systems(Startup, spawn)
-            // FIXME: maybe move the jump system somewhere else
-            .add_systems(
-                Update,
-                (
-                    r#move,
-                    // Must go after so that the player gets moved immediately after
-                    // the jump starts
-                    jump.after(r#move),
-                    // Must go before so that the player is off the ground when we check
-                    stop_jump.before(r#move),
-                ),
-            );
+        app.add_systems(Startup, spawn);
     }
 }
 
@@ -119,20 +101,4 @@ fn spawn(
 
     debug!("Spawning player");
     commands.spawn(PlayerBundle::new(asset_server, window));
-}
-
-pub fn stop_jump(
-    mut player_query: Query<
-        (&mut JumpComponent, &KinematicCharacterControllerOutput),
-        With<Player>,
-    >,
-) {
-    let Ok((mut jump_component, output)) = player_query.get_single_mut() else {
-        return;
-    };
-
-    if output.grounded && jump_component.is_jumping() {
-        debug!("Player is grounded, stopping jump.");
-        jump_component.stop_jump();
-    }
 }

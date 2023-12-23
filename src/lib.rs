@@ -20,6 +20,7 @@ pub fn start_app() {
             RapierDebugRenderPlugin::default(),
             InputManagerPlugin::<components::character::Action>::default(),
             camera::CameraPlugin,
+            components::character::CharacterPlugin,
             player::PlayerPlugin,
             level::LevelPlugin,
         ))
