@@ -18,7 +18,7 @@ pub fn start_app() {
             setup_default_plugins(),
             RapierPhysicsPlugin::<NoUserData>::pixels_per_meter(PIXELS_PER_METER),
             RapierDebugRenderPlugin::default(),
-            InputManagerPlugin::<components::user_moveable::Action>::default(),
+            InputManagerPlugin::<components::character::Action>::default(),
             camera::CameraPlugin,
             player::PlayerPlugin,
             level::LevelPlugin,

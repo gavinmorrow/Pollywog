@@ -7,7 +7,7 @@ use crate::GRAVITY;
 use super::jump::JumpComponent;
 
 #[derive(Component, Default)]
-pub struct UserMoveable {
+pub struct Character {
     pub movement_speed: f32,
 }
 
@@ -20,22 +20,18 @@ pub enum Action {
 }
 
 pub fn r#move(
-    action_state_query: Query<&ActionState<Action>, With<UserMoveable>>,
+    action_state_query: Query<&ActionState<Action>, With<Character>>,
     mut player_query: Query<(
         &mut KinematicCharacterController,
         &KinematicCharacterControllerOutput,
         &mut Sprite,
-        &UserMoveable,
+        &Character,
     )>,
-    mut jump_component_query: Query<&mut JumpComponent, With<UserMoveable>>,
+    mut jump_component_query: Query<&mut JumpComponent, With<Character>>,
 ) {
     let action_state = action_state_query.single();
-    let Ok((
-        mut char_controller,
-        char_controller_output,
-        mut sprite,
-        movement_config,
-    )) = player_query.get_single_mut()
+    let Ok((mut char_controller, char_controller_output, mut sprite, char)) =
+        player_query.get_single_mut()
     else {
         return;
     };
@@ -43,19 +39,15 @@ pub fn r#move(
     let actions = action_state.get_pressed();
 
     if !actions.is_empty() {
-        trace!("Moving player.");
+        trace!("Moving character.");
     }
 
-    char_controller.translation = Some(
-        char_controller
-            .translation
-            .unwrap_or(GRAVITY),
-    );
+    char_controller.translation = Some(char_controller.translation.unwrap_or(GRAVITY));
     let translation = &mut char_controller
         .translation
         .expect("Just set to a Some value above.");
 
-    let movement_speed = movement_config.movement_speed;
+    let movement_speed = char.movement_speed;
 
     for action in actions {
         trace!("Action: {:#?}", action);
@@ -70,11 +62,11 @@ pub fn r#move(
             }
             Action::Jump => {
                 if char_controller_output.grounded {
-                    trace!("Player is grounded, starting jump.");
+                    trace!("Character is grounded, starting jump.");
                     let mut jump_component = jump_component_query.single_mut();
                     jump_component.start_jump();
                 } else {
-                    trace!("Player is not grounded, can't jump.");
+                    trace!("Character is not grounded, can't jump.");
                 }
             }
             Action::Grapple => { /* Do nothing, this is handled elsewhere. */ }

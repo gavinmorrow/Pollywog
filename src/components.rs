@@ -1,2 +1,2 @@
 pub mod jump;
-pub mod user_moveable;
+pub mod character;

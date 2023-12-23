@@ -1,4 +1,4 @@
-use crate::components::user_moveable::{r#move, Action, UserMoveable};
+use crate::components::character::{r#move, Action, Character};
 use bevy::{prelude::*, window::PrimaryWindow};
 use bevy_rapier2d::prelude::*;
 use leafwing_input_manager::prelude::*;
@@ -53,7 +53,7 @@ struct PlayerBundle {
     external_force: ExternalForce,
     gravity_scale: GravityScale,
     jump_component: JumpComponent,
-    movement_config: UserMoveable,
+    char: Character,
 }
 
 impl PlayerBundle {
@@ -103,7 +103,7 @@ impl PlayerBundle {
             external_force: ExternalForce::default(),
             gravity_scale: GravityScale(1.0),
             jump_component: JumpComponent::new(JUMP_MAGNITUDE, false),
-            movement_config: UserMoveable {
+            char: Character {
                 movement_speed: MOVEMENT_SPEED,
             },
         }
