@@ -31,8 +31,8 @@ pub fn r#move(
 ) {
     let action_state = action_state_query.single();
     let Ok((
-        mut kinematic_character_controller,
-        kinematic_character_controller_output,
+        mut char_controller,
+        char_controller_output,
         mut sprite,
         movement_config,
     )) = player_query.get_single_mut()
@@ -46,12 +46,12 @@ pub fn r#move(
         trace!("Moving player.");
     }
 
-    kinematic_character_controller.translation = Some(
-        kinematic_character_controller
+    char_controller.translation = Some(
+        char_controller
             .translation
             .unwrap_or(GRAVITY),
     );
-    let translation = &mut kinematic_character_controller
+    let translation = &mut char_controller
         .translation
         .expect("Just set to a Some value above.");
 
@@ -69,7 +69,7 @@ pub fn r#move(
                 sprite.flip_x = false;
             }
             Action::Jump => {
-                if kinematic_character_controller_output.grounded {
+                if char_controller_output.grounded {
                     trace!("Player is grounded, starting jump.");
                     let mut jump_component = jump_component_query.single_mut();
                     jump_component.start_jump();
@@ -81,5 +81,5 @@ pub fn r#move(
         }
     }
 
-    kinematic_character_controller.translation = Some(*translation);
+    char_controller.translation = Some(*translation);
 }
