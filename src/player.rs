@@ -203,19 +203,3 @@ fn add_grapple_force(
     character_controller.translation = Some(force);
     trace!("Setting grapple force on player to: {:?}", force);
 }
-
-/// Remove the force from the player (to be used for stopping grappling).
-fn remove_grapple_force(mut player_query: Query<&mut KinematicCharacterController, With<Player>>) {
-    let character_controller = &mut player_query.single_mut();
-    let Some(translation) = &mut character_controller.translation else {
-        warn!("No translation found for player, can't remove grapple force.");
-        return;
-    };
-
-    // Remove player external force
-    let force = GRAVITY;
-    *translation = force;
-    trace!("Setting external force on player to: {:?}", force);
-
-    debug!("Removed grapple force from player.");
-}

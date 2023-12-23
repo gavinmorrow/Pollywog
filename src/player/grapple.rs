@@ -366,20 +366,13 @@ fn add_grapple_marker(commands: &mut Commands, point: &Vec2) -> Entity {
         .id()
 }
 
-fn end_grapple(
-    mut_player_query: Query<&mut KinematicCharacterController, With<Player>>,
-    target_pos: Option<Res<TargetPos>>,
-    mut commands: Commands,
-) {
+fn end_grapple(target_pos: Option<Res<TargetPos>>, mut commands: Commands) {
     debug!("Ending grapple");
 
     // Remove target pos resource if it exists
     if let Some(target_pos) = target_pos {
         remove_target_pos(&mut commands, target_pos.2);
     }
-
-    // Remove player external force
-    super::remove_grapple_force(mut_player_query);
 }
 
 fn remove_guideline(guideline: &mut ResMut<Guideline>, commands: &mut Commands) {
