@@ -1,3 +1,4 @@
+use crate::components::user_moveable::{r#move, Action, UserMoveable};
 use bevy::{prelude::*, window::PrimaryWindow};
 use bevy_rapier2d::prelude::*;
 use leafwing_input_manager::prelude::*;
@@ -52,6 +53,7 @@ struct PlayerBundle {
     external_force: ExternalForce,
     gravity_scale: GravityScale,
     jump_component: JumpComponent,
+    movement_config: UserMoveable,
 }
 
 impl PlayerBundle {
@@ -101,16 +103,11 @@ impl PlayerBundle {
             external_force: ExternalForce::default(),
             gravity_scale: GravityScale(1.0),
             jump_component: JumpComponent::new(JUMP_MAGNITUDE, false),
+            movement_config: UserMoveable {
+                movement_speed: MOVEMENT_SPEED,
+            },
         }
     }
-}
-
-#[derive(Actionlike, PartialEq, Eq, Clone, Copy, Hash, Debug, Reflect)]
-pub enum Action {
-    Left,
-    Right,
-    Jump,
-    Grapple,
 }
 
 fn spawn(
@@ -122,60 +119,6 @@ fn spawn(
 
     debug!("Spawning player");
     commands.spawn(PlayerBundle::new(asset_server, window));
-}
-
-pub fn r#move(
-    action_state_query: Query<&ActionState<Action>, With<Player>>,
-    mut player_query: Query<
-        (
-            &mut KinematicCharacterController,
-            &KinematicCharacterControllerOutput,
-            &mut Sprite,
-        ),
-        With<Player>,
-    >,
-    mut jump_component_query: Query<&mut JumpComponent, With<Player>>,
-) {
-    let action_state = action_state_query.single();
-    let Ok((mut player, kinematic_character_controller_output, mut sprite)) =
-        player_query.get_single_mut()
-    else {
-        return;
-    };
-    let actions = action_state.get_pressed();
-
-    if !actions.is_empty() {
-        trace!("Moving player.");
-    }
-
-    player.translation = Some(player.translation.unwrap_or(GRAVITY));
-    let translation = &mut player.translation.expect("Just set to a Some value above.");
-
-    for action in actions {
-        trace!("Action: {:#?}", action);
-        match action {
-            Action::Left => {
-                translation.x = -MOVEMENT_SPEED;
-                sprite.flip_x = true;
-            }
-            Action::Right => {
-                translation.x = MOVEMENT_SPEED;
-                sprite.flip_x = false;
-            }
-            Action::Jump => {
-                if kinematic_character_controller_output.grounded {
-                    trace!("Player is grounded, starting jump.");
-                    let mut jump_component = jump_component_query.single_mut();
-                    jump_component.start_jump();
-                } else {
-                    trace!("Player is not grounded, can't jump.");
-                }
-            }
-            Action::Grapple => { /* Do nothing, this is handled elsewhere. */ }
-        }
-    }
-
-    player.translation = Some(*translation);
 }
 
 pub fn stop_jump(
