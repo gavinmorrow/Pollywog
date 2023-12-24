@@ -15,3 +15,9 @@ impl Health {
         Health::new(total, total)
     }
 }
+
+impl Default for Health {
+    fn default() -> Self {
+        Health::full(100.0)
+    }
+}
