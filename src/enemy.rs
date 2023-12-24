@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use bevy_rapier2d::prelude::*;
 
-use crate::components::{jump::JumpComponent, health::Health};
+use crate::components::{health::Health, jump::JumpComponent};
 
 const SIZE: f32 = 64.0;
 const SIZE_VEC2: Vec2 = Vec2::new(SIZE, SIZE);
