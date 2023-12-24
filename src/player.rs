@@ -3,7 +3,10 @@ use bevy::{prelude::*, window::PrimaryWindow};
 use bevy_rapier2d::prelude::*;
 use leafwing_input_manager::prelude::*;
 
-use crate::{components::jump::JumpComponent, GRAVITY};
+use crate::{
+    components::{health::Health, jump::JumpComponent},
+    GRAVITY,
+};
 
 const SIZE: f32 = 64.0;
 const SIZE_VEC2: Vec2 = Vec2::new(SIZE, SIZE);
@@ -12,6 +15,8 @@ const JUMP_MAGNITUDE: Vec2 = Vec2::new(0.0, 10.0);
 const MOVEMENT_SPEED: f32 = 3.0;
 
 const TEXTURE_PATH: &str = "player.png";
+
+const INITIAL_HEALTH: f32 = 100.0;
 
 #[derive(Default)]
 pub struct PlayerPlugin;
@@ -36,6 +41,7 @@ struct PlayerBundle {
     gravity_scale: GravityScale,
     jump_component: JumpComponent,
     char: Character,
+    health: Health,
 }
 
 impl PlayerBundle {
@@ -76,6 +82,7 @@ impl PlayerBundle {
             char: Character {
                 movement_speed: MOVEMENT_SPEED,
             },
+            health: Health::full(INITIAL_HEALTH),
         }
     }
 }
