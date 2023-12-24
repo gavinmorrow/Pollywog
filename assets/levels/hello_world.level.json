@@ -2,217 +2,217 @@
 	"name": "hello world",
 	"blocks": [
 		{
-			"kind": {
+			"data": {
 				"type": "Enemy"
 			},
 			"position": [6, 3]
 		},
 		{
-			"kind": {
+			"data": {
 				"type": "Dirt"
 			},
 			"position": [0, 1]
 		},
 		{
-			"kind": {
+			"data": {
 				"type": "Dirt"
 			},
 			"position": [1, 1]
 		},
 		{
-			"kind": {
+			"data": {
 				"type": "Dirt"
 			},
 			"position": [2, 1]
 		},
 		{
-			"kind": {
+			"data": {
 				"type": "Dirt"
 			},
 			"position": [3, 1]
 		},
 		{
-			"kind": {
+			"data": {
 				"type": "Dirt"
 			},
 			"position": [4, 1]
 		},
 		{
-			"kind": {
+			"data": {
 				"type": "Dirt"
 			},
 			"position": [5, 1]
 		},
 		{
-			"kind": {
+			"data": {
 				"type": "Dirt"
 			},
 			"position": [6, 2]
 		},
 		{
-			"kind": {
+			"data": {
 				"type": "Dirt"
 			},
 			"position": [7, 2]
 		},
 		{
-			"kind": {
+			"data": {
 				"type": "Dirt"
 			},
 			"position": [8, 2]
 		},
 		{
-			"kind": {
+			"data": {
 				"type": "Dirt"
 			},
 			"position": [9, 2]
 		},
 		{
-			"kind": {
+			"data": {
 				"type": "Dirt"
 			},
 			"position": [10, 2]
 		},
 		{
-			"kind": {
+			"data": {
 				"type": "Dirt"
 			},
 			"position": [11, 2]
 		},
 		{
-			"kind": {
+			"data": {
 				"type": "Dirt"
 			},
 			"position": [10, 6]
 		},
 		{
-			"kind": {
+			"data": {
 				"type": "Dirt"
 			},
 			"position": [11, 2]
 		},
 		{
-			"kind": {
+			"data": {
 				"type": "Dirt"
 			},
 			"position": [12, 2]
 		},
 		{
-			"kind": {
+			"data": {
 				"type": "Dirt"
 			},
 			"position": [13, 2]
 		},
 		{
-			"kind": {
+			"data": {
 				"type": "Dirt"
 			},
 			"position": [14, 2]
 		},
 		{
-			"kind": {
+			"data": {
 				"type": "Dirt"
 			},
 			"position": [15, 2]
 		},
 		{
-			"kind": {
+			"data": {
 				"type": "Dirt"
 			},
 			"position": [16, 2]
 		},
 		{
-			"kind": {
+			"data": {
 				"type": "Dirt"
 			},
 			"position": [17, 2]
 		},
 		{
-			"kind": {
+			"data": {
 				"type": "Dirt"
 			},
 			"position": [18, 2]
 		},
 		{
-			"kind": {
+			"data": {
 				"type": "Dirt"
 			},
 			"position": [19, 2]
 		},
 		{
-			"kind": {
+			"data": {
 				"type": "Dirt"
 			},
 			"position": [20, 2]
 		},
 		{
-			"kind": {
+			"data": {
 				"type": "Dirt"
 			},
 			"position": [21, 2]
 		},
 		{
-			"kind": {
+			"data": {
 				"type": "Dirt"
 			},
 			"position": [22, 2]
 		},
 		{
-			"kind": {
+			"data": {
 				"type": "Dirt"
 			},
 			"position": [23, 2]
 		},
 		{
-			"kind": {
+			"data": {
 				"type": "Dirt"
 			},
 			"position": [24, 2]
 		},
 		{
-			"kind": {
+			"data": {
 				"type": "Dirt"
 			},
 			"position": [25, 2]
 		},
 		{
-			"kind": {
+			"data": {
 				"type": "Dirt"
 			},
 			"position": [26, 2]
 		},
 		{
-			"kind": {
+			"data": {
 				"type": "Dirt"
 			},
 			"position": [27, 2]
 		},
 		{
-			"kind": {
+			"data": {
 				"type": "Dirt"
 			},
 			"position": [28, 2]
 		},
 		{
-			"kind": {
+			"data": {
 				"type": "Dirt"
 			},
 			"position": [29, 2]
 		},
 		{
-			"kind": {
+			"data": {
 				"type": "Dirt"
 			},
 			"position": [30, 2]
 		},
 		{
-			"kind": {
+			"data": {
 				"type": "Dirt"
 			},
 			"position": [31, 2]
 		},
 		{
-			"kind": {
+			"data": {
 				"type": "Dirt"
 			},
 			"position": [32, 2]
