@@ -66,7 +66,7 @@ fn construct_level_res(
 
 fn load_image_assets(asset_server: Res<AssetServer>, mut game_assets: ResMut<GameAsset>) {
     game_assets.image_handles = std::collections::HashMap::from([(
-        "enemy".into(),
+        ImageHandleId::Enemy,
         asset_server.load(crate::enemy::TEXTURE_PATH),
     )]);
 }
@@ -88,7 +88,11 @@ fn spawn_blocks(
             BlockData::Enemy {} => {
                 let enemy = EnemyBundle::new(
                     block.position,
-                    game_assets.image_handles.get("enemy").unwrap().clone(),
+                    game_assets
+                        .image_handles
+                        .get(&ImageHandleId::Enemy)
+                        .unwrap()
+                        .clone(),
                     &image_assets,
                 );
                 commands.spawn(enemy);
@@ -109,7 +113,12 @@ enum LevelState {
 
 #[derive(/*Component,*/ Resource, Default)]
 struct GameAsset {
-    pub image_handles: std::collections::HashMap<String, Handle<Image>>,
+    pub image_handles: std::collections::HashMap<ImageHandleId, Handle<Image>>,
+}
+
+#[derive(Eq, PartialEq, Hash)]
+enum ImageHandleId {
+    Enemy,
 }
 
 #[derive(Debug, Resource)]
