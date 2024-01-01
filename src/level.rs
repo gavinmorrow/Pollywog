@@ -14,8 +14,9 @@ pub struct LevelPlugin;
 impl Plugin for LevelPlugin {
     fn build(&self, app: &mut App) {
         app.add_state::<LevelState>()
+            .insert_resource(GameAsset::default())
             .add_plugins(JsonAssetPlugin::<LevelAsset>::new(&["level.json"]))
-            .add_systems(Startup, (load_level_asset,))
+            .add_systems(Startup, (load_level_asset, load_image_assets))
             .add_systems(
                 // FIXME: these really aren't "update" systems, they're "startup"
                 //        systems. But they need to be run only after the asset
@@ -63,11 +64,19 @@ fn construct_level_res(
     next_state.set(LevelState::SpawningBlocks);
 }
 
+fn load_image_assets(asset_server: Res<AssetServer>, mut game_assets: ResMut<GameAsset>) {
+    game_assets.image_handles = std::collections::HashMap::from([(
+        "enemy".into(),
+        asset_server.load(crate::enemy::TEXTURE_PATH),
+    )]);
+}
+
 fn spawn_blocks(
     mut commands: Commands,
     mut next_state: ResMut<NextState<LevelState>>,
     level: Res<Level>,
-    asset_server: Res<AssetServer>,
+    game_assets: Res<GameAsset>,
+    image_assets: Res<Assets<Image>>,
 ) {
     info!("Spawning blocks for level: {}", level.name);
     for block in &level.blocks {
@@ -77,7 +86,11 @@ fn spawn_blocks(
                 commands.spawn(block);
             }
             BlockData::Enemy {} => {
-                let enemy = EnemyBundle::new(block.position, &asset_server);
+                let enemy = EnemyBundle::new(
+                    block.position,
+                    game_assets.image_handles.get("enemy").unwrap().clone(),
+                    &image_assets,
+                );
                 commands.spawn(enemy);
             }
         }
@@ -92,6 +105,11 @@ enum LevelState {
     ConstructingLevel,
     SpawningBlocks,
     Loaded,
+}
+
+#[derive(/*Component,*/ Resource, Default)]
+struct GameAsset {
+    pub image_handles: std::collections::HashMap<String, Handle<Image>>,
 }
 
 #[derive(Debug, Resource)]
