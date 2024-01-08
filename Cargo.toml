@@ -8,7 +8,7 @@ bevy = { version = "0.12", features = ["dynamic_linking"] }
 bevy_common_assets = { version = "0.8.0", features = ["json"] }
 bevy_rapier2d = "0.23"
 leafwing-input-manager = "0.11"
-serde = { version = "1.0.193", features = ["derive"] }
+serde = { version = "1.0.195", features = ["derive"] }
 
 # Enable high optimizations for dependencies (incl. Bevy), but not for our code:
 [profile.dev.package."*"]
