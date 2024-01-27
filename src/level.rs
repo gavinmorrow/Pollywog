@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use bevy::prelude::*;
 use bevy_common_assets::json::JsonAssetPlugin;
 
@@ -58,7 +60,7 @@ fn construct_level_res(
     };
     let level = Level::from(level_asset);
 
-    info!("Constructing level resource: {:?}", level);
+    info!("Constructing level resource");
 
     commands.insert_resource(level);
     next_state.set(LevelState::SpawningBlocks);
@@ -67,7 +69,10 @@ fn construct_level_res(
 fn load_image_assets(asset_server: Res<AssetServer>, mut game_assets: ResMut<GameAsset>) {
     game_assets.image_handles = std::collections::HashMap::from([(
         ImageHandleId::Enemy,
-        asset_server.load(crate::enemy::TEXTURE_PATH),
+        ImageHandles {
+            texture: asset_server.load(crate::enemy::TEXTURE_PATH),
+            collider: asset_server.load(crate::enemy::COLLIDER_PATH),
+        },
     )]);
 }
 
@@ -91,8 +96,7 @@ fn spawn_blocks(
                     game_assets
                         .image_handles
                         .get(&ImageHandleId::Enemy)
-                        .unwrap()
-                        .clone(),
+                        .expect("Enemy image assets loaded"),
                     &image_assets,
                 );
                 commands.spawn(enemy);
@@ -113,12 +117,17 @@ enum LevelState {
 
 #[derive(/*Component,*/ Resource, Default)]
 struct GameAsset {
-    pub image_handles: std::collections::HashMap<ImageHandleId, Handle<Image>>,
+    pub image_handles: HashMap<ImageHandleId, ImageHandles>,
 }
 
 #[derive(Eq, PartialEq, Hash)]
 enum ImageHandleId {
     Enemy,
+}
+
+pub struct ImageHandles {
+    pub texture: Handle<Image>,
+    pub collider: Handle<Image>,
 }
 
 #[derive(Debug, Resource)]
