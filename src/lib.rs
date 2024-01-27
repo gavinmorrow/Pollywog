@@ -24,6 +24,7 @@ pub fn start_app() {
             components::character::CharacterPlugin,
             player::PlayerPlugin,
             level::LevelPlugin,
+            components::kills_player::KillsPlayerPlugin,
         ))
         .add_systems(Update, bevy::window::close_on_esc)
         .run();

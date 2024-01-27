@@ -2,7 +2,7 @@ use bevy::prelude::*;
 use bevy_rapier2d::prelude::*;
 
 use crate::{
-    components::{health::Health, jump::JumpComponent},
+    components::{health::Health, jump::JumpComponent, kills_player::KillsPlayerComponent},
     level::ImageHandles,
 };
 
@@ -23,6 +23,9 @@ pub struct EnemyBundle {
     jump_component: JumpComponent,
     enemy: Enemy,
     health: Health,
+    active_events: ActiveEvents,
+    kills_player: KillsPlayerComponent,
+    rigid_body: RigidBody,
 }
 
 impl EnemyBundle {
@@ -49,11 +52,14 @@ impl EnemyBundle {
                 texture: handles.texture.clone(),
                 ..default()
             },
-            // collider: Collider::cuboid(SIZE / 2.0, SIZE / 2.0),
-            collider,
+            collider: Collider::cuboid(SIZE / 2.0, SIZE / 2.0),
+            // collider,
             jump_component: JumpComponent::new(JUMP_MAGNITUDE, false),
             enemy: Enemy {},
             health: Health::full(INITIAL_HEALTH),
+            active_events: ActiveEvents::COLLISION_EVENTS,
+            kills_player: KillsPlayerComponent,
+            rigid_body: RigidBody::Dynamic,
         }
     }
 }

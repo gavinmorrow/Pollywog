@@ -42,6 +42,8 @@ struct PlayerBundle {
     jump_component: JumpComponent,
     char: Character,
     health: Health,
+    active_events: ActiveEvents,
+    rigid_body: RigidBody,
 }
 
 impl PlayerBundle {
@@ -83,6 +85,8 @@ impl PlayerBundle {
                 movement_speed: MOVEMENT_SPEED,
             },
             health: Health::full(INITIAL_HEALTH),
+            active_events: ActiveEvents::COLLISION_EVENTS,
+            rigid_body: RigidBody::Dynamic,
         }
     }
 }
