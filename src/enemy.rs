@@ -52,7 +52,7 @@ impl EnemyBundle {
                 texture: handles.texture.clone(),
                 ..default()
             },
-            collider: Collider::cuboid(SIZE / 2.0, SIZE / 2.0),
+            collider: Collider::ball(SIZE / 2.0),
             // collider,
             jump_component: JumpComponent::new(JUMP_MAGNITUDE, false),
             enemy: Enemy {},
