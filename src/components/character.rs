@@ -117,7 +117,7 @@ pub fn stop_jump(
     };
 
     if char_controller_output.grounded && jump_component.is_jumping() {
-        debug!("Player is grounded, stopping jump.");
+        trace!("Player is grounded, stopping jump.");
         jump_component.stop_jump();
     }
 }
