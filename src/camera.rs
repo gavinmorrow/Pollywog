@@ -1,6 +1,6 @@
 use bevy::{prelude::*, window::PrimaryWindow};
 
-use crate::player::Player;
+use crate::bundles::player::Player;
 
 const MAX_SPEED_X: f32 = 3.0;
 const MAX_SPEED_Y: f32 = 1.0;

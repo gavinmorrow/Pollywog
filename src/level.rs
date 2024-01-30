@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use bevy::prelude::*;
 use bevy_common_assets::json::JsonAssetPlugin;
 
-use crate::enemy::EnemyBundle;
+use crate::bundles::enemy::EnemyBundle;
 
 use self::block::BlockBundle;
 
@@ -70,7 +70,7 @@ fn load_image_assets(asset_server: Res<AssetServer>, mut game_assets: ResMut<Gam
     game_assets.image_handles = std::collections::HashMap::from([(
         ImageHandleId::Enemy,
         ImageHandles {
-            texture: asset_server.load(crate::enemy::TEXTURE_PATH),
+            texture: asset_server.load(crate::bundles::enemy::TEXTURE_PATH),
         },
     )]);
 }

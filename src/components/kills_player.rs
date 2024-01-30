@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use bevy_rapier2d::prelude::*;
 
-use crate::{player::Player, state::GameState};
+use crate::{bundles::player::Player, state::GameState};
 
 pub struct KillsPlayerPlugin;
 impl Plugin for KillsPlayerPlugin {

@@ -4,11 +4,10 @@ use leafwing_input_manager::prelude::*;
 
 use crate::state::GameState;
 
+mod bundles;
 mod camera;
 mod components;
-mod enemy;
 mod level;
-mod player;
 mod state;
 
 const PIXELS_PER_METER: f32 = 64.0;
@@ -26,7 +25,7 @@ pub fn start_app() {
             InputManagerPlugin::<components::character::Action>::default(),
             camera::CameraPlugin,
             components::character::CharacterPlugin,
-            player::PlayerPlugin,
+            bundles::player::PlayerPlugin,
             level::LevelPlugin,
             components::kills_player::KillsPlayerPlugin,
             components::dead_screen_plugin::DeadScreenPlugin,
