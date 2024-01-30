@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use bevy_rapier2d::prelude::*;
 
-use crate::player::Player;
+use crate::{player::Player, state::GameState};
 
 pub struct KillsPlayerPlugin;
 impl Plugin for KillsPlayerPlugin {
@@ -18,6 +18,7 @@ pub fn kills_player(
     mut collisions: EventReader<CollisionEvent>,
     player_query: Query<Entity, With<Player>>,
     kills_player_query: Query<Entity, With<KillsPlayerComponent>>,
+    mut next_state: ResMut<NextState<GameState>>,
 ) {
     let player = &player_query.single();
 
@@ -35,8 +36,7 @@ pub fn kills_player(
             {
                 // Collision with player
                 // Kill player
-                // info!("player is dead.")
-                panic!("Player died. sorry. game over.");
+                next_state.set(GameState::Dead)
             }
         }
     }
