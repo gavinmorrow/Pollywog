@@ -23,12 +23,6 @@ pub fn kills_player(
     let player = &player_query.single();
 
     for collision in collisions.read() {
-        eprintln!(
-            "{:#?} {:#?} {:#?}",
-            collision,
-            player,
-            kills_player_query.iter().next().unwrap()
-        );
         if let CollisionEvent::Started(entity_a, entity_b, _flags) = collision {
             let entities = [entity_a, entity_b];
             if entities.contains(&player)
