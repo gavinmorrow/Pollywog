@@ -2,11 +2,14 @@ use bevy::{app::PluginGroupBuilder, log::LogPlugin, prelude::*, window::WindowMo
 use bevy_rapier2d::prelude::*;
 use leafwing_input_manager::prelude::*;
 
+use crate::state::GameState;
+
 mod camera;
 mod components;
 mod enemy;
 mod level;
 mod player;
+mod state;
 
 const PIXELS_PER_METER: f32 = 64.0;
 const GRAVITY: Vec2 = Vec2::new(0.0, -9.81);
@@ -15,6 +18,7 @@ pub fn start_app() {
     eprintln!("Creating app...");
 
     App::new()
+        .add_state::<GameState>()
         .add_plugins((
             setup_default_plugins(),
             RapierPhysicsPlugin::<NoUserData>::pixels_per_meter(PIXELS_PER_METER),
@@ -25,6 +29,7 @@ pub fn start_app() {
             player::PlayerPlugin,
             level::LevelPlugin,
             components::kills_player::KillsPlayerPlugin,
+            components::on_dead::DeadScreenPlugin,
         ))
         .add_systems(Update, bevy::window::close_on_esc)
         .run();
