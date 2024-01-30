@@ -71,7 +71,6 @@ fn load_image_assets(asset_server: Res<AssetServer>, mut game_assets: ResMut<Gam
         ImageHandleId::Enemy,
         ImageHandles {
             texture: asset_server.load(crate::enemy::TEXTURE_PATH),
-            collider: asset_server.load(crate::enemy::COLLIDER_PATH),
         },
     )]);
 }
@@ -81,7 +80,6 @@ fn spawn_blocks(
     mut next_state: ResMut<NextState<LevelState>>,
     level: Res<Level>,
     game_assets: Res<GameAsset>,
-    image_assets: Res<Assets<Image>>,
 ) {
     info!("Spawning blocks for level: {}", level.name);
     for block in &level.blocks {
@@ -97,7 +95,6 @@ fn spawn_blocks(
                         .image_handles
                         .get(&ImageHandleId::Enemy)
                         .expect("Enemy image assets loaded"),
-                    &image_assets,
                 );
                 commands.spawn(enemy);
             }
@@ -127,7 +124,6 @@ enum ImageHandleId {
 
 pub struct ImageHandles {
     pub texture: Handle<Image>,
-    pub collider: Handle<Image>,
 }
 
 #[derive(Debug, Resource)]

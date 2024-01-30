@@ -12,7 +12,6 @@ const SIZE_VEC2: Vec2 = Vec2::new(SIZE, SIZE);
 const JUMP_MAGNITUDE: Vec2 = Vec2::new(0.0, 10.0);
 
 pub const TEXTURE_PATH: &str = "enemy.png";
-pub const COLLIDER_PATH: &str = "enemy_collider.png";
 
 const INITIAL_HEALTH: f32 = 100.0;
 
@@ -29,16 +28,7 @@ pub struct EnemyBundle {
 }
 
 impl EnemyBundle {
-    pub fn new(
-        translation: Vec2,
-        handles: &ImageHandles,
-        image_assets: &Res<Assets<Image>>,
-    ) -> Self {
-        let collider_image = image_assets.get(&handles.collider).unwrap();
-        let collider =
-            bevy_rapier_collider_gen::single_convex_polyline_collider_translated(collider_image)
-                .unwrap();
-
+    pub fn new(translation: Vec2, handles: &ImageHandles) -> Self {
         EnemyBundle {
             sprite_bundle: SpriteBundle {
                 sprite: Sprite {
@@ -53,7 +43,6 @@ impl EnemyBundle {
                 ..default()
             },
             collider: Collider::ball(SIZE / 2.0),
-            // collider,
             jump_component: JumpComponent::new(JUMP_MAGNITUDE, false),
             enemy: Enemy {},
             health: Health::full(INITIAL_HEALTH),
