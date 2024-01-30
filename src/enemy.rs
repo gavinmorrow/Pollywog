@@ -44,7 +44,7 @@ impl EnemyBundle {
             },
             collider: Collider::ball(SIZE / 2.0),
             jump_component: JumpComponent::new(JUMP_MAGNITUDE, false),
-            enemy: Enemy {},
+            enemy: Enemy,
             health: Health::full(INITIAL_HEALTH),
             active_events: ActiveEvents::COLLISION_EVENTS,
             kills_player: KillsPlayerComponent,
@@ -54,4 +54,4 @@ impl EnemyBundle {
 }
 
 #[derive(Component)]
-struct Enemy {}
+struct Enemy;
