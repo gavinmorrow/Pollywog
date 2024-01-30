@@ -30,6 +30,7 @@ pub fn start_app() {
             level::LevelPlugin,
             components::kills_player::KillsPlayerPlugin,
             components::dead_screen_plugin::DeadScreenPlugin,
+            components::npc_movement::NpcMovementPlugin,
         ))
         .add_systems(Update, bevy::window::close_on_esc)
         .run();
