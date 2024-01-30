@@ -29,7 +29,7 @@ pub fn start_app() {
             player::PlayerPlugin,
             level::LevelPlugin,
             components::kills_player::KillsPlayerPlugin,
-            components::on_dead::DeadScreenPlugin,
+            components::dead_screen_plugin::DeadScreenPlugin,
         ))
         .add_systems(Update, bevy::window::close_on_esc)
         .run();
