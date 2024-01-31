@@ -1,4 +1,5 @@
 pub mod character;
+pub mod damage;
 pub mod dead_screen_plugin;
 pub mod health;
 pub mod jump;
@@ -15,6 +16,7 @@ impl bevy::prelude::Plugin for ComponentsPlugin {
             dead_screen_plugin::DeadScreenPlugin,
             npc_movement::NpcMovementPlugin,
             player_win::PlayerWinPlugin,
+            damage::DamagePlugin,
         ));
     }
 }

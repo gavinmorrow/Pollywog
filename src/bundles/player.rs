@@ -16,7 +16,7 @@ const MOVEMENT_SPEED: f32 = 3.0;
 
 const TEXTURE_PATH: &str = "player.png";
 
-const INITIAL_HEALTH: f32 = 100.0;
+pub const INITIAL_HEALTH: f32 = 100.0;
 
 #[derive(Default)]
 pub struct PlayerPlugin;

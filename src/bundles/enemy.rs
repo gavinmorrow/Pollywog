@@ -2,12 +2,11 @@ use bevy::prelude::*;
 use bevy_rapier2d::prelude::*;
 
 use crate::{
-    components::{
-        health::Health, jump::JumpComponent, kills_player::KillsPlayerComponent,
-        npc_movement::NpcMovement,
-    },
+    components::{damage::Damage, health::Health, jump::JumpComponent, npc_movement::NpcMovement},
     level::ImageHandles,
 };
+
+use super::player;
 
 const SIZE: f32 = 64.0;
 const SIZE_VEC2: Vec2 = Vec2::new(SIZE, SIZE);
@@ -26,7 +25,7 @@ pub struct EnemyBundle {
     enemy: Enemy,
     health: Health,
     active_events: ActiveEvents,
-    kills_player: KillsPlayerComponent,
+    damage: Damage,
     rigid_body: RigidBody,
     npc_movement: NpcMovement,
     velocity: Velocity,
@@ -52,7 +51,7 @@ impl EnemyBundle {
             enemy: Enemy,
             health: Health::full(INITIAL_HEALTH),
             active_events: ActiveEvents::COLLISION_EVENTS,
-            kills_player: KillsPlayerComponent,
+            damage: Damage(player::INITIAL_HEALTH),
             rigid_body: RigidBody::Dynamic,
             npc_movement: NpcMovement { modify_vel },
             velocity: Velocity {
