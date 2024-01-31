@@ -18,33 +18,36 @@ impl Plugin for LevelPlugin {
         app.add_state::<LevelState>()
             .insert_resource(GameAsset::default())
             .add_plugins(JsonAssetPlugin::<LevelAsset>::new(&["level.json"]))
-            .add_systems(Startup, (load_level_asset, load_image_assets))
             .add_systems(
-                // FIXME: these really aren't "update" systems, they're "startup"
-                //        systems. But they need to be run only after the asset
-                //        is loaded, and I don't know how to do that.
+                OnEnter(LevelState::LoadingAssets),
+                (load_level_asset, load_image_assets),
+            )
+            .add_systems(
                 Update,
-                (
-                    construct_level_res
-                        .run_if(state_exists_and_equals(LevelState::ConstructingLevel)),
-                    spawn_blocks.run_if(state_exists_and_equals(LevelState::SpawningBlocks)),
-                ),
-            );
+                wait_for_level_load.run_if(state_exists_and_equals(LevelState::LoadingAssets)),
+            )
+            .add_systems(OnEnter(LevelState::ConstructingLevel), construct_level_res)
+            .add_systems(OnEnter(LevelState::SpawningBlocks), spawn_blocks);
     }
 }
 
-fn load_level_asset(
-    mut commands: Commands,
-    mut next_state: ResMut<NextState<LevelState>>,
-    asset_server: Res<AssetServer>,
-) {
+fn load_level_asset(mut commands: Commands, asset_server: Res<AssetServer>) {
     let level_handle = asset_server.load::<LevelAsset>("levels/hello_world.level.json");
     let level_handle = LevelHandle(level_handle);
 
     info!("Loading level asset: {:?}", level_handle);
 
     commands.insert_resource(level_handle);
-    next_state.set(LevelState::ConstructingLevel);
+}
+
+fn wait_for_level_load(
+    mut next_state: ResMut<NextState<LevelState>>,
+    level_handle: Res<LevelHandle>,
+    level_assets: Res<Assets<LevelAsset>>,
+) {
+    if level_assets.get(level_handle.0.clone()).is_some() {
+        next_state.set(LevelState::ConstructingLevel);
+    }
 }
 
 fn construct_level_res(
