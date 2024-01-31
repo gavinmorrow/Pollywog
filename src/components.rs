@@ -4,3 +4,4 @@ pub mod health;
 pub mod jump;
 pub mod kills_player;
 pub mod npc_movement;
+pub mod player_win;
