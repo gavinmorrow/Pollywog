@@ -12,9 +12,6 @@ impl Plugin for KillsPlayerPlugin {
     }
 }
 
-#[derive(Component)]
-pub struct KillsPlayerComponent;
-
 pub fn kills_player(
     player: Query<&Health, With<Player>>,
     mut next_state: ResMut<NextState<GameState>>,
