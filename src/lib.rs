@@ -24,13 +24,9 @@ pub fn start_app() {
             RapierDebugRenderPlugin::default(),
             InputManagerPlugin::<components::character::Action>::default(),
             camera::CameraPlugin,
-            components::character::CharacterPlugin,
             bundles::player::PlayerPlugin,
             level::LevelPlugin,
-            components::kills_player::KillsPlayerPlugin,
-            components::dead_screen_plugin::DeadScreenPlugin,
-            components::npc_movement::NpcMovementPlugin,
-            components::player_win::PlayerWinPlugin,
+            components::ComponentsPlugin,
         ))
         .add_systems(Update, bevy::window::close_on_esc)
         .run();
