@@ -54,26 +54,7 @@ impl EnemyBundle {
             active_events: ActiveEvents::COLLISION_EVENTS,
             kills_player: KillsPlayerComponent,
             rigid_body: RigidBody::Dynamic,
-            npc_movement: NpcMovement {
-                modify_vel: |vel, pos| {
-                    vel.linvel.x = 64.0 * vel.linvel.x.signum();
-
-                    // FIXME: why does this happen. fix it. this is hacky.
-                    if pos.translation().x == 0.0 {
-                        trace!(
-                            "so uhhh somehow the position (global transform)\
-                            of the enemy is ummmm *checks notes* `0.0`. how tf\
-                            is that possible. i'm just gonna return early dw."
-                        );
-                        return;
-                    }
-
-                    if pos.translation().x < 64.0 * 6.0 || pos.translation().x > 64.0 * 10.0 {
-                        vel.linvel *= -1.0;
-                        vel.angvel *= -1.0;
-                    }
-                },
-            },
+            npc_movement: NpcMovement { modify_vel },
             velocity: Velocity {
                 linvel: Vec2::new(64.0, 0.0),
                 ..default()
@@ -84,3 +65,22 @@ impl EnemyBundle {
 
 #[derive(Component)]
 struct Enemy;
+
+fn modify_vel(vel: &mut Velocity, pos: &GlobalTransform) {
+    vel.linvel.x = 64.0 * vel.linvel.x.signum();
+
+    // FIXME: why does this happen. fix it. this is hacky.
+    if pos.translation().x == 0.0 {
+        trace!(
+            "so uhhh somehow the position (global transform)\
+            of the enemy is ummmm *checks notes* `0.0`. how tf\
+            is that possible. i'm just gonna return early dw."
+        );
+        return;
+    }
+
+    if pos.translation().x < 64.0 * 6.0 || pos.translation().x > 64.0 * 10.0 {
+        vel.linvel *= -1.0;
+        vel.angvel *= -1.0;
+    }
+}
