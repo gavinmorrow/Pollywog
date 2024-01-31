@@ -13,10 +13,10 @@ impl Plugin for KillsPlayerPlugin {
 }
 
 pub fn kills_player(
-    player: Query<&Health, With<Player>>,
+    player_health: Query<&Health, With<Player>>,
     mut next_state: ResMut<NextState<GameState>>,
 ) {
-    if player.single().remaining <= 0.0 {
+    if player_health.single().remaining <= 0.0 {
         next_state.set(GameState::Dead);
     }
 }
