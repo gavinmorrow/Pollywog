@@ -3,10 +3,15 @@ use bevy_rapier2d::prelude::*;
 
 use crate::{bundles::player::Player, state::GameState};
 
+use super::health::Health;
+
 pub struct KillsPlayerPlugin;
 impl Plugin for KillsPlayerPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Update, (kills_player, add_active_events));
+        app.add_systems(
+            Update,
+            (enemy_damages_player, kills_player, add_active_events),
+        );
     }
 }
 
@@ -14,25 +19,33 @@ impl Plugin for KillsPlayerPlugin {
 pub struct KillsPlayerComponent;
 
 // FIXME: buggy. try jumping on it very very quickly and it doesn't register.
-pub fn kills_player(
+pub fn enemy_damages_player(
     mut collisions: EventReader<CollisionEvent>,
-    player_query: Query<Entity, With<Player>>,
+    mut player: Query<(Entity, &mut Health), With<Player>>,
     kills_player_query: Query<Entity, With<KillsPlayerComponent>>,
-    mut next_state: ResMut<NextState<GameState>>,
 ) {
-    let player = &player_query.single();
+    let (player_entity, mut player_health) = player.single_mut();
 
     for collision in collisions.read() {
         if let CollisionEvent::Started(entity_a, entity_b, _flags) = collision {
             let entities = [entity_a, entity_b];
-            if entities.contains(&player)
+            if entities.contains(&&player_entity)
                 && kills_player_query.iter().any(|e| entities.contains(&&e))
             {
                 // Collision with player
                 // Kill player
-                next_state.set(GameState::Dead)
+                player_health.remaining = 0.0;
             }
         }
+    }
+}
+
+pub fn kills_player(
+    player: Query<&Health, With<Player>>,
+    mut next_state: ResMut<NextState<GameState>>,
+) {
+    if player.single().remaining <= 0.0 {
+        next_state.set(GameState::Dead);
     }
 }
 
