@@ -11,11 +11,17 @@ impl Plugin for NpcMovementPlugin {
 /// NOTE: must be used with a `Velocity` component on the same entity.
 #[derive(Component)]
 pub struct NpcMovement {
-    pub modify_vel: fn(vel: &mut Velocity, pos: &GlobalTransform),
+    pub update: fn(vel: &mut KinematicCharacterController, pos: &GlobalTransform),
 }
 
-fn move_npcs(mut npcs: Query<(&mut Velocity, &GlobalTransform, &NpcMovement)>) {
+fn move_npcs(
+    mut npcs: Query<(
+        &mut KinematicCharacterController,
+        &GlobalTransform,
+        &NpcMovement,
+    )>,
+) {
     for (mut vel, transform, movement) in npcs.iter_mut() {
-        (movement.modify_vel)(&mut vel, transform)
+        (movement.update)(&mut vel, transform)
     }
 }
