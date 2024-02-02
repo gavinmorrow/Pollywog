@@ -2,7 +2,7 @@ use bevy::prelude::*;
 use bevy_rapier2d::prelude::*;
 
 use crate::{
-    components::{damage::Damage, health::Health, jump::JumpComponent, npc_movement::NpcMovement},
+    components::{damage::Damage, health::Health, jump::JumpComponent},
     level::ImageHandles,
 };
 
@@ -12,6 +12,7 @@ const SIZE: f32 = 64.0;
 const SIZE_VEC2: Vec2 = Vec2::new(SIZE, SIZE);
 
 const JUMP_MAGNITUDE: Vec2 = Vec2::new(0.0, 10.0);
+const SPEED: Vec2 = Vec2::new(1.0, 0.0);
 
 pub const TEXTURE_PATH: &str = "enemy.png";
 
@@ -27,7 +28,6 @@ pub struct EnemyBundle {
     active_events: ActiveEvents,
     damage: Damage,
     rigid_body: RigidBody,
-    npc_movement: NpcMovement,
     // velocity: Velocity,
     char_controller: KinematicCharacterController,
 }
@@ -49,48 +49,72 @@ impl EnemyBundle {
             },
             collider: Collider::ball(SIZE / 2.0),
             jump_component: JumpComponent::new(JUMP_MAGNITUDE, false),
-            enemy: Enemy,
+            enemy: Enemy::default(),
             health: Health::full(INITIAL_HEALTH),
             active_events: ActiveEvents::COLLISION_EVENTS,
             damage: Damage(player::INITIAL_HEALTH),
             rigid_body: RigidBody::Dynamic,
-            npc_movement: NpcMovement { update },
             // velocity: Velocity {
             //     linvel: Vec2::new(64.0, 0.0),
             //     ..default()
             // },
             char_controller: KinematicCharacterController {
-                translation: Some(Vec2::new(64.0, 0.0)),
+                translation: Some(SPEED),
                 ..default()
             },
         }
     }
 }
 
-#[derive(Component)]
-struct Enemy;
+#[derive(Component, Default)]
+pub struct Enemy {
+    direction: Direction,
+    speed: Vec2,
+}
 
-fn update(char: &mut KinematicCharacterController, pos: &GlobalTransform) {
-    // let translation = &mut char.translation.unwrap_or_default();
+// impl Enemy {
+//     fn direction(&self) -> Direction {
+//         // self.direction
+//         if self.speed.x < 0.0 {
+//             Direction::Left
+//         } else {
+//             Direction::Right
+//         }
+//     }
+// }
 
-    // translation.x = 1.0 * translation.x.signum();
+#[derive(Default)]
+enum Direction {
+    Left,
+    #[default]
+    Right,
+}
 
-    // // FIXME: why does this happen. fix it. this is hacky.
-    // if pos.translation().x == 0.0 {
-    //     info!(
-    //         "so uhhh somehow the position (global transform)\
-    //         of the enemy is ummmm *checks notes* `0.0`. how tf\
-    //         is that possible. i'm just gonna return early dw."
-    //     );
-    //     return;
-    // }
+pub fn move_enemy(mut enemies: Query<(&mut KinematicCharacterController, &Enemy)>) {
+    for (mut char, enemy) in enemies.iter_mut() {
+        char.translation = Some(match enemy.direction {
+            Direction::Left => enemy.speed * Vec2::new(-1.0, 0.0),
+            Direction::Right => enemy.speed,
+        });
+    }
+}
 
-    // if pos.translation().x < 64.0 * 6.0 {
-    //     *translation = Vec2::new(64.0, 0.0);
-    // }
-    // if pos.translation().x > 64.0 * 10.0 {
-    //     *translation = Vec2::new(-64.0, 0.0);
-    // }
+pub fn enemy_sprite_flipped(mut enemies: Query<(&mut Sprite, &Enemy)>) {
+    for (mut sprite, enemy) in enemies.iter_mut() {
+        sprite.flip_x = match enemy.direction {
+            Direction::Left => true,
+            Direction::Right => false,
+        };
+    }
+}
 
-    // char.translation = Some(*translation);
+pub fn swap_direction(mut enemies: Query<(&mut Enemy, &GlobalTransform)>) {
+    for (mut enemy, pos) in enemies.iter_mut() {
+        let pos = pos.translation().x;
+        if pos < 64.0 * 6.0 {
+            enemy.direction = Direction::Right;
+        } else if pos > 64.0 * 8.0 {
+            enemy.direction = Direction::Left;
+        }
+    }
 }
