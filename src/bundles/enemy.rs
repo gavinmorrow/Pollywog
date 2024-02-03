@@ -66,24 +66,28 @@ impl EnemyBundle {
     }
 }
 
-#[derive(Component, Default)]
+#[derive(Component)]
 pub struct Enemy {
-    direction: Direction,
     speed: Vec2,
 }
 
-// impl Enemy {
-//     fn direction(&self) -> Direction {
-//         // self.direction
-//         if self.speed.x < 0.0 {
-//             Direction::Left
-//         } else {
-//             Direction::Right
-//         }
-//     }
-// }
+impl Default for Enemy {
+    fn default() -> Self {
+        Self { speed: SPEED }
+    }
+}
 
-#[derive(Default)]
+impl Enemy {
+    fn direction(&self) -> Direction {
+        if self.speed.x < 0.0 {
+            Direction::Left
+        } else {
+            Direction::Right
+        }
+    }
+}
+
+#[derive(Default, Debug)]
 enum Direction {
     Left,
     #[default]
@@ -91,30 +95,68 @@ enum Direction {
 }
 
 pub fn move_enemy(mut enemies: Query<(&mut KinematicCharacterController, &Enemy)>) {
-    for (mut char, enemy) in enemies.iter_mut() {
-        char.translation = Some(match enemy.direction {
-            Direction::Left => enemy.speed * Vec2::new(-1.0, 0.0),
-            Direction::Right => enemy.speed,
-        });
+    for (mut char, &Enemy { speed }) in enemies.iter_mut() {
+        char.translation = Some(speed);
     }
 }
 
 pub fn enemy_sprite_flipped(mut enemies: Query<(&mut Sprite, &Enemy)>) {
     for (mut sprite, enemy) in enemies.iter_mut() {
-        sprite.flip_x = match enemy.direction {
+        sprite.flip_x = match enemy.direction() {
             Direction::Left => true,
             Direction::Right => false,
         };
     }
 }
 
-pub fn swap_direction(mut enemies: Query<(&mut Enemy, &GlobalTransform)>) {
+pub fn swap_direction(mut enemies: Query<(&mut Enemy, &Transform)>) {
     for (mut enemy, pos) in enemies.iter_mut() {
-        let pos = pos.translation().x;
-        if pos < 64.0 * 6.0 {
-            enemy.direction = Direction::Right;
-        } else if pos > 64.0 * 8.0 {
-            enemy.direction = Direction::Left;
+        let pos = pos.translation.x;
+
+        let left_boundary = 64.0 * 6.0;
+        let right_boundary = 64.0 * 8.0;
+
+        let total_dist = right_boundary - left_boundary;
+
+        let relative_x = dbg!(pos) - left_boundary; // relative to left boundary
+        let percent = relative_x / total_dist;
+
+        dbg!(relative_x, percent, enemy.direction());
+        eprintln!("before: {}", enemy.speed);
+
+        // FIXME: this is kinda fully broken
+        // Fix it.
+        match enemy.direction() {
+            Direction::Left => {
+                if percent < 0.25 {
+                    enemy.speed *= 1.0 - percent;
+                } else if percent > 0.75 {
+                    enemy.speed *= 1.0 + percent;
+                } else {
+                    enemy.speed = SPEED;
+                }
+            }
+            Direction::Right => {
+                if percent < 0.25 {
+                    enemy.speed *= 1.0 + percent;
+                } else if percent > 0.75 {
+                    enemy.speed *= 1.0 - percent;
+                } else {
+                    enemy.speed = SPEED;
+                }
+            }
         }
+
+        eprintln!(" after: {}\n", enemy.speed);
+
+        if enemy.speed.x.abs() > 5.0 {
+            panic!("speed too high {}", enemy.speed.x);
+        }
+
+        // if pos < 64.0 * 6.0 {
+        //     enemy.direction = Direction::Right;
+        // } else if pos > 64.0 * 8.0 {
+        //     enemy.direction = Direction::Left;
+        // }
     }
 }
