@@ -128,8 +128,8 @@ pub fn swap_direction(mut enemies: Query<(&mut Enemy, &Transform)>) {
             Direction::Right => relative_x / total_dist,
         };
 
-        eprintln!("\np: {}", percent);
-        eprintln!("b: {}", enemy.speed);
+        trace!("percent: {}", percent);
+        trace!("speed before: {}", enemy.speed);
 
         if percent > 0.75 {
             // Slow done the enemy as it approaches the edge
@@ -150,6 +150,6 @@ pub fn swap_direction(mut enemies: Query<(&mut Enemy, &Transform)>) {
 
         enemy.speed.x = enemy.speed.x.min(SPEED.x);
 
-        eprintln!("a: {}", enemy.speed);
+        trace!("speed after:  {}", enemy.speed);
     }
 }
