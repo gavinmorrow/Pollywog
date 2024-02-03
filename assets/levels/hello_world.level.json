@@ -5,7 +5,7 @@
             "data": {
                 "type": "Enemy"
             },
-            "position": [6, 3]
+            "position": [7, 3]
         },
         {
             "data": { "type": "Dirt" },
