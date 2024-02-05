@@ -123,8 +123,14 @@ pub fn swap_direction(mut enemies: Query<(&mut Enemy, &Transform)>) {
     for (mut enemy, pos) in enemies.iter_mut() {
         let pos = pos.translation.x;
 
-        let left_boundary = 64.0 * 6.0;
+        let left_boundary = 64.0 * 7.0;
         let right_boundary = 64.0 * 12.0;
+
+        if pos <= left_boundary {
+            enemy.direction = Direction::Right;
+        } else if pos >= right_boundary {
+            enemy.direction = Direction::Left;
+        }
 
         let total_dist = right_boundary - left_boundary;
 
@@ -136,7 +142,8 @@ pub fn swap_direction(mut enemies: Query<(&mut Enemy, &Transform)>) {
             Direction::Right => percent,
         };
 
-        // The curve goes from 0 to 1 when x goes from 0 to 0.5.
+        // x needs to be in the range 0.0-0.5 going towards the center,
+        // and then 0.5-0.0 going away from the center.
         //
         // So, the 0.0-0.5 range is ok as is, but we need to map the 0.5-1 range to 0.5-0.
         let x = if rel_percent < 0.5 {
@@ -147,35 +154,12 @@ pub fn swap_direction(mut enemies: Query<(&mut Enemy, &Transform)>) {
             0.5 - (rel_percent - 0.5)
         };
 
-        // FIXME: left boundary must be at least 10% (relative to total width)
-        // away from the starting position initially.
-        if x < 0.1 {
-            enemy.direction.flip();
-            enemy.speed.x *= -1.0;
-            return;
-        }
-
-        let y = curve(1.5, x);
         let scale_factor = 2.0 * enemy.direction.signum();
-
-        enemy.speed.x = y * scale_factor;
+        let min_speed = 0.1;
+        let x = x.max(0.0).sqrt() + min_speed;
+        enemy.speed.x = x * scale_factor;
 
         dbg!(percent, rel_percent, x, enemy.speed.x);
         eprintln!("---");
     }
-}
-
-/**
- * Makes an ease-in-out curve.
- *
- * # Parameters
- * `a` determines the steepness of the middle of the curve. (larger `a` -> steeper middle.)
- * `x` should be a value between 0.0 and 0.5 (inclusive).
- *
- * # Source
- * https://math.stackexchange.com/questions/121720/ease-in-out-function
- */
-fn curve(a: f32, x: f32) -> f32 {
-    // `0.5` is the upper bound of the x range.
-    x.powf(a) / (x.powf(a) + (0.5 - x).powf(a))
 }
