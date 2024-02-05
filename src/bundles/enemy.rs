@@ -123,19 +123,13 @@ pub fn swap_direction(mut enemies: Query<(&mut Enemy, &Transform)>) {
     for (mut enemy, pos) in enemies.iter_mut() {
         let pos = pos.translation.x;
 
-        let left_boundary = 64.0 * 7.0;
+        let left_boundary = 64.0 * 6.0;
         let right_boundary = 64.0 * 12.0;
 
         let total_dist = right_boundary - left_boundary;
 
         let relative_x = pos - left_boundary; // relative to left boundary
         let percent = relative_x / total_dist;
-
-        if percent < 0.0 || percent > 1.0 {
-            enemy.direction.flip();
-        }
-
-        let percent = percent.clamp(0.1, 0.9);
 
         let rel_percent = match enemy.direction {
             Direction::Left => 1.0 - percent,
@@ -153,7 +147,15 @@ pub fn swap_direction(mut enemies: Query<(&mut Enemy, &Transform)>) {
             0.5 - (rel_percent - 0.5)
         };
 
-        let y = curve(1.5, x.clamp(0.1, 0.9));
+        // FIXME: left boundary must be at least 10% (relative to total width)
+        // away from the starting position initially.
+        if x < 0.1 {
+            enemy.direction.flip();
+            enemy.speed.x *= -1.0;
+            return;
+        }
+
+        let y = curve(1.5, x);
         let scale_factor = 2.0 * enemy.direction.signum();
 
         enemy.speed.x = y * scale_factor;
