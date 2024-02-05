@@ -49,7 +49,7 @@ impl EnemyBundle {
             },
             collider: Collider::ball(SIZE / 2.0),
             jump_component: JumpComponent::new(JUMP_MAGNITUDE, false),
-            enemy: Enemy::default(),
+            enemy: Enemy::new(SPEED, 7.0, 12.0),
             health: Health::full(INITIAL_HEALTH),
             active_events: ActiveEvents::COLLISION_EVENTS,
             damage: Damage(player::INITIAL_HEALTH),
@@ -70,32 +70,30 @@ impl EnemyBundle {
 pub struct Enemy {
     direction: Direction,
     speed: Vec2,
+    min_speed: Vec2,
+    left_boundary: f32,
+    right_boundary: f32,
 }
 
-impl Default for Enemy {
-    fn default() -> Self {
-        Self {
-            direction: Direction::default(),
-            speed: Vec2::default(),
+impl Enemy {
+    pub fn new(speed: Vec2, left_boundary: f32, right_boundary: f32) -> Enemy {
+        Enemy {
+            direction: Direction::Right,
+            speed,
+            min_speed: Vec2::new(0.1, 0.0),
+            left_boundary,
+            right_boundary,
         }
     }
 }
 
-#[derive(Copy, Clone, Default, Debug)]
+#[derive(Copy, Clone, Debug)]
 enum Direction {
     Left,
-    #[default]
     Right,
 }
 
 impl Direction {
-    fn flip(&mut self) {
-        *self = match self {
-            Direction::Left => Direction::Right,
-            Direction::Right => Direction::Left,
-        };
-    }
-
     fn signum(&self) -> f32 {
         match self {
             Direction::Left => -1.0,
@@ -123,12 +121,13 @@ pub fn swap_direction(mut enemies: Query<(&mut Enemy, &Transform)>) {
     for (mut enemy, pos) in enemies.iter_mut() {
         let pos = pos.translation.x;
 
-        let left_boundary = 64.0 * 7.0;
-        let right_boundary = 64.0 * 12.0;
-
+        let left_boundary = enemy.left_boundary * 64.0;
+        let right_boundary = enemy.right_boundary * 64.0;
         if pos <= left_boundary {
+            trace!("Enemy past left boundary. Swapping direction.");
             enemy.direction = Direction::Right;
         } else if pos >= right_boundary {
+            trace!("Enemy past right boundary. Swapping direction.");
             enemy.direction = Direction::Left;
         }
 
@@ -155,11 +154,7 @@ pub fn swap_direction(mut enemies: Query<(&mut Enemy, &Transform)>) {
         };
 
         let scale_factor = 2.0 * enemy.direction.signum();
-        let min_speed = 0.1;
-        let x = x.max(0.0).sqrt() + min_speed;
+        let x = x.max(0.0).sqrt() + enemy.min_speed.x;
         enemy.speed.x = x * scale_factor;
-
-        dbg!(percent, rel_percent, x, enemy.speed.x);
-        eprintln!("---");
     }
 }
