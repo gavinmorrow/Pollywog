@@ -20,6 +20,12 @@ impl JumpComponent {
         }
     }
 
+    pub fn apply_gravity(&mut self) {
+        // FIXME: When self.magnitude contains a -15.0, that coordinate gets
+        // turned into NaN (bc of division by zero)
+        self.velocity += GRAVITY / (Vec2::new(15.0, 15.0) + self.magnitude);
+    }
+
     pub fn start_jump(&mut self) {
         self.velocity = self.magnitude;
         self.jumping = true;
@@ -54,13 +60,10 @@ pub fn jump(
         let translation = kinematic_character_controller
             .translation
             .unwrap_or_default();
-        let translation = Vec2::new(translation.x, 0.0) + GRAVITY;
-        debug!(
-            "{} {} {}",
-            translation,
-            jump_component.velocity,
-            translation + jump_component.velocity
-        );
+        let translation = Vec2::new(translation.x, 0.0);
         kinematic_character_controller.translation = Some(translation + jump_component.velocity);
+
+        // Apply gravity to jump component
+        jump_component.apply_gravity();
     }
 }

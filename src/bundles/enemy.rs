@@ -50,11 +50,11 @@ impl EnemyBundle {
             },
             collider: Collider::ball(SIZE / 2.0),
             jump_component: JumpComponent::new(JUMP_MAGNITUDE, false),
-            enemy: Enemy::new(SPEED, 0.0, 8.0),
+            enemy: Enemy::new(SPEED, 0.0, 12.0),
             health: Health::full(INITIAL_HEALTH),
             active_events: ActiveEvents::COLLISION_EVENTS,
             damage: Damage(player::INITIAL_HEALTH),
-            rigid_body: RigidBody::KinematicPositionBased,
+            rigid_body: RigidBody::Dynamic,
             // velocity: Velocity {
             //     linvel: Vec2::new(64.0, 0.0),
             //     ..default()
