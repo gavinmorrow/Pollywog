@@ -54,7 +54,7 @@ impl EnemyBundle {
             health: Health::full(INITIAL_HEALTH),
             active_events: ActiveEvents::COLLISION_EVENTS,
             damage: Damage(player::INITIAL_HEALTH),
-            rigid_body: RigidBody::Dynamic,
+            rigid_body: RigidBody::KinematicPositionBased,
             // velocity: Velocity {
             //     linvel: Vec2::new(64.0, 0.0),
             //     ..default()
