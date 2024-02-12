@@ -105,7 +105,7 @@ impl Direction {
 
 pub fn move_enemy(mut enemies: Query<(&mut KinematicCharacterController, &Enemy)>) {
     for (mut char, enemy) in enemies.iter_mut() {
-        char.translation = Some(enemy.speed);
+        char.translation = Some(enemy.speed + GRAVITY);
     }
 }
 
@@ -157,11 +157,5 @@ pub fn swap_direction(mut enemies: Query<(&mut Enemy, &Transform)>) {
         let scale_factor = 2.0 * enemy.direction.signum();
         let x = x.max(0.0).sqrt() + enemy.min_speed.x;
         enemy.speed.x = x * scale_factor;
-    }
-}
-
-pub fn add_gravity(mut enemies: Query<&mut KinematicCharacterController, With<Enemy>>) {
-    for mut enemy in enemies.iter_mut() {
-        enemy.translation = Some(enemy.translation.unwrap_or_default() + GRAVITY);
     }
 }

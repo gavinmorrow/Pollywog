@@ -43,18 +43,12 @@ pub enum Action {
 
 pub fn r#move(
     action_state_query: Query<&ActionState<Action>, With<Character>>,
-    mut player_query: Query<(
-        &mut KinematicCharacterController,
-        &KinematicCharacterControllerOutput,
-        &mut Sprite,
-        &Character,
-    )>,
+    mut player_query: Query<(&mut KinematicCharacterController, &mut Sprite, &Character)>,
+    char_controller_output: Query<Option<&KinematicCharacterControllerOutput>, With<Character>>,
     mut jump_component_query: Query<&mut JumpComponent, With<Character>>,
 ) {
     let action_state = action_state_query.single();
-    let Ok((mut char_controller, char_controller_output, mut sprite, char)) =
-        player_query.get_single_mut()
-    else {
+    let Ok((mut char_controller, mut sprite, char)) = player_query.get_single_mut() else {
         return;
     };
 
@@ -77,15 +71,18 @@ pub fn r#move(
                 translation.x = char.movement_speed;
                 sprite.flip_x = false;
             }
-            Action::Jump => {
-                if char_controller_output.grounded {
-                    trace!("Character is grounded, starting jump.");
-                    let mut jump_component = jump_component_query.single_mut();
-                    jump_component.start_jump();
-                } else {
-                    trace!("Character is not grounded, can't jump.");
+            Action::Jump => match char_controller_output.single() {
+                Some(output) => {
+                    if output.grounded {
+                        trace!("Character is grounded, starting jump.");
+                        let mut jump_component = jump_component_query.single_mut();
+                        jump_component.start_jump();
+                    } else {
+                        trace!("Character is not grounded, can't jump.");
+                    }
                 }
-            }
+                None => trace!("No character controller output found, can't jump."),
+            },
             Action::Grapple => { /* Do nothing, this is handled elsewhere. */ }
         }
     }
