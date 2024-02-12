@@ -4,6 +4,7 @@ use bevy_rapier2d::prelude::*;
 use crate::{
     components::{damage::Damage, health::Health, jump::JumpComponent},
     level::ImageHandles,
+    GRAVITY,
 };
 
 use super::player;
@@ -49,7 +50,7 @@ impl EnemyBundle {
             },
             collider: Collider::ball(SIZE / 2.0),
             jump_component: JumpComponent::new(JUMP_MAGNITUDE, false),
-            enemy: Enemy::new(SPEED, 7.0, 12.0),
+            enemy: Enemy::new(SPEED, 0.0, 12.0),
             health: Health::full(INITIAL_HEALTH),
             active_events: ActiveEvents::COLLISION_EVENTS,
             damage: Damage(player::INITIAL_HEALTH),
@@ -156,5 +157,11 @@ pub fn swap_direction(mut enemies: Query<(&mut Enemy, &Transform)>) {
         let scale_factor = 2.0 * enemy.direction.signum();
         let x = x.max(0.0).sqrt() + enemy.min_speed.x;
         enemy.speed.x = x * scale_factor;
+    }
+}
+
+pub fn add_gravity(mut enemies: Query<&mut KinematicCharacterController, With<Enemy>>) {
+    for mut enemy in enemies.iter_mut() {
+        enemy.translation = Some(enemy.translation.unwrap_or_default() + GRAVITY);
     }
 }
