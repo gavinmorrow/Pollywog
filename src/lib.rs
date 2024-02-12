@@ -10,7 +10,7 @@ mod components;
 mod level;
 mod state;
 
-const PIXELS_PER_METER: f32 = 64.0;
+const PIXELS_PER_METER: f32 = 100.0;
 const GRAVITY: Vec2 = Vec2::new(0.0, -9.81);
 
 pub fn start_app() {
@@ -18,6 +18,10 @@ pub fn start_app() {
 
     App::new()
         .add_state::<GameState>()
+        .insert_resource(RapierConfiguration {
+            gravity: GRAVITY,
+            ..default()
+        })
         .add_plugins((
             setup_default_plugins(),
             RapierPhysicsPlugin::<NoUserData>::pixels_per_meter(PIXELS_PER_METER),

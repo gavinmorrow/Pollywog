@@ -11,7 +11,7 @@ use crate::{
 const SIZE: f32 = 64.0;
 const SIZE_VEC2: Vec2 = Vec2::new(SIZE, SIZE);
 
-const JUMP_MAGNITUDE: Vec2 = Vec2::new(0.0, 10.0);
+const JUMP_MAGNITUDE: Vec2 = Vec2::new(0.0, 15.0);
 const MOVEMENT_SPEED: f32 = 3.0;
 
 const TEXTURE_PATH: &str = "player.png";
@@ -64,10 +64,7 @@ impl PlayerBundle {
                 ..default()
             },
             // FIXME: maybe not default? just trying to get this to work for now
-            character_controller: KinematicCharacterController {
-                translation: Some(GRAVITY),
-                ..default()
-            },
+            character_controller: KinematicCharacterController::default(),
             collider: Collider::ball(SIZE / 2.0),
             player: Player,
             damping: Damping {
@@ -86,7 +83,7 @@ impl PlayerBundle {
             },
             health: Health::full(INITIAL_HEALTH),
             active_events: ActiveEvents::COLLISION_EVENTS,
-            rigid_body: RigidBody::Dynamic,
+            rigid_body: RigidBody::KinematicPositionBased,
         }
     }
 }
