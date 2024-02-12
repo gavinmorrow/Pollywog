@@ -18,6 +18,10 @@ pub fn start_app() {
 
     App::new()
         .add_state::<GameState>()
+        .insert_resource(RapierConfiguration {
+            gravity: GRAVITY,
+            ..default()
+        })
         .add_plugins((
             setup_default_plugins(),
             RapierPhysicsPlugin::<NoUserData>::pixels_per_meter(PIXELS_PER_METER),
