@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use bevy_rapier2d::prelude::*;
 
-use crate::bundles::player::Player;
+use crate::bundles::{enemy::Enemy, player::Player};
 
 use super::health::Health;
 
@@ -15,27 +15,20 @@ impl Plugin for DamagePlugin {
 #[derive(Component)]
 pub struct Damage(pub f32);
 
-// FIXME: buggy. try jumping on it very very quickly and it doesn't register.
 pub fn enemy_damages_player(
-    mut collisions: EventReader<CollisionEvent>,
-    mut player: Query<(Entity, &mut Health), With<Player>>,
-    kills_player_query: Query<(Entity, &Damage)>,
+    mut player: Query<(&KinematicCharacterControllerOutput, &mut Health), With<Player>>,
+    enemies: Query<(Entity, &Damage), With<Enemy>>,
 ) {
-    let (player_entity, mut player_health) = player.single_mut();
+    let Ok((player_char_controller, mut player_health)) = player.get_single_mut() else {
+        // FIXME: since if the player didn't move, then the player_char_controller will be None.
+        //        if the enemy collides with the player then, the collision won't be registered.
+        return;
+    };
 
-    for collision in collisions.read() {
-        if let CollisionEvent::Started(entity_a, entity_b, _flags) = collision {
-            let entities = [entity_a, entity_b];
-            if entities.contains(&&player_entity)
-            // && kills_player_query.iter().any(|e| entities.contains(&&e))
-            {
-                for (entity, damage) in kills_player_query.iter() {
-                    if entities.contains(&&entity) {
-                        // Collision with player
-                        // Kill player
-                        player_health.remaining -= damage.0;
-                    }
-                }
+    for collision in &player_char_controller.collisions {
+        for (enemy_entity, damage) in enemies.iter() {
+            if collision.entity == enemy_entity {
+                player_health.remaining -= damage.0;
             }
         }
     }
