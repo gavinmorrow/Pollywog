@@ -7,7 +7,10 @@ use super::health::Health;
 pub struct KillsPlayerPlugin;
 impl Plugin for KillsPlayerPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Update, kills_player);
+        app.add_systems(
+            Update,
+            kills_player.after(super::damage::enemy_damage_player),
+        );
     }
 }
 

@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use bevy::prelude::*;
 use bevy_rapier2d::prelude::*;
 
@@ -8,28 +10,47 @@ use super::health::Health;
 pub struct DamagePlugin;
 impl Plugin for DamagePlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Update, enemy_damages_player);
+        app.add_systems(Update, enemy_damage_player);
     }
 }
 
 #[derive(Component)]
 pub struct Damage(pub f32);
 
-pub fn enemy_damages_player(
-    mut player: Query<(&KinematicCharacterControllerOutput, &mut Health), With<Player>>,
-    enemies: Query<(Entity, &Damage), With<Enemy>>,
+pub fn enemy_damage_player(
+    mut player: Query<(Entity, &KinematicCharacterControllerOutput, &mut Health), With<Player>>,
+    enemies: Query<(Entity, &KinematicCharacterControllerOutput, &Damage), With<Enemy>>,
 ) {
-    let Ok((player_char_controller, mut player_health)) = player.get_single_mut() else {
-        // FIXME: since if the player didn't move, then the player_char_controller will be None.
-        //        if the enemy collides with the player then, the collision won't be registered.
+    let Ok((player_entity, player_char_controller, mut player_health)) = player.get_single_mut()
+    else {
+        // Player not created yet
         return;
     };
 
+    let mut damages = HashMap::new();
+
+    // Iterate over all collisions with the player
     for collision in &player_char_controller.collisions {
-        for (enemy_entity, damage) in enemies.iter() {
+        for (enemy_entity, _enemy_char_controller, damage) in enemies.iter() {
             if collision.entity == enemy_entity {
-                player_health.remaining -= damage.0;
+                damages.insert(enemy_entity, damage);
+                eprintln!("player hit enemy");
             }
         }
+    }
+
+    // Iterate over all collisions with the enemies
+    for (enemy_entity, enemy_char_controller, damage) in enemies.iter() {
+        for collision in &enemy_char_controller.collisions {
+            if collision.entity == player_entity {
+                damages.insert(enemy_entity, damage);
+                eprintln!("enemy hit player");
+            }
+        }
+    }
+
+    // Apply the damages
+    for damage in damages.values() {
+        player_health.remaining -= damage.0;
     }
 }
