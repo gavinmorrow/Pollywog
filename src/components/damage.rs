@@ -14,7 +14,7 @@ impl Plugin for DamagePlugin {
     }
 }
 
-#[derive(Component)]
+#[derive(Component, Debug)]
 pub struct Damage(pub f32);
 
 pub fn enemy_damage_player(
@@ -24,6 +24,7 @@ pub fn enemy_damage_player(
     let Ok((player_entity, player_char_controller, mut player_health)) = player.get_single_mut()
     else {
         // Player not created yet
+        trace!("Player not created yet. Skipping damage system.");
         return;
     };
 
@@ -34,7 +35,7 @@ pub fn enemy_damage_player(
         for (enemy_entity, _enemy_char_controller, damage) in enemies.iter() {
             if collision.entity == enemy_entity {
                 damages.insert(enemy_entity, damage);
-                eprintln!("player hit enemy");
+                trace!("player hit enemy, applying {:?} damage", damage);
             }
         }
     }
@@ -44,7 +45,7 @@ pub fn enemy_damage_player(
         for collision in &enemy_char_controller.collisions {
             if collision.entity == player_entity {
                 damages.insert(enemy_entity, damage);
-                eprintln!("enemy hit player");
+                trace!("enemy hit player, applying {:?} damage", damage);
             }
         }
     }
