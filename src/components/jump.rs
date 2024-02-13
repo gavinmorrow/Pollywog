@@ -10,7 +10,6 @@ pub struct JumpComponent {
     jumping: bool,
 }
 
-#[allow(dead_code)] // FIXME: Remove this (when more things that jump exist)
 impl JumpComponent {
     pub fn new(magnitude: Vec2, jumping: bool) -> Self {
         JumpComponent {
@@ -40,6 +39,7 @@ impl JumpComponent {
         self.jumping
     }
 
+    #[allow(dead_code)] // FIXME: Remove this (when more things that jump exist)
     pub fn magnitude(&self) -> Vec2 {
         self.magnitude
     }
