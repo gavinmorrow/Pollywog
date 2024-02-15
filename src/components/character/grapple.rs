@@ -2,7 +2,10 @@ use bevy::{prelude::*, window::PrimaryWindow};
 use bevy_rapier2d::prelude::*;
 use leafwing_input_manager::prelude::*;
 
-use crate::components::character::{add_grapple_force, Action, Character};
+use crate::{
+    bundles::player::Player,
+    components::character::{add_grapple_force, Action, Character},
+};
 
 const GUIDELINE_DISTANCE: f32 = 50.0;
 const GUIDELINE_SIZE: f32 = 10.0;
@@ -301,13 +304,11 @@ fn manage_grapple(
 }
 
 fn should_grapple_end(
-    mut collisions: EventReader<CollisionEvent>,
-    char: Query<Entity, With<Character>>,
+    player: Query<&KinematicCharacterControllerOutput, With<Player>>,
     target_pos: Option<Res<TargetPos>>,
     mut next_grapple_state: ResMut<NextState<GrappleState>>,
 ) {
-    let char = &char.single();
-
+    let player = player.single();
     let Some(target_pos) = target_pos else {
         trace!("No target pos resource");
 
@@ -317,19 +318,16 @@ fn should_grapple_end(
 
         return;
     };
-    let target = &target_pos.1;
+    let target = target_pos.1;
 
     // Check if the character is touching the target
     // FIXME: doesn't work
-    for collision in collisions.read() {
-        if let CollisionEvent::Started(a, b, _) = collision {
-            if (a == char && b == target) || (b == char && a == target) {
-                debug!("Character is touching target, stopping grapple");
-                next_grapple_state.set(GrappleState::Grappling.next());
-
-                // No more cleanup is needed because it will be done in the OnExit
-                return;
-            }
+    for collision in &player.collisions {
+        if collision.entity == target {
+            // End grapple
+            info!("Ending grapple because character is touching target (grappling -> idle)");
+            next_grapple_state.set(GrappleState::Grappling.next());
+            return;
         }
     }
 
