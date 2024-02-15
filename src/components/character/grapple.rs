@@ -321,7 +321,6 @@ fn should_grapple_end(
     let target = target_pos.1;
 
     // Check if the character is touching the target
-    // FIXME: doesn't work
     for collision in &player.collisions {
         if collision.entity == target {
             // End grapple
