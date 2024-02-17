@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use bevy::prelude::*;
 use bevy_common_assets::json::JsonAssetPlugin;
 
-use crate::bundles::enemy::EnemyBundle;
+use crate::bundles::{coin::CoinBundle, enemy::EnemyBundle};
 
 use self::block::BlockBundle;
 
@@ -101,6 +101,10 @@ fn spawn_blocks(
                 );
                 commands.spawn(enemy);
             }
+            BlockData::Coin => {
+                let coin = CoinBundle::new(block.position);
+                commands.spawn(coin);
+            }
         }
     }
     next_state.set(LevelState::Loaded);
@@ -173,4 +177,5 @@ struct Block {
 enum BlockData {
     Dirt,
     Enemy {},
+    Coin,
 }

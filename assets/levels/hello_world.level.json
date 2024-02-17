@@ -146,6 +146,10 @@
         {
             "data": { "type": "Dirt" },
             "position": [32, 2]
+        },
+        {
+            "data": { "type": "Coin" },
+            "position": [3, 3]
         }
     ]
 }
