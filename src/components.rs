@@ -1,4 +1,5 @@
 pub mod character;
+pub mod collect_coin;
 pub mod damage;
 pub mod dead_screen_plugin;
 pub mod health;
@@ -17,6 +18,7 @@ impl bevy::prelude::Plugin for ComponentsPlugin {
             npc_movement::NpcMovementPlugin,
             player_win::PlayerWinPlugin,
             damage::DamagePlugin,
+            collect_coin::CoinPlugin,
         ));
     }
 }

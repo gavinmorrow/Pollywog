@@ -1,4 +1,7 @@
-use crate::components::character::{Action, Character};
+use crate::components::{
+    character::{Action, Character},
+    collect_coin::CollectCoin,
+};
 use bevy::{prelude::*, window::PrimaryWindow};
 use bevy_rapier2d::prelude::*;
 use leafwing_input_manager::prelude::*;
@@ -44,6 +47,7 @@ struct PlayerBundle {
     health: Health,
     active_events: ActiveEvents,
     rigid_body: RigidBody,
+    coins: CollectCoin,
 }
 
 impl PlayerBundle {
@@ -87,6 +91,7 @@ impl PlayerBundle {
             health: Health::full(INITIAL_HEALTH),
             active_events: ActiveEvents::COLLISION_EVENTS,
             rigid_body: RigidBody::KinematicPositionBased,
+            coins: CollectCoin::default(),
         }
     }
 }
