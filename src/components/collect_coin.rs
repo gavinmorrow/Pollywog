@@ -1,7 +1,10 @@
 use bevy::prelude::*;
 use bevy_rapier2d::control::KinematicCharacterControllerOutput;
 
-use crate::bundles::{coin::Coin, player::Player};
+use crate::{
+    bundles::{coin::Coin, player::Player},
+    state::GameState,
+};
 
 const TEXT_POS: Vec2 = Vec2::new(10.0, 10.0);
 const FONT_SIZE: f32 = 64.0;
@@ -9,8 +12,12 @@ const FONT_SIZE: f32 = 64.0;
 pub struct CoinPlugin;
 impl Plugin for CoinPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Startup, create_text)
-            .add_systems(Update, (update_coin_score, coin_collisions));
+        app.add_systems(OnEnter(GameState::InGame), create_text)
+            .add_systems(
+                Update,
+                (update_coin_score, coin_collisions)
+                    .run_if(state_exists_and_equals(GameState::InGame)),
+            );
     }
 }
 

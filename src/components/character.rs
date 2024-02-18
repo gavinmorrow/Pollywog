@@ -2,7 +2,7 @@ use bevy::prelude::*;
 use bevy_rapier2d::prelude::*;
 use leafwing_input_manager::prelude::*;
 
-use crate::GRAVITY;
+use crate::{state::GameState, GRAVITY};
 
 use super::jump::{jump, JumpComponent};
 
@@ -23,7 +23,8 @@ impl Plugin for CharacterPlugin {
                     jump.after(r#move),
                     // Must go before so that the player is off the ground when we check
                     stop_jump.before(r#move),
-                ),
+                )
+                    .run_if(state_exists_and_equals(GameState::InGame)),
             );
     }
 }

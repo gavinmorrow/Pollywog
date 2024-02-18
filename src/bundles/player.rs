@@ -1,6 +1,9 @@
-use crate::components::{
-    character::{Action, Character},
-    collect_coin::CoinCollector,
+use crate::{
+    components::{
+        character::{Action, Character},
+        collect_coin::CoinCollector,
+    },
+    state::GameState,
 };
 use bevy::{prelude::*, window::PrimaryWindow};
 use bevy_rapier2d::prelude::*;
@@ -25,7 +28,7 @@ pub const INITIAL_HEALTH: f32 = 100.0;
 pub struct PlayerPlugin;
 impl Plugin for PlayerPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Startup, spawn);
+        app.add_systems(OnEnter(GameState::InGame), spawn);
     }
 }
 

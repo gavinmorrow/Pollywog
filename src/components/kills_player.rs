@@ -9,7 +9,9 @@ impl Plugin for KillsPlayerPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(
             Update,
-            kills_player.after(super::damage::enemy_damage_player),
+            kills_player
+                .after(super::damage::enemy_damage_player)
+                .run_if(state_exists_and_equals(GameState::InGame)),
         );
     }
 }

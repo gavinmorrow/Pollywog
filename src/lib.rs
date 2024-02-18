@@ -41,6 +41,10 @@ pub fn start_app() {
             components::ComponentsPlugin,
         ))
         .add_systems(Update, bevy::window::close_on_esc)
+        .add_systems(
+            OnEnter(GameState::StartScreen),
+            |mut next_state: ResMut<NextState<GameState>>| next_state.set(GameState::InGame),
+        )
         .run();
 }
 

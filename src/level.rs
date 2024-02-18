@@ -3,7 +3,10 @@ use std::collections::HashMap;
 use bevy::prelude::*;
 use bevy_common_assets::json::JsonAssetPlugin;
 
-use crate::bundles::{coin::CoinBundle, enemy::EnemyBundle};
+use crate::{
+    bundles::{coin::CoinBundle, enemy::EnemyBundle},
+    state::GameState,
+};
 
 use self::block::BlockBundle;
 
@@ -27,6 +30,10 @@ impl Plugin for LevelPlugin {
                 wait_for_level_load.run_if(state_exists_and_equals(LevelState::LoadingAssets)),
             )
             .add_systems(OnEnter(LevelState::ConstructingLevel), construct_level_res)
+            .add_systems(
+                OnEnter(LevelState::WaitingForLevelStart),
+                wait_for_level_start,
+            )
             .add_systems(OnEnter(LevelState::SpawningBlocks), spawn_blocks);
     }
 }
@@ -50,6 +57,15 @@ fn wait_for_level_load(
     }
 }
 
+fn wait_for_level_start(
+    game_state: Res<State<GameState>>,
+    mut next_state: ResMut<NextState<LevelState>>,
+) {
+    if game_state.get() == &GameState::InGame {
+        next_state.set(LevelState::SpawningBlocks);
+    }
+}
+
 fn construct_level_res(
     mut commands: Commands,
     mut next_state: ResMut<NextState<LevelState>>,
@@ -66,7 +82,7 @@ fn construct_level_res(
     info!("Constructing level resource");
 
     commands.insert_resource(level);
-    next_state.set(LevelState::SpawningBlocks);
+    next_state.set(LevelState::WaitingForLevelStart);
 }
 
 fn load_image_assets(asset_server: Res<AssetServer>, mut game_assets: ResMut<GameAsset>) {
@@ -117,6 +133,7 @@ enum LevelState {
     ConstructingLevel,
     SpawningBlocks,
     Loaded,
+    WaitingForLevelStart,
 }
 
 #[derive(/*Component,*/ Resource, Default)]

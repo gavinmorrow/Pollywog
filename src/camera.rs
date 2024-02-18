@@ -1,6 +1,6 @@
 use bevy::{prelude::*, window::PrimaryWindow};
 
-use crate::bundles::player::Player;
+use crate::{bundles::player::Player, state::GameState};
 
 const MAX_SPEED_X: f32 = 3.0;
 const MAX_SPEED_Y: f32 = 1.0;
@@ -11,7 +11,9 @@ impl Plugin for CameraPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(Startup, spawn_camera).add_systems(
             Update,
-            keep_player_in_view.after(crate::components::character::r#move),
+            keep_player_in_view
+                .after(crate::components::character::r#move)
+                .run_if(state_exists_and_equals(GameState::InGame)),
         );
     }
 }

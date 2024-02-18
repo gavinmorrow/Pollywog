@@ -5,6 +5,7 @@ use leafwing_input_manager::prelude::*;
 use crate::{
     bundles::player::Player,
     components::character::{add_grapple_force, Action, Character},
+    state::GameState,
 };
 
 const GUIDELINE_DISTANCE: f32 = 50.0;
@@ -33,7 +34,8 @@ impl Plugin for GrapplePlugin {
                     should_grapple_end.run_if(state_exists_and_equals(GrappleState::Grappling)),
                     end_grapple_on_other_input
                         .run_if(state_exists_and_equals(GrappleState::Grappling)),
-                ),
+                )
+                    .run_if(state_exists_and_equals(GameState::InGame)),
             );
     }
 }
