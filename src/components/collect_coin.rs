@@ -1,11 +1,13 @@
-use crate::bundles::coin::Coin;
 use bevy::prelude::*;
 use bevy_rapier2d::control::KinematicCharacterControllerOutput;
+
+use crate::bundles::{coin::Coin, player::Player};
 
 pub struct CoinPlugin;
 impl Plugin for CoinPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Update, (print_coins, coin_collisions));
+        app.add_systems(Startup, create_text)
+            .add_systems(Update, (update_coin_score, coin_collisions));
     }
 }
 
@@ -14,10 +16,38 @@ pub struct CollectCoin {
     number_coins: u32,
 }
 
-fn print_coins(collect_coin_entities: Query<(Entity, &CollectCoin)>) {
-    for (entity, collect_coin) in &collect_coin_entities {
-        println!("{:?}", collect_coin.number_coins);
-    }
+#[derive(Component)]
+struct CoinScoreText;
+
+fn create_text(mut commands: Commands) {
+    info!("Creating score text.");
+
+    commands
+        .spawn(TextBundle {
+            style: Style {
+                top: Val::Px(10.0),
+                left: Val::Px(10.0),
+                ..default()
+            },
+            text: Text::from_section(
+                "0",
+                TextStyle {
+                    font_size: 64.0,
+                    ..default()
+                },
+            ),
+            ..default()
+        })
+        .insert(CoinScoreText);
+}
+
+fn update_coin_score(
+    collect_coin_entities: Query<&CollectCoin, With<Player>>,
+    mut score_text: Query<&mut Text, With<CoinScoreText>>,
+) {
+    let collect_coin = collect_coin_entities.single();
+    let mut score_text = score_text.single_mut();
+    score_text.sections[0].value = collect_coin.number_coins.to_string();
 }
 
 fn coin_collisions(
