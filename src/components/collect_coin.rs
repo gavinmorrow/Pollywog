@@ -3,6 +3,9 @@ use bevy_rapier2d::control::KinematicCharacterControllerOutput;
 
 use crate::bundles::{coin::Coin, player::Player};
 
+const TEXT_POS: Vec2 = Vec2::new(10.0, 10.0);
+const FONT_SIZE: f32 = 64.0;
+
 pub struct CoinPlugin;
 impl Plugin for CoinPlugin {
     fn build(&self, app: &mut App) {
@@ -25,14 +28,14 @@ fn create_text(mut commands: Commands) {
     commands
         .spawn(TextBundle {
             style: Style {
-                top: Val::Px(10.0),
-                left: Val::Px(10.0),
+                top: Val::Px(TEXT_POS.x),
+                left: Val::Px(TEXT_POS.y),
                 ..default()
             },
             text: Text::from_section(
-                "0",
+                "-",
                 TextStyle {
-                    font_size: 64.0,
+                    font_size: FONT_SIZE,
                     ..default()
                 },
             ),
