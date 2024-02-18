@@ -13,7 +13,7 @@ impl Plugin for CoinPlugin {
 
 #[derive(Component, Debug, Default)]
 pub struct CoinCollector {
-    number_coins: u32,
+    num_coins: u32,
 }
 
 #[derive(Component)]
@@ -47,7 +47,7 @@ fn update_coin_score(
 ) {
     let player = player.single();
     let mut score_text = score_text.single_mut();
-    score_text.sections[0].value = player.number_coins.to_string();
+    score_text.sections[0].value = player.num_coins.to_string();
 }
 
 fn coin_collisions(
@@ -58,7 +58,7 @@ fn coin_collisions(
     for (collisions, mut coin_collector) in &mut collisions {
         for collision in &collisions.collisions {
             if coins.contains(collision.entity) {
-                coin_collector.number_coins += 1;
+                coin_collector.num_coins += 1;
                 commands.entity(collision.entity).despawn_recursive();
             }
         }
