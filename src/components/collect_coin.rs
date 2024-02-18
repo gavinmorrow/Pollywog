@@ -42,12 +42,12 @@ fn create_text(mut commands: Commands) {
 }
 
 fn update_coin_score(
-    collect_coin_entities: Query<&CoinCollector, With<Player>>,
+    player: Query<&CoinCollector, With<Player>>,
     mut score_text: Query<&mut Text, With<CoinScoreText>>,
 ) {
-    let collect_coin = collect_coin_entities.single();
+    let player = player.single();
     let mut score_text = score_text.single_mut();
-    score_text.sections[0].value = collect_coin.number_coins.to_string();
+    score_text.sections[0].value = player.number_coins.to_string();
 }
 
 fn coin_collisions(
