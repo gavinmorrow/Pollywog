@@ -99,6 +99,12 @@ impl PlayerBundle {
 fn get_input_map() -> InputMap<Action> {
     let mut input_map = InputMap::default();
 
+    #[cfg(target_os = "macos")]
+    let scan_code_slash = QwertyScanCode::Slash;
+
+    #[cfg(not(target_os = "macos"))]
+    let scan_code_slash = KeyCode::Slash;
+
     #[rustfmt::skip]
         input_map
             .insert(KeyCode::Left,         Action::Left)
@@ -109,7 +115,7 @@ fn get_input_map() -> InputMap<Action> {
             .insert(QwertyScanCode::W,     Action::Jump)
             .insert(KeyCode::Space,        Action::Jump)
             .insert(QwertyScanCode::E,     Action::Grapple)
-            .insert(QwertyScanCode::Slash, Action::Grapple);
+            .insert(scan_code_slash,       Action::Grapple);
 
     input_map
 }
