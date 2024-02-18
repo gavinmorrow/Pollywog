@@ -13,6 +13,13 @@ mod state;
 const PIXELS_PER_METER: f32 = 64.0;
 const GRAVITY: Vec2 = Vec2::new(0.0, -9.81);
 
+const BACKGROUND_COLOR: Color = Color::Rgba {
+    red: 0.18,
+    green: 0.21,
+    blue: 0.20,
+    alpha: 1.0,
+};
+
 pub fn start_app() {
     eprintln!("Creating app...");
 
@@ -22,6 +29,7 @@ pub fn start_app() {
             gravity: GRAVITY,
             ..default()
         })
+        .insert_resource(ClearColor(BACKGROUND_COLOR))
         .add_plugins((
             setup_default_plugins(),
             RapierPhysicsPlugin::<NoUserData>::pixels_per_meter(PIXELS_PER_METER),
