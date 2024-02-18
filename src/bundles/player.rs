@@ -1,6 +1,6 @@
 use crate::components::{
     character::{Action, Character},
-    collect_coin::CollectCoin,
+    collect_coin::CoinCollector,
 };
 use bevy::{prelude::*, window::PrimaryWindow};
 use bevy_rapier2d::prelude::*;
@@ -47,7 +47,7 @@ struct PlayerBundle {
     health: Health,
     active_events: ActiveEvents,
     rigid_body: RigidBody,
-    coins: CollectCoin,
+    coins: CoinCollector,
 }
 
 impl PlayerBundle {
@@ -91,7 +91,7 @@ impl PlayerBundle {
             health: Health::full(INITIAL_HEALTH),
             active_events: ActiveEvents::COLLISION_EVENTS,
             rigid_body: RigidBody::KinematicPositionBased,
-            coins: CollectCoin::default(),
+            coins: CoinCollector::default(),
         }
     }
 }

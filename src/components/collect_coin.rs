@@ -12,7 +12,7 @@ impl Plugin for CoinPlugin {
 }
 
 #[derive(Component, Debug, Default)]
-pub struct CollectCoin {
+pub struct CoinCollector {
     number_coins: u32,
 }
 
@@ -42,7 +42,7 @@ fn create_text(mut commands: Commands) {
 }
 
 fn update_coin_score(
-    collect_coin_entities: Query<&CollectCoin, With<Player>>,
+    collect_coin_entities: Query<&CoinCollector, With<Player>>,
     mut score_text: Query<&mut Text, With<CoinScoreText>>,
 ) {
     let collect_coin = collect_coin_entities.single();
@@ -51,7 +51,7 @@ fn update_coin_score(
 }
 
 fn coin_collisions(
-    mut collisions: Query<(&KinematicCharacterControllerOutput, &mut CollectCoin)>,
+    mut collisions: Query<(&KinematicCharacterControllerOutput, &mut CoinCollector)>,
     coins: Query<Entity, With<Coin>>,
     mut commands: Commands,
 ) {
