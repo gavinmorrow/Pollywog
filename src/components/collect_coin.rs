@@ -55,10 +55,10 @@ fn coin_collisions(
     coins: Query<Entity, With<Coin>>,
     mut commands: Commands,
 ) {
-    for (collisions, mut collect_coin) in &mut collisions {
+    for (collisions, mut coin_collector) in &mut collisions {
         for collision in &collisions.collisions {
             if coins.contains(collision.entity) {
-                collect_coin.number_coins += 1;
+                coin_collector.number_coins += 1;
                 commands.entity(collision.entity).despawn_recursive();
             }
         }
