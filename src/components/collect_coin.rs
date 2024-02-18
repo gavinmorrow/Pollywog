@@ -23,11 +23,13 @@ fn print_coins(collect_coin_entities: Query<(Entity, &CollectCoin)>) {
 fn coin_collisions(
     mut collisions: Query<(&KinematicCharacterControllerOutput, &mut CollectCoin)>,
     coins: Query<Entity, With<Coin>>,
+    mut commands: Commands,
 ) {
     for (collisions, mut collect_coin) in &mut collisions {
         for collision in &collisions.collisions {
             if coins.contains(collision.entity) {
                 collect_coin.number_coins += 1;
+                commands.entity(collision.entity).despawn_recursive();
             }
         }
     }
