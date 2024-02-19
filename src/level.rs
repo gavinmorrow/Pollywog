@@ -70,12 +70,20 @@ fn construct_level_res(
 }
 
 fn load_image_assets(asset_server: Res<AssetServer>, mut game_assets: ResMut<GameAsset>) {
-    game_assets.image_handles = std::collections::HashMap::from([(
-        ImageHandleId::Enemy,
-        ImageHandles {
-            texture: asset_server.load(crate::bundles::enemy::TEXTURE_PATH),
-        },
-    )]);
+    game_assets.image_handles = std::collections::HashMap::from([
+        (
+            ImageHandleId::Enemy,
+            ImageHandles {
+                texture: asset_server.load(crate::bundles::enemy::TEXTURE_PATH),
+            },
+        ),
+        (
+            ImageHandleId::Coin,
+            ImageHandles {
+                texture: asset_server.load(crate::bundles::coin::TEXTURE_PATH),
+            },
+        ),
+    ]);
 }
 
 fn spawn_blocks(
@@ -102,7 +110,13 @@ fn spawn_blocks(
                 commands.spawn(enemy);
             }
             BlockData::Coin => {
-                let coin = CoinBundle::new(block.position);
+                let coin = CoinBundle::new(
+                    block.position,
+                    game_assets
+                        .image_handles
+                        .get(&ImageHandleId::Coin)
+                        .expect("Coin image assets loaded"),
+                );
                 commands.spawn(coin);
             }
         }
@@ -127,6 +141,7 @@ struct GameAsset {
 #[derive(Eq, PartialEq, Hash)]
 enum ImageHandleId {
     Enemy,
+    Coin,
 }
 
 pub struct ImageHandles {
