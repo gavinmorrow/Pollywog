@@ -70,6 +70,8 @@ fn setup(mut commands: Commands) {
         });
 }
 
+// LINT ALLOW: Ok because it's a bevy Query, and not actually very complex
+#[allow(clippy::type_complexity)]
 fn button_interaction_style(
     mut interactions: Query<
         (&Interaction, &mut BackgroundColor),
