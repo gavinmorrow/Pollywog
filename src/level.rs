@@ -31,8 +31,9 @@ impl Plugin for LevelPlugin {
             )
             .add_systems(OnEnter(LevelState::ConstructingLevel), construct_level_res)
             .add_systems(
-                OnEnter(LevelState::WaitingForLevelStart),
-                wait_for_level_start,
+                Update,
+                wait_for_level_start
+                    .run_if(state_exists_and_equals(LevelState::WaitingForLevelStart)),
             )
             .add_systems(OnEnter(LevelState::SpawningBlocks), spawn_blocks);
     }
@@ -62,6 +63,7 @@ fn wait_for_level_start(
     mut next_state: ResMut<NextState<LevelState>>,
 ) {
     if game_state.get() == &GameState::InGame {
+        info!("Finished waiting for level start, spawning blocks");
         next_state.set(LevelState::SpawningBlocks);
     }
 }

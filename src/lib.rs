@@ -8,6 +8,7 @@ mod bundles;
 mod camera;
 mod components;
 mod level;
+mod start_screen;
 mod state;
 
 const PIXELS_PER_METER: f32 = 64.0;
@@ -36,15 +37,12 @@ pub fn start_app() {
             RapierDebugRenderPlugin::default(),
             InputManagerPlugin::<components::character::Action>::default(),
             camera::CameraPlugin,
+            start_screen::StartScreenPlugin,
             bundles::player::PlayerPlugin,
             level::LevelPlugin,
             components::ComponentsPlugin,
         ))
         .add_systems(Update, bevy::window::close_on_esc)
-        .add_systems(
-            OnEnter(GameState::StartScreen),
-            |mut next_state: ResMut<NextState<GameState>>| next_state.set(GameState::InGame),
-        )
         .run();
 }
 
