@@ -108,17 +108,16 @@ fn get_input_map() -> InputMap<Action> {
     #[cfg(not(target_os = "macos"))]
     let scan_code_slash = KeyCode::Slash;
 
-    #[rustfmt::skip]
-        input_map
-            .insert(KeyCode::Left,         Action::Left)
-            .insert(QwertyScanCode::A,     Action::Left)
-            .insert(KeyCode::Right,        Action::Right)
-            .insert(QwertyScanCode::D,     Action::Right)
-            .insert(KeyCode::Up,           Action::Jump)
-            .insert(QwertyScanCode::W,     Action::Jump)
-            .insert(KeyCode::Space,        Action::Jump)
-            .insert(QwertyScanCode::E,     Action::Grapple)
-            .insert(scan_code_slash,       Action::Grapple);
+    input_map
+        .insert(Action::Left, KeyCode::Left)
+        .insert(Action::Left, QwertyScanCode::A)
+        .insert(Action::Right, KeyCode::Right)
+        .insert(Action::Right, QwertyScanCode::D)
+        .insert(Action::Jump, KeyCode::Up)
+        .insert(Action::Jump, QwertyScanCode::W)
+        .insert(Action::Jump, KeyCode::Space)
+        .insert(Action::Grapple, QwertyScanCode::E)
+        .insert(Action::Grapple, scan_code_slash);
 
     input_map
 }
