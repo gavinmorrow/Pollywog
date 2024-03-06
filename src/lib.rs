@@ -7,6 +7,7 @@ use crate::state::GameState;
 mod bundles;
 mod camera;
 mod components;
+mod dead_screen;
 mod level;
 mod start_screen;
 mod state;
@@ -38,6 +39,7 @@ pub fn start_app() {
             InputManagerPlugin::<components::character::Action>::default(),
             camera::CameraPlugin,
             start_screen::StartScreenPlugin,
+            dead_screen::DeadScreenPlugin,
             bundles::player::PlayerPlugin,
             level::LevelPlugin,
             components::ComponentsPlugin,
