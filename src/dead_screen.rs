@@ -6,12 +6,19 @@ pub struct DeadScreenPlugin;
 impl Plugin for DeadScreenPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(OnEnter(GameState::Dead), setup)
-            .add_systems(Update, restart_button_pressed);
+            .add_systems(Update, (restart_button_pressed, esc_button_pressed))
+            .add_systems(OnExit(GameState::Dead), cleanup);
     }
 }
 
 #[derive(Component)]
 struct RestartButton;
+
+#[derive(Component)]
+struct EscButton;
+
+#[derive(Component)]
+struct RootNode;
 
 fn setup(mut commands: Commands) {
     commands
@@ -32,6 +39,7 @@ fn setup(mut commands: Commands) {
             }),
             ..default()
         })
+        .insert(RootNode)
         .with_children(|parent| {
             parent.spawn(TextBundle {
                 text: Text::from_section(
@@ -65,7 +73,37 @@ fn setup(mut commands: Commands) {
                         ..default()
                     });
                 });
+
+            parent
+                .spawn(ButtonBundle {
+                    style: Style { ..default() },
+                    background_color: BackgroundColor(Color::BLACK),
+                    border_color: BorderColor(Color::WHITE),
+                    ..default()
+                })
+                .insert(EscButton)
+                .with_children(|parent| {
+                    parent.spawn(TextBundle {
+                        text: Text::from_section(
+                            "Back to Start Screen",
+                            TextStyle {
+                                font_size: 42.0,
+                                color: Color::BLACK,
+                                ..default()
+                            },
+                        ),
+                        ..default()
+                    });
+                });
         });
+}
+
+fn cleanup(mut commands: Commands, root_node: Query<Entity, With<RootNode>>) {
+    // Despawn the dead screen
+    let root_node = root_node.single();
+    commands.entity(root_node).despawn_recursive();
+
+    // TODO: despawn level
 }
 
 fn restart_button_pressed(
@@ -81,6 +119,19 @@ fn restart_button_pressed(
             //        (*not* after InGame, because then you can't see the render of the
             //         game underneath the dead screen ui)
             Interaction::Pressed => next_state.set(GameState::InGame),
+            Interaction::Hovered => {}
+            Interaction::None => {}
+        }
+    }
+}
+
+fn esc_button_pressed(
+    mut next_state: ResMut<NextState<GameState>>,
+    mut interaction_query: Query<(&Interaction, &EscButton)>,
+) {
+    for (interaction, _button) in interaction_query.iter_mut() {
+        match *interaction {
+            Interaction::Pressed => next_state.set(GameState::StartScreen),
             Interaction::Hovered => {}
             Interaction::None => {}
         }
