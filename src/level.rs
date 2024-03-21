@@ -35,7 +35,8 @@ impl Plugin for LevelPlugin {
                 wait_for_level_start
                     .run_if(state_exists_and_equals(LevelState::WaitingForLevelStart)),
             )
-            .add_systems(OnEnter(LevelState::SpawningBlocks), spawn_blocks);
+            .add_systems(OnEnter(LevelState::SpawningBlocks), spawn_blocks)
+            .add_systems(OnExit(GameState::InGame), reprime_level_state);
     }
 }
 
@@ -156,14 +157,20 @@ pub fn despawn_entities(commands: &mut Commands, query: Query<Entity, With<Level
     }
 }
 
+/// After the game ends, change to state back to waiting for the level to start,
+/// so that when the game state changes back to `InGame`, the level will respawn.
+fn reprime_level_state(mut next_state: ResMut<NextState<LevelState>>) {
+    next_state.set(LevelState::WaitingForLevelStart)
+}
+
 #[derive(Copy, Clone, Debug, Default, Eq, PartialEq, Hash, States)]
 enum LevelState {
     #[default]
     LoadingAssets,
     ConstructingLevel,
     SpawningBlocks,
-    Loaded,
     WaitingForLevelStart,
+    Loaded,
 }
 
 #[derive(/*Component,*/ Resource, Default)]
