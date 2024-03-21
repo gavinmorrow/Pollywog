@@ -5,11 +5,8 @@ use crate::{bundles::player::Player, state::GameState};
 pub struct PlayerWinPlugin;
 impl Plugin for PlayerWinPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(
-            Update,
-            check_win.run_if(state_exists_and_equals(GameState::InGame)),
-        )
-        .add_systems(OnEnter(GameState::Win), on_win);
+        app.add_systems(Update, check_win.run_if(in_state(GameState::InGame)))
+            .add_systems(OnEnter(GameState::Win), on_win);
     }
 }
 

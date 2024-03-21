@@ -24,7 +24,7 @@ impl Plugin for CharacterPlugin {
                     // Must go before so that the player is off the ground when we check
                     stop_jump.before(r#move),
                 )
-                    .run_if(state_exists_and_equals(GameState::InGame)),
+                    .run_if(in_state(GameState::InGame)),
             );
     }
 }

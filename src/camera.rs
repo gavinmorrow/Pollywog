@@ -13,7 +13,7 @@ impl Plugin for CameraPlugin {
             Update,
             keep_player_in_view
                 .after(crate::components::character::r#move)
-                .run_if(state_exists_and_equals(GameState::InGame)),
+                .run_if(in_state(GameState::InGame)),
         );
     }
 }

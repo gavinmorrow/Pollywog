@@ -11,7 +11,7 @@ impl Plugin for KillsPlayerPlugin {
             Update,
             kills_player
                 .after(super::damage::enemy_damage_player)
-                .run_if(state_exists_and_equals(GameState::InGame)),
+                .run_if(in_state(GameState::InGame)),
         );
     }
 }

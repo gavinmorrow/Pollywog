@@ -16,8 +16,7 @@ impl Plugin for CoinPlugin {
         app.add_systems(OnEnter(GameState::InGame), create_text)
             .add_systems(
                 Update,
-                (update_coin_score, coin_collisions)
-                    .run_if(state_exists_and_equals(GameState::InGame)),
+                (update_coin_score, coin_collisions).run_if(in_state(GameState::InGame)),
             );
     }
 }

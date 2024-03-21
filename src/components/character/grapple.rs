@@ -18,24 +18,23 @@ impl Plugin for GrapplePlugin {
     fn build(&self, app: &mut App) {
         debug!("Building GrapplePlugin");
 
-        app.add_state::<GrappleState>()
+        app.init_state::<GrappleState>()
             .insert_resource(Guideline::default())
             .add_systems(OnExit(GrappleState::Grappling), end_grapple)
             .add_systems(OnExit(GrappleState::Aiming), remove_guideline_system)
             .add_systems(
                 Update,
                 (
-                    idle.run_if(state_exists_and_equals(GrappleState::Idle)),
-                    aim.run_if(state_exists_and_equals(GrappleState::Aiming)),
-                    aim_marker.run_if(state_exists_and_equals(GrappleState::Aiming)),
-                    aim_guideline.run_if(state_exists_and_equals(GrappleState::Aiming)),
-                    grapple.run_if(state_exists_and_equals(GrappleState::Grappling)),
-                    manage_grapple.run_if(state_exists_and_equals(GrappleState::Grappling)),
-                    should_grapple_end.run_if(state_exists_and_equals(GrappleState::Grappling)),
-                    end_grapple_on_other_input
-                        .run_if(state_exists_and_equals(GrappleState::Grappling)),
+                    idle.run_if(in_state(GrappleState::Idle)),
+                    aim.run_if(in_state(GrappleState::Aiming)),
+                    aim_marker.run_if(in_state(GrappleState::Aiming)),
+                    aim_guideline.run_if(in_state(GrappleState::Aiming)),
+                    grapple.run_if(in_state(GrappleState::Grappling)),
+                    manage_grapple.run_if(in_state(GrappleState::Grappling)),
+                    should_grapple_end.run_if(in_state(GrappleState::Grappling)),
+                    end_grapple_on_other_input.run_if(in_state(GrappleState::Grappling)),
                 )
-                    .run_if(state_exists_and_equals(GameState::InGame)),
+                    .run_if(in_state(GameState::InGame)),
             );
     }
 }

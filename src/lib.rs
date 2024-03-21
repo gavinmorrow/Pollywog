@@ -26,7 +26,7 @@ pub fn start_app() {
     eprintln!("Creating app...");
 
     App::new()
-        .add_state::<GameState>()
+        .init_state::<GameState>()
         .insert_resource(RapierConfiguration {
             gravity: GRAVITY,
             ..default()

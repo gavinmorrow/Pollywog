@@ -15,7 +15,7 @@ impl Plugin for DamagePlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(
             Update,
-            enemy_damage_player.run_if(state_exists_and_equals(GameState::InGame)),
+            enemy_damage_player.run_if(in_state(GameState::InGame)),
         );
     }
 }

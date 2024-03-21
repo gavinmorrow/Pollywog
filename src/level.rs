@@ -18,7 +18,7 @@ const SIZE: f32 = 64.0;
 pub struct LevelPlugin;
 impl Plugin for LevelPlugin {
     fn build(&self, app: &mut App) {
-        app.add_state::<LevelState>()
+        app.init_state::<LevelState>()
             .insert_resource(GameAsset::default())
             .add_plugins(JsonAssetPlugin::<LevelAsset>::new(&["level.json"]))
             .add_systems(
@@ -27,13 +27,12 @@ impl Plugin for LevelPlugin {
             )
             .add_systems(
                 Update,
-                wait_for_level_load.run_if(state_exists_and_equals(LevelState::LoadingAssets)),
+                wait_for_level_load.run_if(in_state(LevelState::LoadingAssets)),
             )
             .add_systems(OnEnter(LevelState::ConstructingLevel), construct_level_res)
             .add_systems(
                 Update,
-                wait_for_level_start
-                    .run_if(state_exists_and_equals(LevelState::WaitingForLevelStart)),
+                wait_for_level_start.run_if(in_state(LevelState::WaitingForLevelStart)),
             )
             .add_systems(OnEnter(LevelState::SpawningBlocks), spawn_blocks)
             .add_systems(OnExit(GameState::InGame), reprime_level_state);
