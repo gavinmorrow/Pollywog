@@ -111,35 +111,49 @@ fn spawn_blocks(
     game_assets: Res<GameAsset>,
 ) {
     info!("Spawning blocks for level: {}", level.name);
+
     for block in &level.blocks {
         match block.data {
-            BlockData::Dirt => {
-                let block = BlockBundle::new(block.position);
-                commands.spawn(block);
-            }
-            BlockData::Enemy {} => {
-                let enemy = EnemyBundle::new(
+            BlockData::Dirt => spawn_entity(&mut commands, BlockBundle::new(block.position)),
+            BlockData::Enemy {} => spawn_entity(
+                &mut commands,
+                EnemyBundle::new(
                     block.position,
                     game_assets
                         .image_handles
                         .get(&ImageHandleId::Enemy)
                         .expect("Enemy image assets loaded"),
-                );
-                commands.spawn(enemy);
-            }
-            BlockData::Coin => {
-                let coin = CoinBundle::new(
+                ),
+            ),
+            BlockData::Coin => spawn_entity(
+                &mut commands,
+                CoinBundle::new(
                     block.position,
                     game_assets
                         .image_handles
                         .get(&ImageHandleId::Coin)
                         .expect("Coin image assets loaded"),
-                );
-                commands.spawn(coin);
-            }
+                ),
+            ),
+        };
+    }
+
+    next_state.set(LevelState::Loaded);
+}
+
+/// A helper function to spawn an entity with the `LevelEntity` component.
+/// This is used to keep track of entities that are part of the level, so
+/// they can be easily despawned when the level is cleaned up.
+pub fn spawn_entity(commands: &mut Commands, bundle: impl Bundle) {
+    commands.spawn(bundle).insert(LevelEntity);
+}
+
+pub fn despawn_entities(commands: &mut Commands, query: Query<Entity, With<LevelEntity>>) {
+    for entity in query.iter() {
+        if let Some(entity) = commands.get_entity(entity) {
+            entity.despawn_recursive();
         }
     }
-    next_state.set(LevelState::Loaded);
 }
 
 #[derive(Copy, Clone, Debug, Default, Eq, PartialEq, Hash, States)]
@@ -213,3 +227,6 @@ enum BlockData {
     Enemy {},
     Coin,
 }
+
+#[derive(Component)]
+pub struct LevelEntity;

@@ -3,6 +3,7 @@ use crate::{
         character::{Action, Character},
         collect_coin::CoinCollector,
     },
+    level,
     state::GameState,
 };
 use bevy::{prelude::*, window::PrimaryWindow};
@@ -130,5 +131,5 @@ fn spawn(
     let window = window_query.single();
 
     debug!("Spawning player");
-    commands.spawn(PlayerBundle::new(asset_server, window));
+    level::spawn_entity(&mut commands, PlayerBundle::new(asset_server, window));
 }

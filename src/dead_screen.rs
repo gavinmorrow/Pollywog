@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-use crate::state::GameState;
+use crate::{level, state::GameState};
 
 pub struct DeadScreenPlugin;
 impl Plugin for DeadScreenPlugin {
@@ -98,12 +98,17 @@ fn setup(mut commands: Commands) {
         });
 }
 
-fn cleanup(mut commands: Commands, root_node: Query<Entity, With<RootNode>>) {
+fn cleanup(
+    mut commands: Commands,
+    dead_screen_root_node: Query<Entity, With<RootNode>>,
+    level_entities: Query<Entity, With<crate::level::LevelEntity>>,
+) {
     // Despawn the dead screen
-    let root_node = root_node.single();
+    let root_node = dead_screen_root_node.single();
     commands.entity(root_node).despawn_recursive();
 
-    // TODO: despawn level
+    // Despawn the level
+    level::despawn_entities(&mut commands, level_entities);
 }
 
 fn restart_button_pressed(

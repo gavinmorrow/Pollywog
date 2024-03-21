@@ -3,6 +3,7 @@ use bevy_rapier2d::control::KinematicCharacterControllerOutput;
 
 use crate::{
     bundles::{coin::Coin, player::Player},
+    level,
     state::GameState,
 };
 
@@ -48,7 +49,8 @@ fn create_text(mut commands: Commands) {
             ),
             ..default()
         })
-        .insert(CoinScoreText);
+        .insert(CoinScoreText)
+        .insert(level::LevelEntity);
 }
 
 fn update_coin_score(
