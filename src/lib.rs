@@ -53,6 +53,7 @@ fn setup_default_plugins() -> PluginGroupBuilder {
         .set(LogPlugin {
             filter: "info,wgpu_core=warn,wgpu_hal=warn,pollywog=debug".into(),
             level: bevy::log::Level::TRACE,
+            ..default()
         })
         .set(WindowPlugin {
             primary_window: Some(Window {
