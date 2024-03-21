@@ -4,12 +4,12 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-bevy = { version = "0.12", features = ["dynamic_linking"] }
-# bevy = "0.12"
+bevy = { version = "0.13", features = ["dynamic_linking"] }
+# bevy = "0.13"
 bevy_common_assets = { version = "0.9", features = ["json"] }
-bevy_rapier2d = "0.24"
+bevy_rapier2d = "0.25"
 bevy_rapier_collider_gen = "0.3"
-leafwing-input-manager = "0.12"
+leafwing-input-manager = "0.13"
 serde = { version = "1", features = ["derive"] }
 
 # Enable high optimizations for dependencies (incl. Bevy), but not for our code:
