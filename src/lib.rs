@@ -38,9 +38,6 @@ pub fn start_app() {
             InputManagerPlugin::<components::character::Action>::default(),
             camera::camera_plugin,
             screens::screens_plugin,
-            bundles::player::player_plugin,
-            level::level_plugin,
-            components::ComponentsPlugin,
         ))
         .add_systems(Update, bevy::window::close_on_esc)
         .run();
