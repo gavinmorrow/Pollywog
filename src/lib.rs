@@ -7,9 +7,8 @@ use crate::state::GameState;
 mod bundles;
 mod camera;
 mod components;
-mod dead_screen;
 mod level;
-mod start_screen;
+mod screens;
 mod state;
 
 const PIXELS_PER_METER: f32 = 64.0;
@@ -38,8 +37,7 @@ pub fn start_app() {
             RapierDebugRenderPlugin::default(),
             InputManagerPlugin::<components::character::Action>::default(),
             camera::camera_plugin,
-            start_screen::start_screen_plugin,
-            dead_screen::dead_screen_plugin,
+            screens::screens_plugin,
             bundles::player::player_plugin,
             level::level_plugin,
             components::ComponentsPlugin,
