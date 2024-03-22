@@ -11,12 +11,12 @@ pub struct ComponentsPlugin;
 impl bevy::prelude::Plugin for ComponentsPlugin {
     fn build(&self, app: &mut bevy::prelude::App) {
         app.add_plugins((
-            character::CharacterPlugin,
-            kills_player::KillsPlayerPlugin,
-            npc_movement::NpcMovementPlugin,
-            player_win::PlayerWinPlugin,
-            damage::DamagePlugin,
-            collect_coin::CoinPlugin,
+            character::character_plugin,
+            kills_player::kills_player_plugin,
+            npc_movement::npc_movement_plugin,
+            player_win::player_win_plugin,
+            damage::damage_plugin,
+            collect_coin::coin_plugin,
         ));
     }
 }

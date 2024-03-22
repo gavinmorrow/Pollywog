@@ -4,16 +4,13 @@ use crate::{bundles::player::Player, state::GameState};
 
 use super::health::Health;
 
-pub struct KillsPlayerPlugin;
-impl Plugin for KillsPlayerPlugin {
-    fn build(&self, app: &mut App) {
-        app.add_systems(
-            Update,
-            kills_player
-                .after(super::damage::enemy_damage_player)
-                .run_if(in_state(GameState::InGame)),
-        );
-    }
+pub fn kills_player_plugin(app: &mut App) {
+    app.add_systems(
+        Update,
+        kills_player
+            .after(super::damage::enemy_damage_player)
+            .run_if(in_state(GameState::InGame)),
+    );
 }
 
 pub fn kills_player(

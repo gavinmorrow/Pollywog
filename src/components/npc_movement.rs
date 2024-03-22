@@ -5,12 +5,9 @@ use crate::{
     state::GameState,
 };
 
-pub struct NpcMovementPlugin;
-impl Plugin for NpcMovementPlugin {
-    fn build(&self, app: &mut App) {
-        app.add_systems(
-            Update,
-            (move_enemy, swap_direction, enemy_sprite_flipped).run_if(in_state(GameState::InGame)),
-        );
-    }
+pub fn npc_movement_plugin(app: &mut App) {
+    app.add_systems(
+        Update,
+        (move_enemy, swap_direction, enemy_sprite_flipped).run_if(in_state(GameState::InGame)),
+    );
 }

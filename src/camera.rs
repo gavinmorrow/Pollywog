@@ -5,17 +5,13 @@ use crate::{bundles::player::Player, state::GameState};
 const MAX_SPEED_X: f32 = 3.0;
 const MAX_SPEED_Y: f32 = 1.0;
 
-#[derive(Default)]
-pub struct CameraPlugin;
-impl Plugin for CameraPlugin {
-    fn build(&self, app: &mut App) {
-        app.add_systems(Startup, spawn_camera).add_systems(
-            Update,
-            keep_player_in_view
-                .after(crate::components::character::r#move)
-                .run_if(in_state(GameState::InGame)),
-        );
-    }
+pub fn camera_plugin(app: &mut App) {
+    app.add_systems(Startup, spawn_camera).add_systems(
+        Update,
+        keep_player_in_view
+            .after(crate::components::character::r#move)
+            .run_if(in_state(GameState::InGame)),
+    );
 }
 
 pub fn spawn_camera(mut commands: Commands, window_query: Query<&Window, With<PrimaryWindow>>) {

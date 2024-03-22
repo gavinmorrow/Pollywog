@@ -10,15 +10,12 @@ use crate::{
 const TEXT_POS: Vec2 = Vec2::new(10.0, 10.0);
 const FONT_SIZE: f32 = 64.0;
 
-pub struct CoinPlugin;
-impl Plugin for CoinPlugin {
-    fn build(&self, app: &mut App) {
-        app.add_systems(OnEnter(GameState::InGame), create_text)
-            .add_systems(
-                Update,
-                (update_coin_score, coin_collisions).run_if(in_state(GameState::InGame)),
-            );
-    }
+pub fn coin_plugin(app: &mut App) {
+    app.add_systems(OnEnter(GameState::InGame), create_text)
+        .add_systems(
+            Update,
+            (update_coin_score, coin_collisions).run_if(in_state(GameState::InGame)),
+        );
 }
 
 #[derive(Component, Debug, Default)]

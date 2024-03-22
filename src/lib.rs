@@ -37,11 +37,11 @@ pub fn start_app() {
             RapierPhysicsPlugin::<NoUserData>::pixels_per_meter(PIXELS_PER_METER),
             RapierDebugRenderPlugin::default(),
             InputManagerPlugin::<components::character::Action>::default(),
-            camera::CameraPlugin,
-            start_screen::StartScreenPlugin,
-            dead_screen::DeadScreenPlugin,
-            bundles::player::PlayerPlugin,
-            level::LevelPlugin,
+            camera::camera_plugin,
+            start_screen::start_screen_plugin,
+            dead_screen::dead_screen_plugin,
+            bundles::player::player_plugin,
+            level::level_plugin,
             components::ComponentsPlugin,
         ))
         .add_systems(Update, bevy::window::close_on_esc)

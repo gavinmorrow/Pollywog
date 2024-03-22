@@ -22,13 +22,10 @@ const BUTTON_BG_NORMAL: BackgroundColor = BackgroundColor(Color::Hsla {
     alpha: 1.0,
 });
 
-pub struct StartScreenPlugin;
-impl Plugin for StartScreenPlugin {
-    fn build(&self, app: &mut App) {
-        app.add_systems(OnEnter(GameState::StartScreen), setup)
-            .add_systems(Update, (button_interaction_style, start_button_pressed))
-            .add_systems(OnExit(GameState::StartScreen), cleanup);
-    }
+pub fn start_screen_plugin(app: &mut App) {
+    app.add_systems(OnEnter(GameState::StartScreen), setup)
+        .add_systems(Update, (button_interaction_style, start_button_pressed))
+        .add_systems(OnExit(GameState::StartScreen), cleanup);
 }
 
 fn setup(mut commands: Commands) {

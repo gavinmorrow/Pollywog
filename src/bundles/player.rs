@@ -25,12 +25,8 @@ const TEXTURE_PATH: &str = "player.png";
 
 pub const INITIAL_HEALTH: f32 = 100.0;
 
-#[derive(Default)]
-pub struct PlayerPlugin;
-impl Plugin for PlayerPlugin {
-    fn build(&self, app: &mut App) {
-        app.add_systems(OnEnter(GameState::InGame), spawn);
-    }
+pub fn player_plugin(app: &mut App) {
+    app.add_systems(OnEnter(GameState::InGame), spawn);
 }
 
 #[derive(Component, Default)]

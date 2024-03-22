@@ -2,13 +2,10 @@ use bevy::prelude::*;
 
 use crate::{level, state::GameState};
 
-pub struct DeadScreenPlugin;
-impl Plugin for DeadScreenPlugin {
-    fn build(&self, app: &mut App) {
-        app.add_systems(OnEnter(GameState::Dead), setup)
-            .add_systems(Update, (restart_button_pressed, esc_button_pressed))
-            .add_systems(OnExit(GameState::Dead), cleanup);
-    }
+pub fn dead_screen_plugin(app: &mut App) {
+    app.add_systems(OnEnter(GameState::Dead), setup)
+        .add_systems(Update, (restart_button_pressed, esc_button_pressed))
+        .add_systems(OnExit(GameState::Dead), cleanup);
 }
 
 #[derive(Component)]

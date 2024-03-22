@@ -10,14 +10,11 @@ use crate::{
 
 use super::health::Health;
 
-pub struct DamagePlugin;
-impl Plugin for DamagePlugin {
-    fn build(&self, app: &mut App) {
-        app.add_systems(
-            Update,
-            enemy_damage_player.run_if(in_state(GameState::InGame)),
-        );
-    }
+pub fn damage_plugin(app: &mut App) {
+    app.add_systems(
+        Update,
+        enemy_damage_player.run_if(in_state(GameState::InGame)),
+    );
 }
 
 #[derive(Component, Debug)]

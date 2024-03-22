@@ -8,25 +8,21 @@ use super::jump::{jump, JumpComponent};
 
 pub mod grapple;
 
-#[derive(Default)]
-pub struct CharacterPlugin;
-impl Plugin for CharacterPlugin {
-    fn build(&self, app: &mut App) {
-        app.add_plugins(crate::components::character::grapple::GrapplePlugin::default())
-            // FIXME: maybe move the jump system somewhere else
-            .add_systems(
-                Update,
-                (
-                    r#move,
-                    // Must go after so that the player gets moved immediately after
-                    // the jump starts
-                    jump.after(r#move),
-                    // Must go before so that the player is off the ground when we check
-                    stop_jump.before(r#move),
-                )
-                    .run_if(in_state(GameState::InGame)),
-            );
-    }
+pub fn character_plugin(app: &mut App) {
+    app.add_plugins(crate::components::character::grapple::grapple_plugin)
+        // FIXME: maybe move the jump system somewhere else
+        .add_systems(
+            Update,
+            (
+                r#move,
+                // Must go after so that the player gets moved immediately after
+                // the jump starts
+                jump.after(r#move),
+                // Must go before so that the player is off the ground when we check
+                stop_jump.before(r#move),
+            )
+                .run_if(in_state(GameState::InGame)),
+        );
 }
 
 #[derive(Component, Default)]

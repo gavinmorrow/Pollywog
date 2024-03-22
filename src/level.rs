@@ -14,29 +14,25 @@ mod block;
 
 const SIZE: f32 = 64.0;
 
-#[derive(Default)]
-pub struct LevelPlugin;
-impl Plugin for LevelPlugin {
-    fn build(&self, app: &mut App) {
-        app.init_state::<LevelState>()
-            .insert_resource(GameAsset::default())
-            .add_plugins(JsonAssetPlugin::<LevelAsset>::new(&["level.json"]))
-            .add_systems(
-                OnEnter(LevelState::LoadingAssets),
-                (load_level_asset, load_image_assets),
-            )
-            .add_systems(
-                Update,
-                wait_for_level_load.run_if(in_state(LevelState::LoadingAssets)),
-            )
-            .add_systems(OnEnter(LevelState::ConstructingLevel), construct_level_res)
-            .add_systems(
-                Update,
-                wait_for_level_start.run_if(in_state(LevelState::WaitingForLevelStart)),
-            )
-            .add_systems(OnEnter(LevelState::SpawningBlocks), spawn_blocks)
-            .add_systems(OnExit(GameState::InGame), reprime_level_state);
-    }
+pub fn level_plugin(app: &mut App) {
+    app.init_state::<LevelState>()
+        .insert_resource(GameAsset::default())
+        .add_plugins(JsonAssetPlugin::<LevelAsset>::new(&["level.json"]))
+        .add_systems(
+            OnEnter(LevelState::LoadingAssets),
+            (load_level_asset, load_image_assets),
+        )
+        .add_systems(
+            Update,
+            wait_for_level_load.run_if(in_state(LevelState::LoadingAssets)),
+        )
+        .add_systems(OnEnter(LevelState::ConstructingLevel), construct_level_res)
+        .add_systems(
+            Update,
+            wait_for_level_start.run_if(in_state(LevelState::WaitingForLevelStart)),
+        )
+        .add_systems(OnEnter(LevelState::SpawningBlocks), spawn_blocks)
+        .add_systems(OnExit(GameState::InGame), reprime_level_state);
 }
 
 fn load_level_asset(mut commands: Commands, asset_server: Res<AssetServer>) {
