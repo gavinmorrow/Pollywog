@@ -68,8 +68,8 @@ pub fn r#move(
                 translation.x = char.movement_speed;
                 sprite.flip_x = false;
             }
-            Action::Jump => match char_controller_output.single() {
-                Some(output) => {
+            Action::Jump => {
+                if let Some(output) = char_controller_output.single() {
                     if output.grounded {
                         trace!("Character is grounded, starting jump.");
                         let mut jump_component = jump_component_query.single_mut();
@@ -77,9 +77,10 @@ pub fn r#move(
                     } else {
                         trace!("Character is not grounded, can't jump.");
                     }
+                } else {
+                    trace!("No character controller output found, can't jump.")
                 }
-                None => trace!("No character controller output found, can't jump."),
-            },
+            }
             Action::Grapple => { /* Do nothing, this is handled elsewhere. */ }
         }
     }
