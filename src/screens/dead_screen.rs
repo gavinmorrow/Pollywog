@@ -122,8 +122,7 @@ fn restart_button_pressed(
             //        (*not* after InGame, because then you can't see the render of the
             //         game underneath the dead screen ui)
             Interaction::Pressed => next_state.set(GameState::InGame),
-            Interaction::Hovered => {}
-            Interaction::None => {}
+            Interaction::Hovered | Interaction::None => {}
         }
     }
 }
@@ -135,8 +134,7 @@ fn esc_button_pressed(
     for (interaction, _button) in &mut interaction_query {
         match *interaction {
             Interaction::Pressed => next_state.set(GameState::StartScreen),
-            Interaction::Hovered => {}
-            Interaction::None => {}
+            Interaction::Hovered | Interaction::None => {}
         }
     }
 }
