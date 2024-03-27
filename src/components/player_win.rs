@@ -18,5 +18,5 @@ fn check_win(
 }
 
 fn on_win() {
-    panic!("You won!");
+    bevy::log::info!("You won!");
 }
