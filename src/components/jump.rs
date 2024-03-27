@@ -48,8 +48,7 @@ impl JumpComponent {
 pub fn jump(
     mut jump_component_query: Query<(&mut JumpComponent, &mut KinematicCharacterController)>,
 ) {
-    for (mut jump_component, mut kinematic_character_controller) in jump_component_query.iter_mut()
-    {
+    for (mut jump_component, mut kinematic_character_controller) in &mut jump_component_query {
         if !jump_component.jumping {
             continue;
         }

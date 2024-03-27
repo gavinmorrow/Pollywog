@@ -113,7 +113,7 @@ fn restart_button_pressed(
     mut next_state: ResMut<NextState<GameState>>,
     mut interaction_query: Query<(&Interaction, &RestartButton)>,
 ) {
-    for (interaction, _button) in interaction_query.iter_mut() {
+    for (interaction, _button) in &mut interaction_query {
         match *interaction {
             Interaction::Pressed => next_state.set(GameState::InGame),
             Interaction::Hovered => {}
@@ -126,7 +126,7 @@ fn esc_button_pressed(
     mut next_state: ResMut<NextState<GameState>>,
     mut interaction_query: Query<(&Interaction, &EscButton)>,
 ) {
-    for (interaction, _button) in interaction_query.iter_mut() {
+    for (interaction, _button) in &mut interaction_query {
         match *interaction {
             Interaction::Pressed => next_state.set(GameState::StartScreen),
             Interaction::Hovered => {}

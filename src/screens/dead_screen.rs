@@ -113,7 +113,7 @@ fn restart_button_pressed(
     mut next_state: ResMut<NextState<GameState>>,
     mut interaction_query: Query<(&Interaction, &RestartButton)>,
 ) {
-    for (interaction, _button) in interaction_query.iter_mut() {
+    for (interaction, _button) in &mut interaction_query {
         match *interaction {
             // FIXME: game crashes when clicked, because it tries to re-create all
             //        entities, but they already exist (since they were never despawned).
@@ -132,7 +132,7 @@ fn esc_button_pressed(
     mut next_state: ResMut<NextState<GameState>>,
     mut interaction_query: Query<(&Interaction, &EscButton)>,
 ) {
-    for (interaction, _button) in interaction_query.iter_mut() {
+    for (interaction, _button) in &mut interaction_query {
         match *interaction {
             Interaction::Pressed => next_state.set(GameState::StartScreen),
             Interaction::Hovered => {}

@@ -104,13 +104,13 @@ impl Direction {
 }
 
 pub fn move_enemy(mut enemies: Query<(&mut KinematicCharacterController, &Enemy)>) {
-    for (mut char, enemy) in enemies.iter_mut() {
+    for (mut char, enemy) in &mut enemies {
         char.translation = Some(enemy.speed + GRAVITY);
     }
 }
 
 pub fn enemy_sprite_flipped(mut enemies: Query<(&mut Sprite, &Enemy)>) {
-    for (mut sprite, enemy) in enemies.iter_mut() {
+    for (mut sprite, enemy) in &mut enemies {
         sprite.flip_x = match enemy.direction {
             Direction::Left => true,
             Direction::Right => false,
@@ -119,7 +119,7 @@ pub fn enemy_sprite_flipped(mut enemies: Query<(&mut Sprite, &Enemy)>) {
 }
 
 pub fn swap_direction(mut enemies: Query<(&mut Enemy, &Transform)>) {
-    for (mut enemy, pos) in enemies.iter_mut() {
+    for (mut enemy, pos) in &mut enemies {
         let pos = pos.translation.x;
 
         let left_boundary = enemy.left_boundary * 64.0;
