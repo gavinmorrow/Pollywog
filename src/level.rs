@@ -145,7 +145,7 @@ pub fn spawn_entity(commands: &mut Commands, bundle: impl Bundle) {
 }
 
 pub fn despawn_entities(commands: &mut Commands, query: Query<Entity, With<LevelEntity>>) {
-    for entity in query.iter() {
+    for entity in &query {
         if let Some(entity) = commands.get_entity(entity) {
             entity.despawn_recursive();
         }

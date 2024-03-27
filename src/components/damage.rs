@@ -35,7 +35,7 @@ pub fn enemy_damage_player(
 
     // Iterate over all collisions with the player
     for collision in &player_char_controller.collisions {
-        for (enemy_entity, _enemy_char_controller, damage) in enemies.iter() {
+        for (enemy_entity, _enemy_char_controller, damage) in &enemies {
             if collision.entity == enemy_entity {
                 damages.insert(enemy_entity, damage);
                 trace!("player hit enemy, applying {:?} damage", damage);
@@ -44,7 +44,7 @@ pub fn enemy_damage_player(
     }
 
     // Iterate over all collisions with the enemies
-    for (enemy_entity, enemy_char_controller, damage) in enemies.iter() {
+    for (enemy_entity, enemy_char_controller, damage) in &enemies {
         for collision in &enemy_char_controller.collisions {
             if collision.entity == player_entity {
                 damages.insert(enemy_entity, damage);

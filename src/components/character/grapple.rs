@@ -372,7 +372,7 @@ fn remove_guideline(guideline: &mut ResMut<Guideline>, commands: &mut Commands) 
     trace!("Removing guideline");
 
     // Clear old guidelines
-    for guideline in guideline.0.iter() {
+    for guideline in &guideline.0 {
         commands.entity(*guideline).despawn();
     }
 
