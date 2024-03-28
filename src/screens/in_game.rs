@@ -12,6 +12,7 @@ pub fn in_game_plugin(app: &mut App) {
     .add_systems(OnExit(GameState::Dead), cleanup);
 }
 
+// TODO: clean this up so it doesn't need to import `components::character::grapple::GrappleState`
 fn cleanup(
     commands: Commands,
     query: Query<Entity, With<level::LevelEntity>>,
