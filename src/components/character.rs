@@ -25,6 +25,10 @@ pub fn character_plugin(app: &mut App) {
         );
 }
 
+pub fn cleanup(next_grapple_state: ResMut<NextState<grapple::GrappleState>>) {
+    grapple::cleanup(next_grapple_state);
+}
+
 #[derive(Component, Default)]
 pub struct Character {
     pub movement_speed: f32,

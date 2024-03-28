@@ -35,7 +35,7 @@ pub fn grapple_plugin(app: &mut App) {
 }
 
 #[derive(States, Debug, Default, Clone, Eq, PartialEq, Hash)]
-enum GrappleState {
+pub enum GrappleState {
     #[default]
     Idle,
     Aiming,
@@ -64,6 +64,10 @@ struct TargetPos(
 
 #[derive(Resource, Default)]
 struct Guideline(Vec<Entity>);
+
+pub fn cleanup(mut next_grapple_state: ResMut<NextState<GrappleState>>) {
+    next_grapple_state.set(GrappleState::default());
+}
 
 fn idle(
     action_state_query: Query<&ActionState<Action>, With<Character>>,

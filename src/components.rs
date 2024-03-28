@@ -20,3 +20,11 @@ impl bevy::prelude::Plugin for ComponentsPlugin {
         ));
     }
 }
+
+pub fn cleanup(
+    next_grapple_state: bevy::prelude::ResMut<
+        bevy::prelude::NextState<character::grapple::GrappleState>,
+    >,
+) {
+    character::cleanup(next_grapple_state);
+}
