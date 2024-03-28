@@ -115,12 +115,6 @@ fn restart_button_pressed(
 ) {
     for (interaction, _button) in &mut interaction_query {
         match *interaction {
-            // FIXME: game crashes when clicked, because it tries to re-create all
-            //        entities, but they already exist (since they were never despawned).
-            // Possible solution:
-            //  - despawn all entities when the game state changes out of Dead
-            //        (*not* after InGame, because then you can't see the render of the
-            //         game underneath the dead screen ui)
             Interaction::Pressed => next_state.set(GameState::InGame),
             Interaction::Hovered | Interaction::None => {}
         }
