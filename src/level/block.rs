@@ -11,7 +11,6 @@ pub struct BlockBundle {
     collider: Collider,
     friction: Friction,
     block: Block,
-    // active_events: ActiveEvents,
 }
 
 impl BlockBundle {
@@ -41,7 +40,6 @@ impl BlockBundle {
                 ..default()
             },
             block: Block,
-            // active_events: ActiveEvents::default(),
         }
     }
 }
