@@ -29,7 +29,6 @@ pub struct EnemyBundle {
     active_events: ActiveEvents,
     damage: Damage,
     rigid_body: RigidBody,
-    // velocity: Velocity,
     char_controller: KinematicCharacterController,
 }
 
@@ -55,10 +54,6 @@ impl EnemyBundle {
             active_events: ActiveEvents::COLLISION_EVENTS,
             damage: Damage(player::INITIAL_HEALTH),
             rigid_body: RigidBody::KinematicPositionBased,
-            // velocity: Velocity {
-            //     linvel: Vec2::new(64.0, 0.0),
-            //     ..default()
-            // },
             char_controller: KinematicCharacterController {
                 translation: Some(SPEED),
                 ..default()
