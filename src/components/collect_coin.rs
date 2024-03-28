@@ -60,7 +60,7 @@ fn update_coin_score(
 
 fn coin_collisions(
     mut collisions: Query<(&KinematicCharacterControllerOutput, &mut CoinCollector)>,
-    coins: Query<Entity, With<Coin>>,
+    coins: Query<&Coin>,
     mut commands: Commands,
 ) {
     for (collisions, mut coin_collector) in &mut collisions {
