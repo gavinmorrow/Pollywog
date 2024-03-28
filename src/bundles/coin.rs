@@ -14,7 +14,8 @@ pub struct Coin;
 #[derive(Bundle)]
 pub struct CoinBundle {
     collider: Collider,
-    rigid_body: RigidBody,
+    sensor: Sensor,
+    active_collision_types: ActiveCollisionTypes,
     sprite_bundle: SpriteBundle,
     coin: Coin,
 }
@@ -23,7 +24,9 @@ impl CoinBundle {
     pub fn new(translation: Vec2, handles: &ImageHandles) -> Self {
         CoinBundle {
             collider: Collider::ball(SIZE / 2.0),
-            rigid_body: RigidBody::KinematicVelocityBased,
+            sensor: Sensor,
+            active_collision_types: ActiveCollisionTypes::default()
+                | ActiveCollisionTypes::KINEMATIC_STATIC,
             sprite_bundle: SpriteBundle {
                 sprite: Sprite {
                     custom_size: Some(Vec2::new(SIZE, SIZE)),

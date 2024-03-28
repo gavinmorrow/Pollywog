@@ -1,5 +1,5 @@
 use bevy::prelude::*;
-use bevy_rapier2d::control::KinematicCharacterControllerOutput;
+use bevy_rapier2d::plugin::RapierContext;
 
 use crate::{
     bundles::{coin::Coin, player::Player},
@@ -59,15 +59,22 @@ fn update_coin_score(
 }
 
 fn coin_collisions(
-    mut collisions: Query<(&KinematicCharacterControllerOutput, &mut CoinCollector)>,
-    coins: Query<&Coin>,
+    // Is this use of RapierContext correct, or is there a better way to do it?
+    rapier_context: Res<RapierContext>,
+    mut collectors: Query<(Entity, &mut CoinCollector)>,
+    coins: Query<Entity, With<Coin>>,
     mut commands: Commands,
 ) {
-    for (collisions, mut coin_collector) in &mut collisions {
-        for collision in &collisions.collisions {
-            if coins.contains(collision.entity) {
-                coin_collector.num_coins += 1;
-                commands.entity(collision.entity).despawn_recursive();
+    for (entity, mut collector) in &mut collectors {
+        for coin in &coins {
+            if rapier_context.intersection_pair(entity, coin) == Some(true) {
+                // They are intersecting
+                commands.entity(coin).despawn_recursive();
+                collector.num_coins += 1;
+                debug!(
+                    "{:?} collected a coin {:?}! new total: {}",
+                    entity, coin, collector.num_coins
+                );
             }
         }
     }
