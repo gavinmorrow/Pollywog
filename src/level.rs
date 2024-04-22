@@ -128,6 +128,19 @@ fn spawn_blocks(
 ) {
     info!("Spawning blocks for level: {}", level.name);
 
+    for section in level.biome.sections() {
+        spawn_entity(
+            &mut commands,
+            BackgroundBundle::new(
+                section,
+                game_assets
+                    .image_handles
+                    .get(&section.image_handle_id())
+                    .expect("background assets must be loaded"),
+            ),
+        )
+    }
+
     for block in &level.blocks {
         match block.data {
             BlockData::Dirt => spawn_entity(&mut commands, BlockBundle::new(block.position)),
@@ -152,19 +165,6 @@ fn spawn_blocks(
                 ),
             ),
         };
-    }
-
-    for section in level.biome.sections() {
-        spawn_entity(
-            &mut commands,
-            BackgroundBundle::new(
-                section,
-                game_assets
-                    .image_handles
-                    .get(&section.image_handle_id())
-                    .expect("background assets must be loaded"),
-            ),
-        )
     }
 
     next_state.set(LevelState::Loaded);

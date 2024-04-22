@@ -4,7 +4,7 @@ use bevy_rapier2d::prelude::*;
 use crate::{
     components::{damage::Damage, health::Health, jump::JumpComponent},
     level::ImageHandles,
-    GRAVITY,
+    z_index, GRAVITY,
 };
 
 use super::player;
@@ -44,7 +44,7 @@ impl EnemyBundle {
                     ..default()
                 },
                 transform: Transform {
-                    translation: translation.extend(0.0),
+                    translation: translation.extend(z_index::LEVEL_BASE),
                     ..default()
                 },
                 texture: handles.texture.clone(),

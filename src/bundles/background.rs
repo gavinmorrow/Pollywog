@@ -20,7 +20,7 @@ impl Background {
         //     }
         // but since all z are shifted up by one (from -1..7 to 0..8) to fit in a u8, remove the +1
 
-        -global_x * self.section.z() as f32 / 10.0
+        -global_x * (crate::z_index::BG_MAX - self.section.z()) as f32 / 10.0
     }
 }
 
@@ -39,7 +39,7 @@ impl BackgroundBundle {
                     custom_size: Some(section.size()),
                     ..default()
                 },
-                transform: Transform::from_translation(Vec3::ZERO),
+                transform: Transform::from_translation(Vec2::ZERO.extend(section.z() as f32)),
                 texture: image_handles.texture.clone(),
                 ..default()
             },
@@ -171,23 +171,24 @@ impl BackgroundSection {
     //     .init(texture: .kelp1,   z: 7, opacity: 0.15),
     //     .init(texture: .pond,    z: -1, opacity: 0)
 
-    pub fn z(&self) -> u8 {
+    pub fn z(&self) -> f32 {
+        use crate::z_index::*;
         use BackgroundSection::*;
 
-        // FIXME: rename all hills/islands to match z
         match &self {
-            SwampHills0 => 3,
-            SwampHills1 => 2,
-            SwampHills2 => 1,
-            SwampIsland0 => 6,
-            SwampIsland1 => 5,
-            SwampIsland2 => 4,
-            SwampKelp0 => 7,
-            SwampKelp1 => 8,
-            SwampPond => 0,
+            SwampHills0 => SWAMP_HILLS_0,
+            SwampHills1 => SWAMP_HILLS_1,
+            SwampHills2 => SWAMP_HILLS_2,
+            SwampIsland0 => SWAMP_ISLAND_0,
+            SwampIsland1 => SWAMP_ISLAND_0,
+            SwampIsland2 => SWAMP_ISLAND_0,
+            SwampKelp0 => SWAMP_KELP_0,
+            SwampKelp1 => SWAMP_KELP_1,
+            SwampPond => SWAMP_POND,
         }
     }
 
+    #[allow(dead_code)]
     /// Out of 1
     pub fn opacity(&self) -> f32 {
         use BackgroundSection::*;

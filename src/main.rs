@@ -59,3 +59,22 @@ fn setup_default_plugins() -> PluginGroupBuilder {
             ..default()
         })
 }
+
+// FIXME: oh my god this is so fragile
+pub mod z_index {
+    // FIXME: rename all hills/islands to match z order
+    type ZIndex = f32;
+    pub const BG_BASE: ZIndex = 0.0;
+    pub const BG_MAX: ZIndex = 8.0;
+    pub const SWAMP_KELP_1: ZIndex = BG_BASE + 7.0;
+    pub const SWAMP_KELP_0: ZIndex = BG_BASE + 6.0;
+    pub const SWAMP_ISLAND_0: ZIndex = BG_BASE + 5.0;
+    pub const SWAMP_ISLAND_1: ZIndex = BG_BASE + 4.0;
+    pub const SWAMP_ISLAND_2: ZIndex = BG_BASE + 3.0;
+    pub const SWAMP_HILLS_0: ZIndex = BG_BASE + 2.0;
+    pub const SWAMP_HILLS_1: ZIndex = BG_BASE + 1.0;
+    pub const SWAMP_HILLS_2: ZIndex = BG_BASE + 0.0;
+    pub const SWAMP_POND: ZIndex = BG_BASE + 8.0;
+
+    pub const LEVEL_BASE: ZIndex = BG_MAX + 1.0;
+}

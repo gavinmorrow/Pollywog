@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use bevy_rapier2d::prelude::*;
 
-use crate::level::ImageHandles;
+use crate::{level::ImageHandles, z_index};
 
 // FIXME: when this is 64.0, the player and enemy get stuck underneath it
 //        and the player for some reason doesn't collect it??? very weird
@@ -33,7 +33,7 @@ impl CoinBundle {
                     ..default()
                 },
                 texture: handles.texture.clone(),
-                transform: Transform::from_translation(translation.extend(0.0)),
+                transform: Transform::from_translation(translation.extend(z_index::LEVEL_BASE)),
                 ..default()
             },
             coin: Coin,

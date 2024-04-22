@@ -5,6 +5,7 @@ use crate::{
     },
     level,
     state::GameState,
+    z_index,
 };
 use bevy::{prelude::*, window::PrimaryWindow};
 use bevy_rapier2d::prelude::*;
@@ -57,7 +58,7 @@ impl PlayerBundle {
         Self {
             sprite_bundle: SpriteBundle {
                 transform: Transform {
-                    translation: Vec3::new(0.0, window.height(), 0.0),
+                    translation: Vec3::new(0.0, window.height(), z_index::LEVEL_BASE),
                     ..default()
                 },
                 texture: asset_server.load(TEXTURE_PATH),
