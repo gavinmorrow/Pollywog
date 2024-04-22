@@ -4,7 +4,11 @@ use bevy::prelude::*;
 use bevy_common_assets::json::JsonAssetPlugin;
 
 use crate::{
-    bundles::{coin::CoinBundle, enemy::EnemyBundle},
+    bundles::{
+        background::{BackgroundBundle, BackgroundSection, Biome},
+        coin::CoinBundle,
+        enemy::EnemyBundle,
+    },
     state::GameState,
 };
 
@@ -84,7 +88,7 @@ fn construct_level_res(
 }
 
 fn load_image_assets(asset_server: Res<AssetServer>, mut game_assets: ResMut<GameAsset>) {
-    game_assets.image_handles = std::collections::HashMap::from([
+    let mut handles = std::collections::HashMap::from([
         (
             ImageHandleId::Enemy,
             ImageHandles {
@@ -98,6 +102,22 @@ fn load_image_assets(asset_server: Res<AssetServer>, mut game_assets: ResMut<Gam
             },
         ),
     ]);
+
+    BackgroundSection::enumerate()
+        .iter()
+        .map(|section| {
+            (
+                section.image_handle_id(),
+                ImageHandles {
+                    texture: asset_server.load(section.texture_path()),
+                },
+            )
+        })
+        .for_each(|(k, v)| {
+            handles.insert(k, v);
+        });
+
+    game_assets.image_handles = handles;
 }
 
 fn spawn_blocks(
@@ -132,6 +152,19 @@ fn spawn_blocks(
                 ),
             ),
         };
+    }
+
+    for section in level.biome.sections() {
+        spawn_entity(
+            &mut commands,
+            BackgroundBundle::new(
+                section,
+                game_assets
+                    .image_handles
+                    .get(&section.image_handle_id())
+                    .expect("background assets must be loaded"),
+            ),
+        )
     }
 
     next_state.set(LevelState::Loaded);
@@ -174,9 +207,18 @@ struct GameAsset {
 }
 
 #[derive(Eq, PartialEq, Hash)]
-enum ImageHandleId {
+pub enum ImageHandleId {
     Enemy,
     Coin,
+    BackgroundSwampHills0,
+    BackgroundSwampHills1,
+    BackgroundSwampHills2,
+    BackgroundSwampIsland0,
+    BackgroundSwampIsland1,
+    BackgroundSwampIsland2,
+    BackgroundSwampKelp0,
+    BackgroundSwampKelp1,
+    BackgroundSwampPond,
 }
 
 pub struct ImageHandles {
@@ -189,6 +231,7 @@ struct LevelHandle(Handle<LevelAsset>);
 #[derive(Clone, Debug, Resource)]
 struct Level {
     name: String,
+    biome: Biome,
     blocks: Vec<Block>,
 }
 
@@ -205,6 +248,7 @@ impl From<LevelAsset> for Level {
 
         Level {
             name: level_asset.name,
+            biome: level_asset.biome,
             blocks,
         }
     }
@@ -213,6 +257,7 @@ impl From<LevelAsset> for Level {
 #[derive(Clone, Debug, serde::Deserialize, Asset, bevy::reflect::TypePath)]
 struct LevelAsset {
     name: String,
+    biome: Biome,
     blocks: Vec<Block>,
 }
 
