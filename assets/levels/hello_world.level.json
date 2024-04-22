@@ -1,5 +1,6 @@
 {
     "name": "hello world",
+    "biome": "Swamp",
     "blocks": [
         {
             "data": {
