@@ -11,6 +11,19 @@ pub struct Background {
     section: BackgroundSection,
 }
 
+impl Background {
+    pub fn new_position(&self, global_x: f32) -> f32 {
+        // From swift app:
+        //     // Move background
+        //     for node in levelState.background {
+        //        node.position.x = -scrollX * CGFloat(node.z + 1) / 10
+        //     }
+        // but since all z are shifted up by one (from -1..7 to 0..8) to fit in a u8, remove the +1
+
+        -global_x * self.section.z() as f32 / 10.0
+    }
+}
+
 #[derive(Bundle)]
 pub struct BackgroundBundle {
     sprite_bundle: SpriteBundle,
@@ -32,17 +45,6 @@ impl BackgroundBundle {
             },
             background: Background { section },
         }
-    }
-
-    pub fn distance_to_move(&self, global_x: f32) -> f32 {
-        // From swift app:
-        //     // Move background
-        //     for node in levelState.background {
-        //        node.position.x = -scrollX * CGFloat(node.z + 1) / 10
-        //     }
-        // but since all z are shifted up by one (from -1..7 to 0..8) to fit in a u8, remove the +1
-
-        -global_x * self.background.section.z() as f32 / 10.0
     }
 }
 
