@@ -15,20 +15,21 @@ pub fn grapple_plugin(app: &mut App) {
     debug!("Building GrapplePlugin");
 
     app.init_state::<GrappleState>()
-        .insert_resource(Guideline::default())
+        .init_resource::<Guideline>()
         .add_systems(OnExit(GrappleState::Grappling), end_grapple)
         .add_systems(OnExit(GrappleState::Aiming), remove_guideline_system)
         .add_systems(
             Update,
             (
                 idle.run_if(in_state(GrappleState::Idle)),
-                aim.run_if(in_state(GrappleState::Aiming)),
-                aim_marker.run_if(in_state(GrappleState::Aiming)),
-                aim_guideline.run_if(in_state(GrappleState::Aiming)),
-                grapple.run_if(in_state(GrappleState::Grappling)),
-                manage_grapple.run_if(in_state(GrappleState::Grappling)),
-                should_grapple_end.run_if(in_state(GrappleState::Grappling)),
-                end_grapple_on_other_input.run_if(in_state(GrappleState::Grappling)),
+                (aim, aim_marker, aim_guideline).run_if(in_state(GrappleState::Aiming)),
+                (
+                    grapple,
+                    manage_grapple,
+                    should_grapple_end,
+                    end_grapple_on_other_input,
+                )
+                    .run_if(in_state(GrappleState::Grappling)),
             )
                 .run_if(in_state(GameState::InGame)),
         );
@@ -66,7 +67,8 @@ struct TargetPos(
 struct Guideline(Vec<Entity>);
 
 pub fn cleanup(mut next_grapple_state: ResMut<NextState<GrappleState>>) {
-    next_grapple_state.set(GrappleState::default());
+    info!("Cleaning up grapple.");
+    next_grapple_state.set(GrappleState::Idle);
 }
 
 fn idle(
@@ -308,7 +310,14 @@ fn should_grapple_end(
     target_pos: Option<Res<TargetPos>>,
     mut next_grapple_state: ResMut<NextState<GrappleState>>,
 ) {
-    let player = player.single();
+    let Ok(player) = player.get_single() else {
+        // FIXME: should never happen but does if the player is mid-grapple and dies,
+        //        then the restart button is pressed.
+        // In theory this shouldn't be possible. But it keeps happening (might be a bevy bug).
+        // I spent a ton of time on it, and couldn't figure it out. It's easier to just do this.
+        error!("Couldn't get player when testing for grapple end.");
+        return;
+    };
     let Some(target_pos) = target_pos else {
         trace!("No target pos resource");
 
