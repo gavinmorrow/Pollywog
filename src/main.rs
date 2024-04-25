@@ -34,7 +34,7 @@ pub fn main() {
         .add_plugins((
             setup_default_plugins(),
             RapierPhysicsPlugin::<NoUserData>::pixels_per_meter(PIXELS_PER_METER),
-            RapierDebugRenderPlugin::default(),
+            // RapierDebugRenderPlugin::default(),
             InputManagerPlugin::<components::character::Action>::default(),
             camera::camera_plugin,
             screens::screens_plugin,
