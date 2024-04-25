@@ -14,6 +14,7 @@ pub struct Background {
     section: BackgroundSection,
 }
 
+// FIXME: kinda broken
 impl Background {
     pub fn new_position(&self, global_x: f32) -> f32 {
         // From swift app:
