@@ -15,12 +15,10 @@ pub fn camera_plugin(app: &mut App) {
 }
 
 pub fn spawn_camera(mut commands: Commands, window_query: Query<&Window, With<PrimaryWindow>>) {
-    let window = window_query.single();
-
     debug!("Spawning camera");
     commands.spawn(Camera2dBundle {
         transform: Transform {
-            translation: Vec3::new(window.width() / 4.0, window.height() / 3.0, 1000.0),
+            translation: Vec3::new(0.0, 0.0, 1000.0),
             ..default()
         },
         ..default()
@@ -47,6 +45,6 @@ pub fn keep_player_in_view(
 fn follow(a: f32, b: &mut f32, max_speed: f32) {
     let delta = *b - a;
     let delta = delta / 100.0;
-    let delta = if delta.abs() < 0.5 { 0.0 } else { delta };
+    let delta = if delta.abs() < 0.25 { 0.0 } else { delta };
     *b -= delta.min(max_speed);
 }

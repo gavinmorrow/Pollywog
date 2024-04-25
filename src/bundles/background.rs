@@ -4,7 +4,10 @@
 use bevy::prelude::*;
 use serde::Deserialize;
 
-use crate::level::{ImageHandleId, ImageHandles};
+use crate::{
+    level::{ImageHandleId, ImageHandles},
+    BACKGROUND_COLOR,
+};
 
 #[derive(Component)]
 pub struct Background {
@@ -20,7 +23,8 @@ impl Background {
         //     }
         // but since all z are shifted up by one (from -1..7 to 0..8) to fit in a u8, remove the +1
 
-        -global_x * (crate::z_index::BG_MAX - self.section.z()) as f32 / 10.0
+        -global_x * (crate::z_index::BG_MAX - self.section.z()) as f32 / 42.0
+            + self.section.size().x / 5.0
     }
 }
 
@@ -32,14 +36,27 @@ pub struct BackgroundBundle {
 
 impl BackgroundBundle {
     pub fn new(section: BackgroundSection, image_handles: &ImageHandles) -> Self {
-        // TODO: opacity
+        /// Takes the relative position of trans in the trans_range and
+        /// maps it to the relative position in the total_range.
+        fn map_transparency(total_range: (f32, f32), trans_range: (f32, f32), trans: f32) -> f32 {
+            let percent = (trans - trans_range.0) / (trans_range.1 - trans_range.0);
+            (total_range.1 - total_range.0) * percent + total_range.0
+        }
+
         BackgroundBundle {
             sprite_bundle: SpriteBundle {
                 sprite: Sprite {
+                    color: BACKGROUND_COLOR.with_l(map_transparency(
+                        (0.1, 0.42),
+                        (0.0, 0.15),
+                        (0.15 - section.transparency()).abs(),
+                    )),
                     custom_size: Some(section.size()),
                     ..default()
                 },
-                transform: Transform::from_translation(Vec2::ZERO.extend(section.z() as f32)),
+                transform: Transform::from_translation(
+                    Vec2::new(0.0, section.size().y / 5.0).extend(section.z() as f32),
+                ),
                 texture: image_handles.texture.clone(),
                 ..default()
             },
@@ -189,8 +206,8 @@ impl BackgroundSection {
     }
 
     #[allow(dead_code)]
-    /// Out of 1
-    pub fn opacity(&self) -> f32 {
+    /// Out of 1. Range: 0.0 - 0.15 inclusive.
+    pub fn transparency(&self) -> f32 {
         use BackgroundSection::*;
 
         match &self {

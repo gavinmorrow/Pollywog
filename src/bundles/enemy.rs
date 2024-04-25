@@ -9,7 +9,7 @@ use crate::{
 
 use super::player;
 
-const WIDTH: f32 = 128.0;
+const WIDTH: f32 = 128.0 / 2.0;
 const HEIGHT: f32 = WIDTH / TEXTURE_ASPECT_RATIO;
 const SIZE_VEC2: Vec2 = Vec2::new(WIDTH, HEIGHT);
 
