@@ -1,4 +1,4 @@
-use bevy::{prelude::*, window::PrimaryWindow};
+use bevy::prelude::*;
 
 use crate::{bundles::player::Player, state::GameState};
 
@@ -14,7 +14,7 @@ pub fn camera_plugin(app: &mut App) {
     );
 }
 
-pub fn spawn_camera(mut commands: Commands, window_query: Query<&Window, With<PrimaryWindow>>) {
+pub fn spawn_camera(mut commands: Commands) {
     debug!("Spawning camera");
     commands.spawn(Camera2dBundle {
         transform: Transform {
