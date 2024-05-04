@@ -48,7 +48,7 @@ impl BackgroundBundle {
             sprite_bundle: SpriteBundle {
                 sprite: Sprite {
                     color: BACKGROUND_COLOR.with_l(map_transparency(
-                        (0.1, 0.42),
+                        (0.22, 0.66),
                         (0.0, 0.15),
                         (0.15 - section.transparency()).abs(),
                     )),
