@@ -1,5 +1,15 @@
-use bevy::{app::PluginGroupBuilder, log::LogPlugin, prelude::*, window::WindowMode};
+use bevy::{
+    app::PluginGroupBuilder,
+    diagnostic::{
+        EntityCountDiagnosticsPlugin, FrameTimeDiagnosticsPlugin,
+        SystemInformationDiagnosticsPlugin,
+    },
+    log::LogPlugin,
+    prelude::*,
+    window::WindowMode,
+};
 use bevy_rapier2d::prelude::*;
+use iyes_perf_ui::{PerfUiCompleteBundle, PerfUiPlugin};
 use leafwing_input_manager::prelude::*;
 
 use crate::state::GameState;
@@ -33,6 +43,7 @@ pub fn main() {
         .insert_resource(ClearColor(BACKGROUND_COLOR))
         .add_plugins((
             setup_default_plugins(),
+            perf_ui_plugin,
             RapierPhysicsPlugin::<NoUserData>::pixels_per_meter(PIXELS_PER_METER),
             RapierDebugRenderPlugin::default(),
             InputManagerPlugin::<components::character::Action>::default(),
@@ -58,6 +69,18 @@ fn setup_default_plugins() -> PluginGroupBuilder {
             }),
             ..default()
         })
+}
+
+fn perf_ui_plugin(app: &mut App) {
+    app.add_plugins((
+        FrameTimeDiagnosticsPlugin,
+        EntityCountDiagnosticsPlugin,
+        SystemInformationDiagnosticsPlugin,
+        PerfUiPlugin,
+    ))
+    .add_systems(Startup, |mut commands: Commands| {
+        commands.spawn(PerfUiCompleteBundle::default());
+    });
 }
 
 // FIXME: oh my god this is so fragile
