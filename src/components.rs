@@ -1,3 +1,4 @@
+mod animated_sprite;
 pub mod background;
 pub mod character;
 pub mod collect_coin;
@@ -12,13 +13,14 @@ pub struct ComponentsPlugin;
 impl bevy::prelude::Plugin for ComponentsPlugin {
     fn build(&self, app: &mut bevy::prelude::App) {
         app.add_plugins((
+            animated_sprite::animated_sprite_plugin,
             background::background_plugin,
             character::character_plugin,
+            collect_coin::coin_plugin,
+            damage::damage_plugin,
             kills_player::kills_player_plugin,
             npc_movement::npc_movement_plugin,
             player_win::player_win_plugin,
-            damage::damage_plugin,
-            collect_coin::coin_plugin,
         ));
     }
 }
