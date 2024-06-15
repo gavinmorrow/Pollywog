@@ -17,7 +17,7 @@ use crate::{
     GRAVITY,
 };
 
-const SIZE: Vec2 = Vec2::new(223.0, 373.0);
+const SIZE: Vec2 = Vec2::new(233.0, 373.0);
 
 const JUMP_MAGNITUDE: Vec2 = Vec2::new(0.0, 10.0);
 const MOVEMENT_SPEED: f32 = 3.0;
@@ -70,6 +70,7 @@ impl PlayerBundle {
             sprite_bundle: SpriteBundle {
                 transform: Transform {
                     translation: Vec3::new(0.0, window.height(), z_index::LEVEL_BASE),
+                    scale: Vec3::splat(64.0 / SIZE.x),
                     ..default()
                 },
                 texture,
