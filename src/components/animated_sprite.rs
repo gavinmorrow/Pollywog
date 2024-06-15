@@ -6,7 +6,7 @@ pub fn animated_sprite_plugin(app: &mut App) {
 
 // Derived from https://github.com/bevyengine/bevy/blob/latest/examples/2d/sprite_sheet.rs
 
-#[derive(Component)]
+#[derive(Bundle)]
 pub struct AnimatedSprite {
     texture_atlas: TextureAtlas,
     animation_indices: AnimationIndices,
@@ -31,8 +31,8 @@ impl AnimatedSprite {
 
 #[derive(Component)]
 pub struct AnimationIndices {
-    first: usize,
-    last: usize,
+    pub first: usize,
+    pub last: usize,
 }
 
 #[derive(Component, Deref, DerefMut)]

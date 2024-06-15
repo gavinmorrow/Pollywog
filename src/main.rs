@@ -69,6 +69,7 @@ fn setup_default_plugins() -> PluginGroupBuilder {
             }),
             ..default()
         })
+        .set(ImagePlugin::default_nearest())
 }
 
 fn perf_ui_plugin(app: &mut App) {

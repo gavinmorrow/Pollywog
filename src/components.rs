@@ -1,4 +1,4 @@
-mod animated_sprite;
+pub mod animated_sprite;
 pub mod background;
 pub mod character;
 pub mod collect_coin;
