@@ -35,21 +35,30 @@ pub struct Player;
 
 #[derive(Bundle)]
 struct PlayerBundle {
-    sprite_bundle: SpriteBundle,
+    // Marker component
+    player: Player,
+
+    // Sprite
     animation: AnimatedSprite,
+    sprite_bundle: SpriteBundle,
+
+    // Physics
+    active_events: ActiveEvents,
     character_controller: KinematicCharacterController,
     collider: Collider,
-    player: Player,
     damping: Damping,
-    input_manager: InputManagerBundle<Action>,
     external_force: ExternalForce,
     gravity_scale: GravityScale,
-    jump_component: JumpComponent,
-    char: Character,
-    health: Health,
-    active_events: ActiveEvents,
     rigid_body: RigidBody,
+
+    // Properties
+    char: Character,
     coins: CoinCollector,
+    health: Health,
+    jump_component: JumpComponent,
+
+    // Input manager
+    input_manager: InputManagerBundle<Action>,
 }
 
 impl PlayerBundle {
@@ -67,6 +76,17 @@ impl PlayerBundle {
         let animation_indices = AnimationIndices { first: 0, last: 8 };
 
         Self {
+            player: Player,
+
+            animation: AnimatedSprite {
+                texture_atlas: TextureAtlas {
+                    layout,
+                    index: animation_indices.first,
+                },
+                animation_indices,
+                animation_timer: AnimationTimer(Timer::from_seconds(0.05, TimerMode::Repeating)),
+                ..default()
+            },
             sprite_bundle: SpriteBundle {
                 transform: Transform {
                     translation: Vec3::new(0.0, window.height(), z_index::LEVEL_BASE),
@@ -80,40 +100,32 @@ impl PlayerBundle {
                 },
                 ..default()
             },
-            animation: AnimatedSprite {
-                texture_atlas: TextureAtlas {
-                    layout,
-                    index: animation_indices.first,
-                },
-                animation_indices,
-                animation_timer: AnimationTimer(Timer::from_seconds(0.05, TimerMode::Repeating)),
-                ..default()
-            },
-            // FIXME: maybe not default? just trying to get this to work for now
+
+            active_events: ActiveEvents::COLLISION_EVENTS,
             character_controller: KinematicCharacterController {
                 translation: Some(GRAVITY),
                 ..default()
             },
             collider: Collider::cuboid(SIZE.x / 2.0, SIZE.y / 2.0),
-            player: Player,
             damping: Damping {
                 angular_damping: 3.0,
                 linear_damping: 0.0,
             },
+            external_force: ExternalForce::default(),
+            gravity_scale: GravityScale(1.0),
+            rigid_body: RigidBody::KinematicPositionBased,
+
+            char: Character {
+                movement_speed: MOVEMENT_SPEED,
+            },
+            coins: CoinCollector::default(),
+            health: Health::full(INITIAL_HEALTH),
+            jump_component: JumpComponent::new(JUMP_MAGNITUDE, false),
+
             input_manager: InputManagerBundle::<Action> {
                 action_state: ActionState::default(),
                 input_map: get_input_map(),
             },
-            external_force: ExternalForce::default(),
-            gravity_scale: GravityScale(1.0),
-            jump_component: JumpComponent::new(JUMP_MAGNITUDE, false),
-            char: Character {
-                movement_speed: MOVEMENT_SPEED,
-            },
-            health: Health::full(INITIAL_HEALTH),
-            active_events: ActiveEvents::COLLISION_EVENTS,
-            rigid_body: RigidBody::KinematicPositionBased,
-            coins: CoinCollector::default(),
         }
     }
 }
