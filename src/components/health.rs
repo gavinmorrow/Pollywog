@@ -3,6 +3,7 @@ use bevy::prelude::*;
 #[derive(Component)]
 pub struct Health {
     pub remaining: f32,
+    #[allow(dead_code)]
     pub total: f32,
 }
 
