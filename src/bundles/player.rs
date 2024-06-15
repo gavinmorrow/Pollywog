@@ -46,7 +46,6 @@ struct PlayerBundle {
     character_controller: KinematicCharacterController,
     collider: Collider,
     damping: Damping,
-    gravity_scale: GravityScale,
     rigid_body: RigidBody,
 
     // Properties
@@ -108,7 +107,6 @@ impl PlayerBundle {
                 angular_damping: 3.0,
                 linear_damping: 0.0,
             },
-            gravity_scale: GravityScale(1.0),
             rigid_body: RigidBody::KinematicPositionBased,
 
             char: Character {
