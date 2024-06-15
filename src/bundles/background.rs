@@ -24,7 +24,7 @@ impl Background {
         //     }
         // but since all z are shifted up by one (from -1..7 to 0..8) to fit in a u8, remove the +1
 
-        -global_x * (crate::z_index::BG_MAX - self.section.z()) as f32 / 42.0
+        -global_x * (crate::z_index::BG_MAX - self.section.z()) / 42.0
             + self.section.size().x / 5.0
     }
 }
@@ -56,7 +56,7 @@ impl BackgroundBundle {
                     ..default()
                 },
                 transform: Transform::from_translation(
-                    Vec2::new(0.0, section.size().y / 5.0).extend(section.z() as f32),
+                    Vec2::new(0.0, section.size().y / 5.0).extend(section.z()),
                 ),
                 texture: image_handles.texture.clone(),
                 ..default()
