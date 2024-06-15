@@ -46,7 +46,6 @@ struct PlayerBundle {
     character_controller: KinematicCharacterController,
     collider: Collider,
     damping: Damping,
-    external_force: ExternalForce,
     gravity_scale: GravityScale,
     rigid_body: RigidBody,
 
@@ -109,7 +108,6 @@ impl PlayerBundle {
                 angular_damping: 3.0,
                 linear_damping: 0.0,
             },
-            external_force: ExternalForce::default(),
             gravity_scale: GravityScale(1.0),
             rigid_body: RigidBody::KinematicPositionBased,
 
