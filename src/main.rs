@@ -36,10 +36,7 @@ pub fn main() {
 
     App::new()
         .init_state::<GameState>()
-        .insert_resource(RapierConfiguration {
-            gravity: GRAVITY,
-            ..default()
-        })
+        .insert_resource(RapierConfiguration::new(PIXELS_PER_METER))
         .insert_resource(ClearColor(BACKGROUND_COLOR))
         .add_plugins((
             setup_default_plugins(),
