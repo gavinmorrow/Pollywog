@@ -5,7 +5,7 @@ use leafwing_input_manager::prelude::*;
 use crate::{state::GameState, GRAVITY};
 
 use super::{
-    animated_sprite::{AnimationIndices, CurrentlyAnimating},
+    animated_sprite::CurrentlyAnimating,
     jump::{jump, JumpComponent},
 };
 
