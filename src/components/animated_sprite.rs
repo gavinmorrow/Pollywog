@@ -6,50 +6,55 @@ pub fn animated_sprite_plugin(app: &mut App) {
 
 // Derived from https://github.com/bevyengine/bevy/blob/latest/examples/2d/sprite_sheet.rs
 
-#[derive(Bundle)]
+#[derive(Bundle, Default)]
 pub struct AnimatedSprite {
-    texture_atlas: TextureAtlas,
-    animation_indices: AnimationIndices,
-    timer: AnimationTimer,
+    pub texture_atlas: TextureAtlas,
+    pub animation_indices: AnimationIndices,
+    pub animation_timer: AnimationTimer,
+    pub currently_animating: CurrentlyAnimating,
 }
 
-impl AnimatedSprite {
-    pub fn new(
-        texture_atlas_layout: Handle<TextureAtlasLayout>,
-        animation_indices: AnimationIndices,
-    ) -> Self {
-        AnimatedSprite {
-            texture_atlas: TextureAtlas {
-                layout: texture_atlas_layout,
-                index: animation_indices.first,
-            },
-            animation_indices,
-            timer: AnimationTimer(Timer::from_seconds(0.1, TimerMode::Repeating)),
-        }
-    }
-}
-
-#[derive(Component)]
+#[derive(Component, Default)]
 pub struct AnimationIndices {
     pub first: usize,
     pub last: usize,
 }
 
-#[derive(Component, Deref, DerefMut)]
-struct AnimationTimer(Timer);
+impl AnimationIndices {
+    pub fn next(&self, index: usize) -> usize {
+        let index = index + 1;
+        if index >= self.last {
+            self.first
+        } else {
+            index
+        }
+    }
+}
+
+#[derive(Component, Default, Deref, DerefMut)]
+pub struct AnimationTimer(pub Timer);
+
+/// Make the sprite animate
+#[derive(Component, Default, Deref, DerefMut)]
+pub struct CurrentlyAnimating(pub bool);
 
 fn animate_sprite(
     time: Res<Time>,
-    mut query: Query<(&AnimationIndices, &mut AnimationTimer, &mut TextureAtlas)>,
+    mut query: Query<(
+        &CurrentlyAnimating,
+        &AnimationIndices,
+        &mut AnimationTimer,
+        &mut TextureAtlas,
+    )>,
 ) {
-    for (indices, mut timer, mut atlas) in &mut query {
+    for (CurrentlyAnimating(currently_animating), indices, mut timer, mut atlas) in &mut query {
+        if !currently_animating {
+            continue;
+        }
+
         timer.tick(time.delta());
         if timer.just_finished() {
-            atlas.index = if atlas.index == indices.last {
-                indices.first
-            } else {
-                atlas.index + 1
-            };
+            atlas.index = indices.next(atlas.index);
         }
     }
 }

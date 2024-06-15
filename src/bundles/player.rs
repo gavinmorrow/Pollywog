@@ -1,6 +1,6 @@
 use crate::{
     components::{
-        animated_sprite::{AnimatedSprite, AnimationIndices},
+        animated_sprite::{AnimatedSprite, AnimationIndices, AnimationTimer},
         character::{Action, Character},
         collect_coin::CoinCollector,
     },
@@ -80,7 +80,15 @@ impl PlayerBundle {
                 },
                 ..default()
             },
-            animation: AnimatedSprite::new(layout, animation_indices),
+            animation: AnimatedSprite {
+                texture_atlas: TextureAtlas {
+                    layout,
+                    index: animation_indices.first,
+                },
+                animation_indices,
+                animation_timer: AnimationTimer(Timer::from_seconds(0.05, TimerMode::Repeating)),
+                ..default()
+            },
             // FIXME: maybe not default? just trying to get this to work for now
             character_controller: KinematicCharacterController {
                 translation: Some(GRAVITY),

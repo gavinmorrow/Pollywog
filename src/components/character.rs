@@ -4,7 +4,10 @@ use leafwing_input_manager::prelude::*;
 
 use crate::{state::GameState, GRAVITY};
 
-use super::jump::{jump, JumpComponent};
+use super::{
+    animated_sprite::{AnimationIndices, CurrentlyAnimating},
+    jump::{jump, JumpComponent},
+};
 
 pub mod grapple;
 
@@ -44,18 +47,28 @@ pub enum Action {
 
 pub fn r#move(
     action_state_query: Query<&ActionState<Action>, With<Character>>,
-    mut player_query: Query<(&mut KinematicCharacterController, &mut Sprite, &Character)>,
+    mut player_query: Query<(
+        &mut KinematicCharacterController,
+        &mut Sprite,
+        &Character,
+        &mut CurrentlyAnimating,
+    )>,
     char_controller_output: Query<Option<&KinematicCharacterControllerOutput>, With<Character>>,
     mut jump_component_query: Query<&mut JumpComponent, With<Character>>,
 ) {
     let action_state = action_state_query.single();
-    let Ok((mut char_controller, mut sprite, char)) = player_query.get_single_mut() else {
+    let Ok((mut char_controller, mut sprite, char, mut currently_animating)) =
+        player_query.get_single_mut()
+    else {
         return;
     };
 
     let actions = action_state.get_pressed();
 
-    if !actions.is_empty() {
+    if actions.is_empty() {
+        trace!("No actions pressed.");
+        *currently_animating = CurrentlyAnimating(false);
+    } else {
         trace!("Moving character.");
     }
 
@@ -67,15 +80,20 @@ pub fn r#move(
             Action::Left => {
                 translation.x = -char.movement_speed;
                 sprite.flip_x = true;
+                *currently_animating = CurrentlyAnimating(true);
             }
             Action::Right => {
                 translation.x = char.movement_speed;
                 sprite.flip_x = false;
+                *currently_animating = CurrentlyAnimating(true);
             }
             Action::Jump => {
                 if let Some(output) = char_controller_output.single() {
                     if output.grounded {
                         trace!("Character is grounded, starting jump.");
+
+                        *currently_animating = CurrentlyAnimating(false);
+
                         let mut jump_component = jump_component_query.single_mut();
                         jump_component.start_jump();
                     } else {
