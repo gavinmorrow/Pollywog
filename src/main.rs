@@ -1,5 +1,15 @@
-use bevy::{app::PluginGroupBuilder, log::LogPlugin, prelude::*, window::WindowMode};
+use bevy::{
+    app::PluginGroupBuilder,
+    diagnostic::{
+        EntityCountDiagnosticsPlugin, FrameTimeDiagnosticsPlugin,
+        SystemInformationDiagnosticsPlugin,
+    },
+    log::LogPlugin,
+    prelude::*,
+    window::WindowMode,
+};
 use bevy_rapier2d::prelude::*;
+use iyes_perf_ui::{PerfUiCompleteBundle, PerfUiPlugin};
 use leafwing_input_manager::prelude::*;
 
 use crate::state::GameState;
@@ -33,6 +43,7 @@ pub fn main() {
         .insert_resource(ClearColor(BACKGROUND_COLOR))
         .add_plugins((
             setup_default_plugins(),
+            perf_ui_plugin,
             RapierPhysicsPlugin::<NoUserData>::pixels_per_meter(PIXELS_PER_METER),
             RapierDebugRenderPlugin::default(),
             InputManagerPlugin::<components::character::Action>::default(),
@@ -58,4 +69,36 @@ fn setup_default_plugins() -> PluginGroupBuilder {
             }),
             ..default()
         })
+        .set(ImagePlugin::default_nearest())
+}
+
+fn perf_ui_plugin(app: &mut App) {
+    app.add_plugins((
+        FrameTimeDiagnosticsPlugin,
+        EntityCountDiagnosticsPlugin,
+        SystemInformationDiagnosticsPlugin,
+        PerfUiPlugin,
+    ))
+    .add_systems(Startup, |mut commands: Commands| {
+        commands.spawn(PerfUiCompleteBundle::default());
+    });
+}
+
+// FIXME: oh my god this is so fragile
+pub mod z_index {
+    // FIXME: rename all hills/islands to match z order
+    type ZIndex = f32;
+    pub const BG_BASE: ZIndex = 0.0;
+    pub const BG_MAX: ZIndex = 8.0;
+    pub const SWAMP_KELP_1: ZIndex = BG_BASE + 7.0;
+    pub const SWAMP_KELP_0: ZIndex = BG_BASE + 6.0;
+    pub const SWAMP_ISLAND_0: ZIndex = BG_BASE + 5.0;
+    pub const SWAMP_ISLAND_1: ZIndex = BG_BASE + 4.0;
+    pub const SWAMP_ISLAND_2: ZIndex = BG_BASE + 3.0;
+    pub const SWAMP_HILLS_0: ZIndex = BG_BASE + 2.0;
+    pub const SWAMP_HILLS_1: ZIndex = BG_BASE + 1.0;
+    pub const SWAMP_HILLS_2: ZIndex = BG_BASE + 0.0;
+    pub const SWAMP_POND: ZIndex = BG_BASE + 8.0;
+
+    pub const LEVEL_BASE: ZIndex = BG_MAX + 1.0;
 }

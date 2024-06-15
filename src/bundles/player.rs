@@ -1,10 +1,12 @@
 use crate::{
     components::{
+        animated_sprite::{AnimatedSprite, AnimationIndices, AnimationTimer},
         character::{Action, Character},
         collect_coin::CoinCollector,
     },
     level,
     state::GameState,
+    z_index,
 };
 use bevy::{prelude::*, window::PrimaryWindow};
 use bevy_rapier2d::prelude::*;
@@ -15,13 +17,12 @@ use crate::{
     GRAVITY,
 };
 
-const SIZE: f32 = 64.0;
-const SIZE_VEC2: Vec2 = Vec2::new(SIZE, SIZE);
+const SIZE: Vec2 = Vec2::new(233.0, 373.0);
 
 const JUMP_MAGNITUDE: Vec2 = Vec2::new(0.0, 10.0);
 const MOVEMENT_SPEED: f32 = 3.0;
 
-const TEXTURE_PATH: &str = "player.png";
+const TEXTURE_PATH: &str = "player_new.atlas.png";
 
 pub const INITIAL_HEALTH: f32 = 100.0;
 
@@ -32,9 +33,10 @@ pub fn player_plugin(app: &mut App) {
 #[derive(Component, Default)]
 pub struct Player;
 
-#[derive(Bundle, Default)]
+#[derive(Bundle)]
 struct PlayerBundle {
     sprite_bundle: SpriteBundle,
+    animation: AnimatedSprite,
     character_controller: KinematicCharacterController,
     collider: Collider,
     player: Player,
@@ -51,20 +53,40 @@ struct PlayerBundle {
 }
 
 impl PlayerBundle {
-    fn new(asset_server: Res<AssetServer>, window: &Window) -> Self {
+    fn new(
+        asset_server: Res<AssetServer>,
+        mut texture_atlas_layouts: ResMut<Assets<TextureAtlasLayout>>,
+        window: &Window,
+    ) -> Self {
         debug!("Creating player bundle");
+
+        let layout = TextureAtlasLayout::from_grid(SIZE, 5, 2, None, None);
+        let layout = texture_atlas_layouts.add(layout);
+
+        let texture = asset_server.load(TEXTURE_PATH);
+        let animation_indices = AnimationIndices { first: 0, last: 8 };
 
         Self {
             sprite_bundle: SpriteBundle {
                 transform: Transform {
-                    translation: Vec3::new(0.0, window.height(), 0.0),
+                    translation: Vec3::new(0.0, window.height(), z_index::LEVEL_BASE),
+                    scale: Vec3::splat(64.0 / SIZE.x),
                     ..default()
                 },
-                texture: asset_server.load(TEXTURE_PATH),
+                texture,
                 sprite: Sprite {
-                    custom_size: Some(SIZE_VEC2),
+                    custom_size: Some(SIZE),
                     ..default()
                 },
+                ..default()
+            },
+            animation: AnimatedSprite {
+                texture_atlas: TextureAtlas {
+                    layout,
+                    index: animation_indices.first,
+                },
+                animation_indices,
+                animation_timer: AnimationTimer(Timer::from_seconds(0.05, TimerMode::Repeating)),
                 ..default()
             },
             // FIXME: maybe not default? just trying to get this to work for now
@@ -72,7 +94,7 @@ impl PlayerBundle {
                 translation: Some(GRAVITY),
                 ..default()
             },
-            collider: Collider::ball(SIZE / 2.0),
+            collider: Collider::cuboid(SIZE.x / 2.0, SIZE.y / 2.0),
             player: Player,
             damping: Damping {
                 angular_damping: 3.0,
@@ -116,10 +138,14 @@ fn get_input_map() -> InputMap<Action> {
 fn spawn(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
+    texture_atlas_layouts: ResMut<Assets<TextureAtlasLayout>>,
     window_query: Query<&Window, With<PrimaryWindow>>,
 ) {
     let window = window_query.single();
 
     debug!("Spawning player");
-    level::spawn_entity(&mut commands, PlayerBundle::new(asset_server, window));
+    level::spawn_entity(
+        &mut commands,
+        PlayerBundle::new(asset_server, texture_atlas_layouts, window),
+    );
 }

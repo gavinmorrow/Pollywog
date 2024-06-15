@@ -1,6 +1,8 @@
 use bevy::prelude::*;
 use bevy_rapier2d::prelude::*;
 
+use crate::z_index;
+
 #[derive(Component, Copy, Clone, Default, Debug)]
 pub struct Block;
 
@@ -15,15 +17,12 @@ pub struct BlockBundle {
 
 impl BlockBundle {
     pub fn new(translation: Vec2) -> Self {
-        // Needed because `SpriteBundle` requires a `Vec3`
-        let translation = translation.extend(0.0);
-
         trace!("Creating block bundle (translation: {:?})", translation);
 
         Self {
             sprite_bundle: SpriteBundle {
                 transform: Transform {
-                    translation,
+                    translation: translation.extend(z_index::LEVEL_BASE),
                     ..default()
                 },
                 sprite: Sprite {

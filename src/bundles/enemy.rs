@@ -4,18 +4,21 @@ use bevy_rapier2d::prelude::*;
 use crate::{
     components::{damage::Damage, health::Health, jump::JumpComponent},
     level::ImageHandles,
-    GRAVITY,
+    z_index, GRAVITY,
 };
 
 use super::player;
 
-const SIZE: f32 = 64.0;
-const SIZE_VEC2: Vec2 = Vec2::new(SIZE, SIZE);
+const WIDTH: f32 = 128.0 / 2.0;
+const HEIGHT: f32 = WIDTH / TEXTURE_ASPECT_RATIO;
+const SIZE_VEC2: Vec2 = Vec2::new(WIDTH, HEIGHT);
 
 const JUMP_MAGNITUDE: Vec2 = Vec2::new(0.0, 10.0);
 const SPEED: Vec2 = Vec2::new(2.0, 0.0);
 
-pub const TEXTURE_PATH: &str = "enemy.png";
+pub const TEXTURE_PATH: &str = "swamp_chomp.png";
+const TEXTURE_SIZE: Vec2 = Vec2::new(476.0, 416.0);
+const TEXTURE_ASPECT_RATIO: f32 = TEXTURE_SIZE.x / TEXTURE_SIZE.y;
 
 const INITIAL_HEALTH: f32 = 100.0;
 
@@ -41,13 +44,13 @@ impl EnemyBundle {
                     ..default()
                 },
                 transform: Transform {
-                    translation: translation.extend(0.0),
+                    translation: translation.extend(z_index::LEVEL_BASE),
                     ..default()
                 },
                 texture: handles.texture.clone(),
                 ..default()
             },
-            collider: Collider::ball(SIZE / 2.0),
+            collider: Collider::cuboid(WIDTH / 2.0, HEIGHT / 2.0),
             jump_component: JumpComponent::new(JUMP_MAGNITUDE, false),
             enemy: Enemy::new(SPEED, 0.0, 12.0),
             health: Health::full(INITIAL_HEALTH),
