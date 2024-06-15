@@ -43,7 +43,6 @@ struct PlayerBundle {
     sprite_bundle: SpriteBundle,
 
     // Physics
-    active_events: ActiveEvents,
     character_controller: KinematicCharacterController,
     collider: Collider,
     damping: Damping,
@@ -101,7 +100,6 @@ impl PlayerBundle {
                 ..default()
             },
 
-            active_events: ActiveEvents::COLLISION_EVENTS,
             character_controller: KinematicCharacterController {
                 translation: Some(GRAVITY),
                 ..default()
