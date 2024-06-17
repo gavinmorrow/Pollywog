@@ -45,7 +45,6 @@ struct PlayerBundle {
     // Physics
     character_controller: KinematicCharacterController,
     collider: Collider,
-    damping: Damping,
     rigid_body: RigidBody,
 
     // Properties
@@ -103,10 +102,6 @@ impl PlayerBundle {
                 ..default()
             },
             collider: Collider::cuboid(SIZE.x / 2.0, SIZE.y / 2.0),
-            damping: Damping {
-                angular_damping: 3.0,
-                linear_damping: 0.0,
-            },
             rigid_body: RigidBody::KinematicPositionBased,
 
             char: Character {
