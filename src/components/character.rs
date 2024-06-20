@@ -6,7 +6,7 @@ use crate::{state::GameState, GRAVITY};
 
 use super::{
     animated_sprite::CurrentlyAnimating,
-    jump::{jump, JumpComponent},
+    jump::JumpComponent,
 };
 
 pub mod grapple;
@@ -18,11 +18,6 @@ pub fn character_plugin(app: &mut App) {
             Update,
             (
                 r#move,
-                // Must go after so that the player gets moved immediately after
-                // the jump starts
-                jump.after(r#move),
-                // Must go before so that the player is off the ground when we check
-                stop_jump.before(r#move),
             )
                 .run_if(in_state(GameState::InGame)),
         );
@@ -54,7 +49,6 @@ pub fn r#move(
         &mut CurrentlyAnimating,
     )>,
     char_controller_output: Query<Option<&KinematicCharacterControllerOutput>, With<Character>>,
-    mut jump_component_query: Query<&mut JumpComponent, With<Character>>,
 ) {
     let action_state = action_state_query.single();
     let Ok((mut char_controller, mut sprite, char, mut currently_animating)) =
@@ -90,12 +84,11 @@ pub fn r#move(
             Action::Jump => {
                 if let Some(output) = char_controller_output.single() {
                     if output.grounded {
-                        trace!("Character is grounded, starting jump.");
+                        debug!("Character is grounded, starting jump.");
 
                         *currently_animating = CurrentlyAnimating(false);
-
-                        let mut jump_component = jump_component_query.single_mut();
-                        jump_component.start_jump();
+                        
+                        todo!("start jump");
                     } else {
                         trace!("Character is not grounded, can't jump.");
                     }
@@ -133,8 +126,8 @@ pub fn stop_jump(
         return;
     };
 
-    if char_controller_output.grounded && jump_component.is_jumping() {
-        trace!("Player is grounded, stopping jump.");
-        jump_component.stop_jump();
+    if char_controller_output.grounded {
+        trace!("Character is grounded, stopping jump.");
+        todo!("stop jump");
     }
 }
