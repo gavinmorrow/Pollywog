@@ -21,7 +21,7 @@ mod level;
 mod screens;
 mod state;
 
-const PIXELS_PER_METER: f32 = 64.0;
+const PIXELS_PER_METER: f32 = 1.0;
 const GRAVITY: Vec2 = Vec2::new(0.0, -9.81);
 
 const BACKGROUND_COLOR: Color = Color::Rgba {
@@ -36,7 +36,6 @@ pub fn main() {
 
     App::new()
         .init_state::<GameState>()
-        .insert_resource(RapierConfiguration::new(PIXELS_PER_METER))
         .insert_resource(ClearColor(BACKGROUND_COLOR))
         .add_plugins((
             setup_default_plugins(),

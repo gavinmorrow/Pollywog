@@ -4,7 +4,6 @@ pub mod character;
 pub mod collect_coin;
 pub mod damage;
 pub mod health;
-pub mod jump;
 pub mod kills_player;
 pub mod npc_movement;
 pub mod player_win;

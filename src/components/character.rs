@@ -1,24 +1,22 @@
 use bevy::prelude::*;
 use bevy_rapier2d::prelude::*;
+use jump::JumpComponent;
 use leafwing_input_manager::prelude::*;
 
-use crate::{state::GameState, GRAVITY};
+use crate::{bundles::player, state::GameState, GRAVITY};
 
-use super::{
-    animated_sprite::CurrentlyAnimating,
-    jump::JumpComponent,
-};
+use super::animated_sprite::CurrentlyAnimating;
 
 pub mod grapple;
+pub mod jump;
 
 pub fn character_plugin(app: &mut App) {
     app.add_plugins(crate::components::character::grapple::grapple_plugin)
         // FIXME: maybe move the jump system somewhere else
         .add_systems(
             Update,
-            (
-                r#move,
-            )
+            (stop_jump, r#move, jump::jump)
+                .chain()
                 .run_if(in_state(GameState::InGame)),
         );
 }
@@ -43,15 +41,17 @@ pub enum Action {
 pub fn r#move(
     action_state_query: Query<&ActionState<Action>, With<Character>>,
     mut player_query: Query<(
+        Entity,
         &mut KinematicCharacterController,
         &mut Sprite,
         &Character,
         &mut CurrentlyAnimating,
     )>,
     char_controller_output: Query<Option<&KinematicCharacterControllerOutput>, With<Character>>,
+    mut commands: Commands,
 ) {
     let action_state = action_state_query.single();
-    let Ok((mut char_controller, mut sprite, char, mut currently_animating)) =
+    let Ok((entity, mut char_controller, mut sprite, char, mut currently_animating)) =
         player_query.get_single_mut()
     else {
         return;
@@ -85,10 +85,8 @@ pub fn r#move(
                 if let Some(output) = char_controller_output.single() {
                     if output.grounded {
                         debug!("Character is grounded, starting jump.");
-
                         *currently_animating = CurrentlyAnimating(false);
-                        
-                        todo!("start jump");
+                        commands.entity(entity).insert(player::jump_component());
                     } else {
                         trace!("Character is not grounded, can't jump.");
                     }
@@ -118,16 +116,15 @@ pub fn add_grapple_force(
 
 pub fn stop_jump(
     mut char_query: Query<
-        (&mut JumpComponent, &KinematicCharacterControllerOutput),
-        With<Character>,
+        (Entity, &KinematicCharacterControllerOutput),
+        (With<Character>, With<JumpComponent>),
     >,
+    mut commands: Commands,
 ) {
-    let Ok((mut jump_component, char_controller_output)) = char_query.get_single_mut() else {
-        return;
-    };
-
-    if char_controller_output.grounded {
-        trace!("Character is grounded, stopping jump.");
-        todo!("stop jump");
+    if let Ok((entity, char_controller_output)) = char_query.get_single_mut() {
+        if char_controller_output.grounded {
+            trace!("Character is grounded, stopping jump.");
+            commands.entity(entity).remove::<JumpComponent>();
+        }
     }
 }

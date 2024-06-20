@@ -1,7 +1,9 @@
+use std::time::Duration;
+
 use crate::{
     components::{
         animated_sprite::{AnimatedSprite, AnimationIndices, AnimationTimer},
-        character::{Action, Character},
+        character::{jump::JumpComponent, Action, Character},
         collect_coin::CoinCollector,
     },
     level,
@@ -12,10 +14,7 @@ use bevy::{prelude::*, window::PrimaryWindow};
 use bevy_rapier2d::prelude::*;
 use leafwing_input_manager::prelude::*;
 
-use crate::{
-    components::health::Health,
-    GRAVITY,
-};
+use crate::{components::health::Health, GRAVITY};
 
 const SIZE: Vec2 = Vec2::new(233.0, 373.0);
 
@@ -147,4 +146,11 @@ fn spawn(
         &mut commands,
         PlayerBundle::new(asset_server, texture_atlas_layouts, window),
     );
+}
+
+pub fn jump_component() -> JumpComponent {
+    JumpComponent {
+        magnitude: 20.0,
+        timer: Timer::from_seconds(1.0, TimerMode::Once),
+    }
 }
