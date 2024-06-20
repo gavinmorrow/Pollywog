@@ -13,7 +13,7 @@ use bevy_rapier2d::prelude::*;
 use leafwing_input_manager::prelude::*;
 
 use crate::{
-    components::{health::Health, jump::JumpComponent},
+    components::health::Health,
     GRAVITY,
 };
 
@@ -51,7 +51,6 @@ struct PlayerBundle {
     char: Character,
     coins: CoinCollector,
     health: Health,
-    jump_component: JumpComponent,
 
     // Input manager
     input_manager: InputManagerBundle<Action>,
@@ -109,7 +108,6 @@ impl PlayerBundle {
             },
             coins: CoinCollector::default(),
             health: Health::full(INITIAL_HEALTH),
-            jump_component: JumpComponent::new(JUMP_MAGNITUDE, false),
 
             input_manager: InputManagerBundle::<Action> {
                 action_state: ActionState::default(),
