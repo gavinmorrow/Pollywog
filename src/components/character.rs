@@ -114,9 +114,11 @@ pub fn add_grapple_force(
     trace!("Setting grapple force on player to: {:?}", force);
 }
 
+// LINT ALLOW: Ok because it's a bevy Query, and not actually very complex
+#[allow(clippy::type_complexity)]
 pub fn stop_jump(
     // ALLOW: pretty simple query
-    #[allow(clippy::type_complexity)] mut char_query: Query<
+    mut char_query: Query<
         (Entity, &KinematicCharacterControllerOutput),
         (With<Character>, With<JumpComponent>),
     >,
