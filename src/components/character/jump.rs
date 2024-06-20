@@ -17,11 +17,7 @@ impl JumpComponent {
         let d = self.timer.duration().as_secs_f32();
         let m = self.magnitude;
 
-        let half = d / 2.0;
-        // let s = if x < half { 1.0 } else { -1.0 };
-        let s = -1.0;
-
-        m * s * 2.0 * ((1.0 / d) * x - 0.5).tan().powi(1) + GRAVITY.y
+        m * -2.0 * ((1.0 / d) * x - 0.5).tan().powi(1) + GRAVITY.y
     }
 }
 

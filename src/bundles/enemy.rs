@@ -13,7 +13,6 @@ const WIDTH: f32 = 128.0 / 2.0;
 const HEIGHT: f32 = WIDTH / TEXTURE_ASPECT_RATIO;
 const SIZE_VEC2: Vec2 = Vec2::new(WIDTH, HEIGHT);
 
-const JUMP_MAGNITUDE: Vec2 = Vec2::new(0.0, 10.0);
 const SPEED: Vec2 = Vec2::new(2.0, 0.0);
 
 pub const TEXTURE_PATH: &str = "swamp_chomp.png";

@@ -1,5 +1,3 @@
-use std::time::Duration;
-
 use crate::{
     components::{
         animated_sprite::{AnimatedSprite, AnimationIndices, AnimationTimer},
@@ -18,7 +16,6 @@ use crate::{components::health::Health, GRAVITY};
 
 const SIZE: Vec2 = Vec2::new(233.0, 373.0);
 
-const JUMP_MAGNITUDE: Vec2 = Vec2::new(0.0, 10.0);
 const MOVEMENT_SPEED: f32 = 3.0;
 
 const TEXTURE_PATH: &str = "player_new.atlas.png";
