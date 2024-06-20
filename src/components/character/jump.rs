@@ -27,8 +27,11 @@ pub fn jump(
 ) {
     for (mut jump_component, mut char_controller) in &mut jump_component_query {
         jump_component.timer.tick(time.delta());
+
         let vel = jump_component.velocity_at(jump_component.timer.elapsed());
+        char_controller.translation = Some(char_controller.translation.unwrap_or_default());
+        let t = char_controller.translation.as_mut().unwrap();
         debug!("Jumping w/ vel {}", vel);
-        char_controller.translation.as_mut().map(|t| t.y = vel);
+        t.y = vel;
     }
 }
