@@ -115,7 +115,8 @@ pub fn add_grapple_force(
 }
 
 pub fn stop_jump(
-    mut char_query: Query<
+    // ALLOW: pretty simple query
+    #[allow(clippy::type_complexity)] mut char_query: Query<
         (Entity, &KinematicCharacterControllerOutput),
         (With<Character>, With<JumpComponent>),
     >,
