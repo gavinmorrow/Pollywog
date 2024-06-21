@@ -8,8 +8,6 @@ use bevy_rapier2d::prelude::KinematicCharacterController;
 
 #[derive(Component, Debug, Clone, Default)]
 pub struct JumpComponent {
-    pub height: f32,
-    pub time_to_peak: f32,
     gravity: f32,
     initial_velocity: f32,
 
@@ -19,8 +17,6 @@ pub struct JumpComponent {
 impl JumpComponent {
     pub fn new(height: f32, time_to_peak: f32) -> Self {
         Self {
-            height,
-            time_to_peak,
             gravity: -2.0 * height / (time_to_peak * time_to_peak),
             initial_velocity: 2.0 * height / time_to_peak,
 
