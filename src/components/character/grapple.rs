@@ -1,6 +1,8 @@
 use bevy::{prelude::*, window::PrimaryWindow};
-use bevy_rapier2d::prelude::*;
-use leafwing_input_manager::prelude::*;
+use bevy_rapier2d::prelude::{
+    KinematicCharacterController, KinematicCharacterControllerOutput, QueryFilter, RapierContext,
+};
+use leafwing_input_manager::prelude::ActionState;
 
 use crate::{
     bundles::player::Player,
@@ -19,7 +21,8 @@ pub fn grapple_plugin(app: &mut App) {
         .add_systems(OnExit(GrappleState::Grappling), end_grapple)
         .add_systems(OnExit(GrappleState::Aiming), remove_guideline_system)
         .add_systems(
-            Update,
+            // FIXME: should this *all* be in FixedUpdate?
+            FixedUpdate,
             (
                 idle.run_if(in_state(GrappleState::Idle)),
                 (aim, aim_marker, aim_guideline).run_if(in_state(GrappleState::Aiming)),
