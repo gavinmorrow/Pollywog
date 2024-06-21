@@ -88,7 +88,7 @@ pub fn r#move(
                         *currently_animating = CurrentlyAnimating(false);
                         commands.entity(entity).insert(player::jump_component());
                     } else {
-                        info!("Character is not grounded, can't jump.");
+                        debug!("Character is not grounded, can't jump.");
                     }
                 } else {
                     warn!("No character controller output found, can't jump.")
