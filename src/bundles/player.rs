@@ -14,11 +14,16 @@ use leafwing_input_manager::prelude::*;
 
 use crate::{components::health::Health, GRAVITY};
 
-const SIZE: Vec2 = Vec2::new(233.0, 373.0);
+/// In pixels
+const TEXTURE_SIZE: Vec2 = Vec2::new(233.0, 373.0);
+const TEXTURE_PATH: &str = "player_new.atlas.png";
+
+/// In meters
+const JUMP_HEIGHT: f32 = 1.5;
+/// In seconds
+const JUMP_TIME_TO_PEAK: f32 = 0.5;
 
 const MOVEMENT_SPEED: f32 = 3.0;
-
-const TEXTURE_PATH: &str = "player_new.atlas.png";
 
 pub const INITIAL_HEALTH: f32 = 100.0;
 
@@ -60,7 +65,7 @@ impl PlayerBundle {
     ) -> Self {
         debug!("Creating player bundle");
 
-        let layout = TextureAtlasLayout::from_grid(SIZE, 5, 2, None, None);
+        let layout = TextureAtlasLayout::from_grid(TEXTURE_SIZE, 5, 2, None, None);
         let layout = texture_atlas_layouts.add(layout);
 
         let texture = asset_server.load(TEXTURE_PATH);
@@ -81,12 +86,12 @@ impl PlayerBundle {
             sprite_bundle: SpriteBundle {
                 transform: Transform {
                     translation: Vec3::new(0.0, window.height(), z_index::LEVEL_BASE),
-                    scale: Vec3::splat(64.0 / SIZE.x),
+                    scale: Vec3::splat(64.0 / TEXTURE_SIZE.x),
                     ..default()
                 },
                 texture,
                 sprite: Sprite {
-                    custom_size: Some(SIZE),
+                    custom_size: Some(TEXTURE_SIZE),
                     ..default()
                 },
                 ..default()
@@ -96,7 +101,7 @@ impl PlayerBundle {
                 translation: Some(GRAVITY),
                 ..default()
             },
-            collider: Collider::cuboid(SIZE.x / 2.0, SIZE.y / 2.0),
+            collider: Collider::cuboid(TEXTURE_SIZE.x / 2.0, TEXTURE_SIZE.y / 2.0),
             rigid_body: RigidBody::KinematicPositionBased,
 
             char: Character {
@@ -146,8 +151,5 @@ fn spawn(
 }
 
 pub fn jump_component() -> JumpComponent {
-    JumpComponent {
-        magnitude: 20.0,
-        timer: Timer::from_seconds(1.0, TimerMode::Once),
-    }
+    JumpComponent::new(JUMP_HEIGHT, JUMP_TIME_TO_PEAK)
 }

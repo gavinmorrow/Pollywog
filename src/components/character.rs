@@ -84,14 +84,14 @@ pub fn r#move(
             Action::Jump => {
                 if let Some(output) = char_controller_output.single() {
                     if output.grounded {
-                        debug!("Character is grounded, starting jump.");
+                        info!("Character is grounded, starting jump.");
                         *currently_animating = CurrentlyAnimating(false);
                         commands.entity(entity).insert(player::jump_component());
                     } else {
-                        trace!("Character is not grounded, can't jump.");
+                        info!("Character is not grounded, can't jump.");
                     }
                 } else {
-                    trace!("No character controller output found, can't jump.")
+                    warn!("No character controller output found, can't jump.")
                 }
             }
             Action::Grapple => { /* Do nothing, this is handled elsewhere. */ }

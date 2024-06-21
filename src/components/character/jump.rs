@@ -1,23 +1,35 @@
+//! Based off of <https://www.youtube.com/watch?v=hG9SzQxaCm8> and
+//! <https://www.youtube.com/watch?v=eeLPL3Y9jjA>.
+
 use std::time::Duration;
 
 use bevy::prelude::*;
-use bevy_rapier2d::prelude::*;
+use bevy_rapier2d::prelude::KinematicCharacterController;
 
-use crate::GRAVITY;
-
-#[derive(Component, Clone, Default)]
+#[derive(Component, Debug, Clone, Default)]
 pub struct JumpComponent {
-    pub magnitude: f32,
-    pub timer: Timer,
+    pub height: f32,
+    pub time_to_peak: f32,
+    gravity: f32,
+    initial_velocity: f32,
+
+    timer: Timer,
 }
 
 impl JumpComponent {
-    pub fn velocity_at(&self, elapsed: Duration) -> f32 {
-        let x = elapsed.as_secs_f32();
-        let d = self.timer.duration().as_secs_f32();
-        let m = self.magnitude;
+    pub fn new(height: f32, time_to_peak: f32) -> Self {
+        Self {
+            height,
+            time_to_peak,
+            gravity: -2.0 * height / (time_to_peak * time_to_peak),
+            initial_velocity: 2.0 * height / time_to_peak,
 
-        m * -2.0 * ((1.0 / d) * x - 0.5).tan() + GRAVITY.y
+            timer: Timer::from_seconds(time_to_peak * 2.0, TimerMode::Once),
+        }
+    }
+
+    pub fn velocity_at(&self, elapsed: Duration) -> f32 {
+        self.gravity * elapsed.as_secs_f32() + self.initial_velocity
     }
 }
 
@@ -26,12 +38,20 @@ pub fn jump(
     mut jump_component_query: Query<(&mut JumpComponent, &mut KinematicCharacterController)>,
 ) {
     for (mut jump_component, mut char_controller) in &mut jump_component_query {
+        // Tick timer
+        // FIXME: when slow framerate, this gets out of sync with the rest of physics.
+        // solutions prob to either make this frame dependent or use a fixed timestep
+        // for everything.
         jump_component.timer.tick(time.delta());
 
-        let vel = jump_component.velocity_at(jump_component.timer.elapsed());
-        char_controller.translation = Some(char_controller.translation.unwrap_or_default());
-        let t = char_controller.translation.as_mut().unwrap();
+        // Calculate velocity
+        let elapsed = jump_component.timer.elapsed();
+        let vel = jump_component.velocity_at(elapsed);
         debug!("Jumping w/ vel {}", vel);
-        t.y = vel;
+
+        // Apply velocity
+        let mut trans = char_controller.translation.unwrap_or_default();
+        trans.y = vel;
+        char_controller.translation = Some(trans);
     }
 }
