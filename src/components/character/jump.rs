@@ -4,7 +4,9 @@
 use std::time::Duration;
 
 use bevy::prelude::*;
-use bevy_rapier2d::prelude::KinematicCharacterController;
+use bevy_rapier2d::prelude::{KinematicCharacterController, KinematicCharacterControllerOutput};
+
+use super::Character;
 
 #[derive(Component, Debug, Clone, Default)]
 pub struct JumpComponent {
@@ -46,5 +48,23 @@ pub fn jump(
         let mut trans = char_controller.translation.unwrap_or_default();
         trans.y = vel;
         char_controller.translation = Some(trans);
+    }
+}
+
+// LINT ALLOW: Ok because it's a bevy Query, and not actually very complex
+#[allow(clippy::type_complexity)]
+pub fn stop_jump(
+    // ALLOW: pretty simple query
+    mut char_query: Query<
+        (Entity, &KinematicCharacterControllerOutput),
+        (With<Character>, With<JumpComponent>),
+    >,
+    mut commands: Commands,
+) {
+    if let Ok((entity, char_controller_output)) = char_query.get_single_mut() {
+        if char_controller_output.grounded {
+            info!("Character is grounded, stopping jump.");
+            commands.entity(entity).remove::<JumpComponent>();
+        }
     }
 }

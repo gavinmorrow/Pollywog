@@ -1,6 +1,5 @@
 use bevy::prelude::*;
 use bevy_rapier2d::prelude::*;
-use jump::JumpComponent;
 use leafwing_input_manager::prelude::*;
 
 use crate::{bundles::player, state::GameState, GRAVITY};
@@ -15,7 +14,7 @@ pub fn character_plugin(app: &mut App) {
         // FIXME: maybe move the jump system somewhere else
         .add_systems(
             FixedUpdate,
-            (stop_jump, r#move, jump::jump)
+            (jump::stop_jump, r#move, jump::jump)
                 .run_if(in_state(GameState::InGame))
                 // Must run in order because otherwise:
                 // a) `stop_jump` could run immediately after `jump`, ending it
@@ -123,22 +122,4 @@ pub fn add_grapple_force(
     let force = direction * 10.0;
     char_controller.translation = Some(force);
     trace!("Setting grapple force on player to: {:?}", force);
-}
-
-// LINT ALLOW: Ok because it's a bevy Query, and not actually very complex
-#[allow(clippy::type_complexity)]
-pub fn stop_jump(
-    // ALLOW: pretty simple query
-    mut char_query: Query<
-        (Entity, &KinematicCharacterControllerOutput),
-        (With<Character>, With<JumpComponent>),
-    >,
-    mut commands: Commands,
-) {
-    if let Ok((entity, char_controller_output)) = char_query.get_single_mut() {
-        if char_controller_output.grounded {
-            info!("Character is grounded, stopping jump.");
-            commands.entity(entity).remove::<JumpComponent>();
-        }
-    }
 }
