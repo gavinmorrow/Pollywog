@@ -14,10 +14,21 @@ pub fn character_plugin(app: &mut App) {
     app.add_plugins(crate::components::character::grapple::grapple_plugin)
         // FIXME: maybe move the jump system somewhere else
         .add_systems(
-            Update,
+            FixedUpdate,
             (stop_jump, r#move, jump::jump)
+                .run_if(in_state(GameState::InGame))
+                // Must run in order because otherwise:
+                // a) `stop_jump` could run immediately after `jump`, ending it
+                //    before it starts.
+                // b) `stop_jump` could run after r#move, meaning that from its
+                //    pov the jump ends 1 frame late.
+                // c) `jump` could run before r#move, meaning that the jump
+                //    starts 1 frame late.
                 .chain()
-                .run_if(in_state(GameState::InGame)),
+                // Must run after physics or its possible that the jump will be
+                // stopped before the character has a chance to actually move.
+                // FIXME: double check that this is the right `SystemSet`
+                .after(PhysicsSet::Writeback),
         );
 }
 
@@ -88,7 +99,7 @@ pub fn r#move(
                         *currently_animating = CurrentlyAnimating(false);
                         commands.entity(entity).insert(player::jump_component());
                     } else {
-                        info!("Character is not grounded, can't jump.");
+                        debug!("Character is not grounded, can't jump.");
                     }
                 } else {
                     warn!("No character controller output found, can't jump.")
@@ -126,7 +137,7 @@ pub fn stop_jump(
 ) {
     if let Ok((entity, char_controller_output)) = char_query.get_single_mut() {
         if char_controller_output.grounded {
-            trace!("Character is grounded, stopping jump.");
+            info!("Character is grounded, stopping jump.");
             commands.entity(entity).remove::<JumpComponent>();
         }
     }

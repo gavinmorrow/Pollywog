@@ -23,6 +23,7 @@ mod state;
 
 const PIXELS_PER_METER: f32 = 1.0;
 const GRAVITY: Vec2 = Vec2::new(0.0, -9.81);
+const PHYSICS_FRAMERATE: f64 = 60.0;
 
 const BACKGROUND_COLOR: Color = Color::Rgba {
     red: 0.18,
@@ -37,10 +38,12 @@ pub fn main() {
     App::new()
         .init_state::<GameState>()
         .insert_resource(ClearColor(BACKGROUND_COLOR))
+        .insert_resource(Time::<Fixed>::from_seconds(1.0 / PHYSICS_FRAMERATE))
         .add_plugins((
             setup_default_plugins(),
             perf_ui_plugin,
-            RapierPhysicsPlugin::<NoUserData>::pixels_per_meter(PIXELS_PER_METER),
+            RapierPhysicsPlugin::<NoUserData>::pixels_per_meter(PIXELS_PER_METER)
+                .in_fixed_schedule(),
             RapierDebugRenderPlugin::default(),
             InputManagerPlugin::<components::character::Action>::default(),
             camera::camera_plugin,

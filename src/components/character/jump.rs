@@ -35,9 +35,6 @@ pub fn jump(
 ) {
     for (mut jump_component, mut char_controller) in &mut jump_component_query {
         // Tick timer
-        // FIXME: when slow framerate, this gets out of sync with the rest of physics.
-        // solutions prob to either make this frame dependent or use a fixed timestep
-        // for everything.
         jump_component.timer.tick(time.delta());
 
         // Calculate velocity
