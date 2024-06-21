@@ -53,7 +53,10 @@ pub fn main() {
 fn setup_default_plugins() -> PluginGroupBuilder {
     DefaultPlugins
         .set(LogPlugin {
-            filter: "info,wgpu_core=warn,wgpu_hal=warn,pollywog=debug".into(),
+            filter: format!(
+                "info,wgpu_core=warn,wgpu_hal=warn,pollywog={}",
+                std::env::var("POLLYWOG_LOG_LEVEL").unwrap_or("info".to_string())
+            ),
             level: bevy::log::Level::TRACE,
             ..default()
         })
