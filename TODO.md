@@ -1,6 +1,6 @@
 # TODO
 
-- [ ] Use animated version of coin sprite
+- [x] ~~Use animated version of coin sprite~~
 - [ ] Fine-tune jump (ie finish going through the videos)
 - [ ] Fix crashes when restarting after winning
   - This happens because the player doesn't get despawned
