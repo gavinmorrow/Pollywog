@@ -56,7 +56,6 @@ impl CoinBundle {
                 },
                 animation_indices,
                 animation_timer: AnimationTimer(Timer::from_seconds(0.05, TimerMode::Repeating)),
-                ..default()
             },
             currently_animating: CurrentlyAnimating,
             sprite_bundle: SpriteBundle {

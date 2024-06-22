@@ -81,7 +81,6 @@ impl PlayerBundle {
                 },
                 animation_indices,
                 animation_timer: AnimationTimer(Timer::from_seconds(0.05, TimerMode::Repeating)),
-                ..default()
             },
             sprite_bundle: SpriteBundle {
                 transform: Transform {
