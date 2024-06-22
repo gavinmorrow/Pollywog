@@ -125,6 +125,10 @@ fn spawn_blocks(
     mut next_state: ResMut<NextState<LevelState>>,
     level: Res<Level>,
     game_assets: Res<GameAsset>,
+    // FIXME: This is a hack to get the asset server in the system.
+    //        Maybe take out all the preemptive loading and just load on demand? (like the player)
+    asset_server: Res<AssetServer>,
+    mut texture_atlas_layouts: ResMut<Assets<TextureAtlasLayout>>,
 ) {
     info!("Spawning blocks for level: {}", level.name);
 
@@ -156,13 +160,7 @@ fn spawn_blocks(
             ),
             BlockData::Coin => spawn_entity(
                 &mut commands,
-                CoinBundle::new(
-                    block.position,
-                    game_assets
-                        .image_handles
-                        .get(&ImageHandleId::Coin)
-                        .expect("Coin image assets loaded"),
-                ),
+                CoinBundle::new(block.position, &asset_server, &mut texture_atlas_layouts),
             ),
         };
     }
