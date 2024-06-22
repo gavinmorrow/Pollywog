@@ -11,7 +11,6 @@ pub struct AnimatedSprite {
     pub texture_atlas: TextureAtlas,
     pub animation_indices: AnimationIndices,
     pub animation_timer: AnimationTimer,
-    pub currently_animating: CurrentlyAnimating,
 }
 
 #[derive(Component, Default)]
@@ -35,23 +34,17 @@ impl AnimationIndices {
 pub struct AnimationTimer(pub Timer);
 
 /// Make the sprite animate
-#[derive(Component, Default, Deref, DerefMut)]
-pub struct CurrentlyAnimating(pub bool);
+#[derive(Component)]
+pub struct CurrentlyAnimating;
 
 fn animate_sprite(
     time: Res<Time>,
-    mut query: Query<(
-        &CurrentlyAnimating,
-        &AnimationIndices,
-        &mut AnimationTimer,
-        &mut TextureAtlas,
-    )>,
+    mut query: Query<
+        (&AnimationIndices, &mut AnimationTimer, &mut TextureAtlas),
+        With<CurrentlyAnimating>,
+    >,
 ) {
-    for (CurrentlyAnimating(currently_animating), indices, mut timer, mut atlas) in &mut query {
-        if !currently_animating {
-            continue;
-        }
-
+    for (indices, mut timer, mut atlas) in &mut query {
         timer.tick(time.delta());
         if timer.just_finished() {
             atlas.index = indices.next(atlas.index);

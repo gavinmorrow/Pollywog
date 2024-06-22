@@ -55,15 +55,12 @@ pub fn r#move(
         &mut KinematicCharacterController,
         &mut Sprite,
         &Character,
-        &mut CurrentlyAnimating,
     )>,
     char_controller_output: Query<Option<&KinematicCharacterControllerOutput>, With<Character>>,
     mut commands: Commands,
 ) {
     let action_state = action_state_query.single();
-    let Ok((entity, mut char_controller, mut sprite, char, mut currently_animating)) =
-        player_query.get_single_mut()
-    else {
+    let Ok((entity, mut char_controller, mut sprite, char)) = player_query.get_single_mut() else {
         return;
     };
 
@@ -71,7 +68,7 @@ pub fn r#move(
 
     if actions.is_empty() {
         trace!("No actions pressed.");
-        *currently_animating = CurrentlyAnimating(false);
+        commands.entity(entity).remove::<CurrentlyAnimating>();
     } else {
         trace!("Moving character.");
     }
@@ -84,18 +81,18 @@ pub fn r#move(
             Action::Left => {
                 translation.x = -char.movement_speed;
                 sprite.flip_x = true;
-                *currently_animating = CurrentlyAnimating(true);
+                commands.entity(entity).insert(CurrentlyAnimating);
             }
             Action::Right => {
                 translation.x = char.movement_speed;
                 sprite.flip_x = false;
-                *currently_animating = CurrentlyAnimating(true);
+                commands.entity(entity).insert(CurrentlyAnimating);
             }
             Action::Jump => {
                 if let Some(output) = char_controller_output.single() {
                     if output.grounded {
                         info!("Character is grounded, starting jump.");
-                        *currently_animating = CurrentlyAnimating(false);
+                        commands.entity(entity).remove::<CurrentlyAnimating>();
                         commands.entity(entity).insert(player::jump_component());
                     } else {
                         debug!("Character is not grounded, can't jump.");
