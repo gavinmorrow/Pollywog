@@ -10,7 +10,7 @@ pub mod grapple;
 pub mod jump;
 
 pub fn character_plugin(app: &mut App) {
-    app.add_plugins(crate::components::character::grapple::grapple_plugin)
+    app.add_plugins(crate::plugins::in_game::components::character::grapple::grapple_plugin)
         // FIXME: maybe move the jump system somewhere else
         .add_systems(
             FixedUpdate,

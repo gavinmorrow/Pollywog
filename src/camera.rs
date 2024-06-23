@@ -9,7 +9,7 @@ pub fn camera_plugin(app: &mut App) {
     app.add_systems(Startup, spawn_camera).add_systems(
         Update,
         keep_player_in_view
-            .after(crate::components::character::r#move)
+            .after(crate::plugins::in_game::components::character::r#move)
             .run_if(in_state(GameState::InGame)),
     );
 }

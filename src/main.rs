@@ -16,7 +16,6 @@ use crate::state::GameState;
 
 mod bundles;
 mod camera;
-mod components;
 mod plugins;
 mod state;
 
@@ -44,7 +43,7 @@ pub fn main() {
             RapierPhysicsPlugin::<NoUserData>::pixels_per_meter(PIXELS_PER_METER)
                 .in_fixed_schedule(),
             RapierDebugRenderPlugin::default(),
-            InputManagerPlugin::<components::character::Action>::default(),
+            InputManagerPlugin::<plugins::in_game::components::character::Action>::default(),
             camera::camera_plugin,
             plugins::screens_plugin,
         ))

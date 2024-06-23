@@ -1,7 +1,8 @@
 use bevy::prelude::*;
 
-use crate::{components, state::GameState};
+use crate::state::GameState;
 
+pub mod components;
 pub mod level;
 pub mod player;
 

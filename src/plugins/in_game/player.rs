@@ -1,5 +1,5 @@
 use crate::{
-    components::{
+    plugins::in_game::components::{
         animated_sprite::{AnimatedSprite, AnimationIndices, AnimationTimer},
         character::{jump::JumpComponent, Action, Character},
         collect_coin::CoinCollector,
@@ -12,7 +12,7 @@ use bevy::{prelude::*, window::PrimaryWindow};
 use bevy_rapier2d::prelude::*;
 use leafwing_input_manager::prelude::*;
 
-use crate::{components::health::Health, GRAVITY};
+use crate::{plugins::in_game::components::health::Health, GRAVITY};
 
 /// In pixels
 const TEXTURE_SIZE: Vec2 = Vec2::new(233.0, 373.0);

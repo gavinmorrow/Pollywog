@@ -2,7 +2,7 @@ use bevy::prelude::*;
 use bevy_rapier2d::prelude::*;
 
 use crate::{
-    components::animated_sprite::{
+    plugins::in_game::components::animated_sprite::{
         AnimatedSprite, AnimationIndices, AnimationTimer, CurrentlyAnimating,
     },
     z_index,
