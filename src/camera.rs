@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-use crate::{bundles::player::Player, state::GameState};
+use crate::{plugins::in_game::player::Player, state::GameState};
 
 const MAX_SPEED_X: f32 = 3.0;
 const MAX_SPEED_Y: f32 = 1.0;

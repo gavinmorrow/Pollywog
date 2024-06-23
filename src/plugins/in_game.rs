@@ -1,12 +1,13 @@
 use bevy::prelude::*;
 
-use crate::{bundles, components, state::GameState};
+use crate::{components, state::GameState};
 
 pub mod level;
+pub mod player;
 
 pub fn in_game_plugin(app: &mut App) {
     app.add_plugins((
-        bundles::player::player_plugin,
+        player::player_plugin,
         level::level_plugin,
         components::ComponentsPlugin,
     ))

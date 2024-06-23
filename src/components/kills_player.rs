@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-use crate::{bundles::player::Player, state::GameState};
+use crate::{plugins::in_game::player::Player, state::GameState};
 
 use super::health::Health;
 

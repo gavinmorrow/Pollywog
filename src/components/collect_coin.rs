@@ -2,8 +2,8 @@ use bevy::prelude::*;
 use bevy_rapier2d::plugin::RapierContext;
 
 use crate::{
-    bundles::{coin::Coin, player::Player},
-    plugins::in_game::level,
+    bundles::coin::Coin,
+    plugins::in_game::{level, player::Player},
     state::GameState,
 };
 

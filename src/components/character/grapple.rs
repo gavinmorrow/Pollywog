@@ -5,8 +5,8 @@ use bevy_rapier2d::prelude::{
 use leafwing_input_manager::prelude::ActionState;
 
 use crate::{
-    bundles::player::Player,
     components::character::{add_grapple_force, Action, Character},
+    plugins::in_game::player::Player,
     state::GameState,
 };
 

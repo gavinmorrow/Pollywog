@@ -7,7 +7,7 @@ use crate::{
     z_index, GRAVITY,
 };
 
-use super::player;
+use crate::plugins::in_game::player;
 
 const WIDTH: f32 = 128.0 / 2.0;
 const HEIGHT: f32 = WIDTH / TEXTURE_ASPECT_RATIO;

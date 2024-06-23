@@ -2,7 +2,7 @@ use bevy::prelude::*;
 use bevy_rapier2d::prelude::*;
 use leafwing_input_manager::prelude::*;
 
-use crate::{bundles::player, state::GameState, GRAVITY};
+use crate::{plugins::in_game::player, state::GameState, GRAVITY};
 
 use super::animated_sprite::CurrentlyAnimating;
 

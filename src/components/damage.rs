@@ -3,10 +3,7 @@ use std::collections::HashMap;
 use bevy::prelude::*;
 use bevy_rapier2d::prelude::*;
 
-use crate::{
-    bundles::{enemy::Enemy, player::Player},
-    state::GameState,
-};
+use crate::{bundles::enemy::Enemy, plugins::in_game::player::Player, state::GameState};
 
 use super::health::Health;
 
