@@ -18,7 +18,7 @@ mod bundles;
 mod camera;
 mod components;
 mod level;
-mod screens;
+mod plugins;
 mod state;
 
 const PIXELS_PER_METER: f32 = 1.0;
