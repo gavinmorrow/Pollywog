@@ -15,7 +15,6 @@ use leafwing_input_manager::prelude::*;
 use crate::state::GameState;
 
 mod bundles;
-mod camera;
 mod plugins;
 mod state;
 
@@ -44,7 +43,7 @@ pub fn main() {
                 .in_fixed_schedule(),
             RapierDebugRenderPlugin::default(),
             InputManagerPlugin::<plugins::in_game::components::character::Action>::default(),
-            camera::camera_plugin,
+            plugins::camera::camera_plugin,
             plugins::screens_plugin,
         ))
         .add_systems(Update, bevy::window::close_on_esc)

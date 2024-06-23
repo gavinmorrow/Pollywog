@@ -1,5 +1,6 @@
 use bevy::prelude::*;
 
+pub mod camera;
 pub mod dead_screen;
 pub mod in_game;
 pub mod start_screen;
