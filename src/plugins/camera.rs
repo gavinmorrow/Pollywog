@@ -10,9 +10,13 @@ pub fn camera_plugin(app: &mut App) {
         Update,
         keep_player_in_view
             .after(crate::plugins::in_game::components::character::r#move)
+            .in_set(CameraSet)
             .run_if(in_state(GameState::InGame)),
     );
 }
+
+#[derive(SystemSet, Debug, Clone, PartialEq, Eq, Hash)]
+pub struct CameraSet;
 
 pub fn spawn_camera(mut commands: Commands) {
     debug!("Spawning camera");
