@@ -98,7 +98,7 @@ pub fn r#move(
                         debug!("Character is not grounded, can't jump.");
                     }
                 } else {
-                    warn!("No character controller output found, can't jump.")
+                    warn!("No character controller output found, can't jump.");
                 }
             }
             Action::Grapple => { /* Do nothing, this is handled elsewhere. */ }

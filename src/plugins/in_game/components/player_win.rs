@@ -12,6 +12,6 @@ fn check_win(
 ) {
     let x = player.single().translation.x;
     if x >= 64.0 * 32.0 {
-        next_state.set(GameState::Win)
+        next_state.set(GameState::Win);
     }
 }

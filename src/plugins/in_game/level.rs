@@ -142,7 +142,7 @@ fn spawn_blocks(
                     .get(&section.image_handle_id())
                     .expect("background assets must be loaded"),
             ),
-        )
+        );
     }
 
     for block in &level.blocks {
@@ -186,7 +186,7 @@ pub fn despawn_entities(mut commands: Commands, query: Query<Entity, With<LevelE
 /// After the game ends, change to state back to waiting for the level to start,
 /// so that when the game state changes back to `InGame`, the level will respawn.
 fn reprime_level_state(mut next_state: ResMut<NextState<LevelState>>) {
-    next_state.set(LevelState::WaitingForLevelStart)
+    next_state.set(LevelState::WaitingForLevelStart);
 }
 
 #[derive(Copy, Clone, Debug, Default, Eq, PartialEq, Hash, States)]
