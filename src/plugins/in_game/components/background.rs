@@ -1,6 +1,8 @@
 use bevy::prelude::*;
 
-use crate::{bundles::background::Background, state::GameState};
+use crate::state::GameState;
+
+use super::super::bundles::background::Background;
 
 pub fn background_plugin(app: &mut App) {
     app.add_systems(Update, parallax.run_if(in_state(GameState::InGame)));

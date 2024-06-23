@@ -14,7 +14,6 @@ use leafwing_input_manager::prelude::*;
 
 use crate::state::GameState;
 
-mod bundles;
 mod plugins;
 mod state;
 

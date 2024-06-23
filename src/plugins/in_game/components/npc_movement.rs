@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 
 use crate::{
-    bundles::enemy::{enemy_sprite_flipped, move_enemy, swap_direction},
+    plugins::in_game::bundles::enemy::{enemy_sprite_flipped, move_enemy, swap_direction},
     state::GameState,
 };
 

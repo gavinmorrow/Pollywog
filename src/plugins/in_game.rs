@@ -2,6 +2,7 @@ use bevy::prelude::*;
 
 use crate::state::GameState;
 
+mod bundles;
 pub mod components;
 pub mod level;
 pub mod player;

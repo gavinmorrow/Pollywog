@@ -4,7 +4,7 @@ use bevy::prelude::*;
 use bevy_common_assets::json::JsonAssetPlugin;
 
 use crate::{
-    bundles::{
+    plugins::in_game::bundles::{
         background::{BackgroundBundle, BackgroundSection, Biome},
         coin::CoinBundle,
         enemy::EnemyBundle,
@@ -92,13 +92,13 @@ fn load_image_assets(asset_server: Res<AssetServer>, mut game_assets: ResMut<Gam
         (
             ImageHandleId::Enemy,
             ImageHandles {
-                texture: asset_server.load(crate::bundles::enemy::TEXTURE_PATH),
+                texture: asset_server.load(crate::plugins::in_game::bundles::enemy::TEXTURE_PATH),
             },
         ),
         (
             ImageHandleId::Coin,
             ImageHandles {
-                texture: asset_server.load(crate::bundles::coin::TEXTURE_PATH),
+                texture: asset_server.load(crate::plugins::in_game::bundles::coin::TEXTURE_PATH),
             },
         ),
     ]);
