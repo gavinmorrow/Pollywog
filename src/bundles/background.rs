@@ -5,7 +5,7 @@ use bevy::prelude::*;
 use serde::Deserialize;
 
 use crate::{
-    level::{ImageHandleId, ImageHandles},
+    plugins::in_game::level::{ImageHandleId, ImageHandles},
     BACKGROUND_COLOR,
 };
 

@@ -17,7 +17,6 @@ use crate::state::GameState;
 mod bundles;
 mod camera;
 mod components;
-mod level;
 mod plugins;
 mod state;
 
@@ -47,7 +46,7 @@ pub fn main() {
             RapierDebugRenderPlugin::default(),
             InputManagerPlugin::<components::character::Action>::default(),
             camera::camera_plugin,
-            screens::screens_plugin,
+            plugins::screens_plugin,
         ))
         .add_systems(Update, bevy::window::close_on_esc)
         .run();

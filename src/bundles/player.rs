@@ -4,7 +4,7 @@ use crate::{
         character::{jump::JumpComponent, Action, Character},
         collect_coin::CoinCollector,
     },
-    level,
+    plugins::in_game::level,
     state::GameState,
     z_index,
 };

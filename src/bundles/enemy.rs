@@ -3,7 +3,7 @@ use bevy_rapier2d::prelude::*;
 
 use crate::{
     components::{damage::Damage, health::Health},
-    level::ImageHandles,
+    plugins::in_game::level::ImageHandles,
     z_index, GRAVITY,
 };
 

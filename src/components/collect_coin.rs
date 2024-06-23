@@ -3,7 +3,7 @@ use bevy_rapier2d::plugin::RapierContext;
 
 use crate::{
     bundles::{coin::Coin, player::Player},
-    level,
+    plugins::in_game::level,
     state::GameState,
 };
 

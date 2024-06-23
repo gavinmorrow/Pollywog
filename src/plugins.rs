@@ -1,9 +1,9 @@
 use bevy::prelude::*;
 
-mod dead_screen;
-mod in_game;
-mod start_screen;
-mod win_screen;
+pub mod dead_screen;
+pub mod in_game;
+pub mod start_screen;
+pub mod win_screen;
 
 pub fn screens_plugin(app: &mut App) {
     app.add_plugins((
