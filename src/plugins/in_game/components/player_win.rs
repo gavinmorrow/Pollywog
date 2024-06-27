@@ -1,9 +1,12 @@
 use bevy::prelude::*;
 
-use crate::{plugins::in_game::player::Player, state::GameState};
+use crate::{
+    plugins::in_game::{player::Player, InGameSet},
+    state::GameState,
+};
 
 pub fn player_win_plugin(app: &mut App) {
-    app.add_systems(Update, check_win.run_if(in_state(GameState::InGame)));
+    app.add_systems(Update, check_win.in_set(InGameSet));
 }
 
 fn check_win(

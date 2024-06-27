@@ -2,7 +2,7 @@ use bevy::prelude::*;
 use bevy_rapier2d::plugin::RapierContext;
 
 use crate::{
-    plugins::in_game::{bundles::coin::Coin, level, player::Player},
+    plugins::in_game::{bundles::coin::Coin, level, player::Player, InGameSet},
     state::GameState,
 };
 
@@ -13,7 +13,7 @@ pub fn coin_plugin(app: &mut App) {
     app.add_systems(OnEnter(GameState::InGame), create_text)
         .add_systems(
             Update,
-            (update_coin_score, coin_collisions).run_if(in_state(GameState::InGame)),
+            (update_coin_score, coin_collisions).in_set(InGameSet),
         );
 }
 

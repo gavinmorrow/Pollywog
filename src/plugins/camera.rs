@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-use crate::{plugins::in_game::player::Player, state::GameState};
+use crate::plugins::in_game::{player::Player, InGameSet};
 
 const MAX_SPEED_X: f32 = 3.0;
 const MAX_SPEED_Y: f32 = 1.0;
@@ -11,7 +11,7 @@ pub fn camera_plugin(app: &mut App) {
         keep_player_in_view
             .after(crate::plugins::in_game::components::character::r#move)
             .in_set(CameraSet)
-            .run_if(in_state(GameState::InGame)),
+            .in_set(InGameSet),
     );
 }
 

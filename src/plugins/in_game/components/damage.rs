@@ -3,18 +3,12 @@ use std::collections::HashMap;
 use bevy::prelude::*;
 use bevy_rapier2d::prelude::*;
 
-use crate::{
-    plugins::in_game::{bundles::enemy::Enemy, player::Player},
-    state::GameState,
-};
+use crate::plugins::in_game::{bundles::enemy::Enemy, player::Player, InGameSet};
 
 use super::health::Health;
 
 pub fn damage_plugin(app: &mut App) {
-    app.add_systems(
-        Update,
-        enemy_damage_player.run_if(in_state(GameState::InGame)),
-    );
+    app.add_systems(Update, enemy_damage_player.in_set(InGameSet));
 }
 
 #[derive(Component, Debug)]

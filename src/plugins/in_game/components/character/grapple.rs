@@ -4,10 +4,10 @@ use bevy_rapier2d::prelude::{
 };
 use leafwing_input_manager::prelude::ActionState;
 
-use crate::{
-    plugins::in_game::components::character::{add_grapple_force, Action, Character},
-    plugins::in_game::player::Player,
-    state::GameState,
+use crate::plugins::in_game::{
+    components::character::{add_grapple_force, Action, Character},
+    player::Player,
+    InGameSet,
 };
 
 const GUIDELINE_DISTANCE: f32 = 50.0;
@@ -34,7 +34,7 @@ pub fn grapple_plugin(app: &mut App) {
                 )
                     .run_if(in_state(GrappleState::Grappling)),
             )
-                .run_if(in_state(GameState::InGame)),
+                .in_set(InGameSet),
         );
 }
 

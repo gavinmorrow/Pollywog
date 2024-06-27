@@ -2,7 +2,10 @@ use bevy::prelude::*;
 use bevy_rapier2d::prelude::*;
 use leafwing_input_manager::prelude::*;
 
-use crate::{plugins::in_game::player, state::GameState, GRAVITY};
+use crate::{
+    plugins::in_game::{player, InGameSet},
+    GRAVITY,
+};
 
 use super::animated_sprite::CurrentlyAnimating;
 
@@ -15,7 +18,7 @@ pub fn character_plugin(app: &mut App) {
         .add_systems(
             FixedUpdate,
             (jump::stop_jump, r#move, jump::jump)
-                .run_if(in_state(GameState::InGame))
+                .in_set(InGameSet)
                 // Must run in order because otherwise:
                 // a) `stop_jump` could run immediately after `jump`, ending it
                 //    before it starts.

@@ -1,6 +1,9 @@
 use bevy::prelude::*;
 
-use crate::{plugins::in_game::player::Player, state::GameState};
+use crate::{
+    plugins::in_game::{player::Player, InGameSet},
+    state::GameState,
+};
 
 use super::health::Health;
 
@@ -9,7 +12,7 @@ pub fn kills_player_plugin(app: &mut App) {
         Update,
         kills_player
             .after(super::damage::enemy_damage_player)
-            .run_if(in_state(GameState::InGame)),
+            .in_set(InGameSet),
     );
 }
 
